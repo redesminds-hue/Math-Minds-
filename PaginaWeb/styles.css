@@ -30,9 +30,9 @@ body{
 }
 
 .header-inner{
-  width:min(1200px, calc(100% - 32px));
+  width:(2000px, calc(100% - 35px));
   margin:0 auto;
-  min-height:120px;
+  min-height:70px;
   position:relative;
 }
 
@@ -105,7 +105,7 @@ body{
 /* =========================
    BANDERITA
 ========================= */
-.flag-icon{
+.flag{
   width:18px;
   height:auto;
   display:block;
@@ -122,8 +122,8 @@ body{
 }
 
 /* SOLO se anima con hover o tap */
-.menu a:hover .flag-icon,
-.menu a:active .flag-icon{
+.menu a:hover .flag,
+.menu a:active .flag{
   animation: flag-wave 0.8s ease-in-out;
 }
 
@@ -168,27 +168,14 @@ body{
    REDES
 ========================= */
 .social{
+  width:100%;
   display:flex;
+  justify-content: flex-end;
   align-items:center;
-  gap:8px;
-  padding-top:2px;
+  gap:4px;
+  padding:8px 24px;
 }
-
-.social a{
-  width:30px;
-  height:30px;
-  border:2px solid var(--black);
-  border-radius:6px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  text-decoration:none;
-  color:var(--black);
-  font-weight:700;
-  font-size:14px;
-}
+ 
 
 /* =========================
    BURGER (MÓVIL)
@@ -244,7 +231,7 @@ body{
 /* =========================
    FOOTER
 ========================= */
-.footer-bar{
+.footer{
   height:120px;
   width:100%;
   background:var(--purple);
@@ -256,4 +243,50 @@ body{
 /* =========================
    RESPONSIVE
 ========================= */
+@media (max-width: 980px){
+  .searchbox{
+    width:200px;
+  }
+  .menu{
+    gap:10px;
+    flex-wrap:wrap;
+  }
+}
 
+@media (max-width: 740px){
+  .brand{
+    width:200px;
+  }
+
+  .header-top{
+    margin-left:200px;
+    flex-wrap:wrap;
+  }
+
+  .searchbox,
+  .contact,
+  .social{
+    width:100%;
+  }
+
+  .menu{
+    display:none;
+    flex-direction:column;
+    gap:10px;
+    padding:12px;
+    border:2px solid var(--black);
+    border-radius:12px;
+    background:#fff;
+    position:absolute;
+    top:120px;
+    right:16px;
+    width:min(320px, calc(100% - 32px));
+    z-index:20;
+  }
+
+  .burger{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+}
