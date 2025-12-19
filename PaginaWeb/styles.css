@@ -41,8 +41,8 @@ body{
   position:absolute;
   left:0;
   top:0;
-  width:240px;
-  height:120px;
+  width:300px;
+  height:150px;
   border-right:2px solid var(--black);
   border-bottom:2px solid var(--black);
   border-bottom-right-radius:18px;
@@ -79,6 +79,7 @@ body{
   padding-top:6px;
   font-weight:700;
   letter-spacing:.2px;
+  margin-left: auto;
 }
 
 .menu a{
@@ -158,10 +159,13 @@ body{
   gap:8px;
   padding-top:3px;
   white-space:nowrap;
+  margin-left: auto;
+  
 }
 
 .phone{
   font-weight:700;
+  margin-top: -10px;
 }
 
 /* =========================
@@ -173,11 +177,11 @@ body{
   align-items:center;
   gap:0px;                 
   padding:12px 24px;  
-  margin-left:auto; 
+  margin-left: 1340px; 
   margin-top:-10px ;      
 }
 .social-up{
-  transform: translateY(-10px);   
+  transform: translateY(-10px); 
 }
 .social-up2{
   transform: translateY(-12px);   
@@ -207,7 +211,7 @@ body{
 
 /* Línea inferior header */
 .header-line{
-  width:100%;
+  width:110%;
   height:2px;
   background:var(--black);
 }
@@ -296,3 +300,120 @@ body{
     justify-content:center;
   }
 }
+/* =========================
+   CAROUSEL FULL WIDTH
+========================= */
+
+/* Franja gris infinita */
+.carousel-section{
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  height:420px;                  /* altura del banner */
+  background:#d9d9d9;
+  border-top:2px solid var(--black);
+  border-bottom:2px solid var(--black);
+  position:relative;
+  overflow:hidden;
+}
+
+/* El carrusel cubre todo */
+.carousel{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+/* Track */
+.carousel-track{
+  position:relative;
+  width:100%;
+  height:100%;
+}
+
+/* Slides */
+.slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transform:translateX(20px);
+  transition:opacity 0.6s ease, transform 0.6s ease;
+}
+
+.slide.is-active{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/* Imagen del slide */
+.slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;     /* banner completo */
+  object-position:center;
+  display:block;
+}
+
+/* Flechas */
+.carousel-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:48px;
+  height:48px;
+  border:2px solid var(--black);
+  background:rgba(255,255,255,0.95);
+  border-radius:50%;
+  cursor:pointer;
+  font-size:30px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+  user-select:none;
+}
+
+.carousel-arrow.left{ left:18px; }
+.carousel-arrow.right{ right:18px; }
+
+.carousel-arrow:hover{
+  transform:translateY(-50%) scale(1.05);
+}
+
+/* Dots */
+.carousel-dots{
+  position:absolute;
+  left:50%;
+  bottom:16px;
+  transform:translateX(-50%);
+  display:flex;
+  gap:12px;
+  z-index:10;
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border:2px solid var(--black);
+  border-radius:50%;
+  background:rgba(255,255,255,0.85);
+  cursor:pointer;
+}
+
+.dot.is-active{
+  background:var(--black);
+}
+
+/* Responsive */
+@media (max-width: 740px){
+  .carousel-section{
+    height:280px;
+  }
+  .carousel-arrow{
+    width:40px;
+    height:40px;
+    font-size:24px;
+  }
+}
+
