@@ -168,14 +168,20 @@ body{
    REDES
 ========================= */
 .social{
-  width:100%;
+  width:fit-content;
   display:flex;
-  justify-content: flex-end;
   align-items:center;
-  gap:4px;
-  padding:8px 24px;
+  gap:0px;                 
+  padding:12px 24px;  
+  margin-left:auto; 
+  margin-top:-10px ;      
 }
- 
+.social-up{
+  transform: translateY(-10px);   
+}
+.social-up2{
+  transform: translateY(-12px);   
+}
 
 /* =========================
    BURGER (MÓVIL)
