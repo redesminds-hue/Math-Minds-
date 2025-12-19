@@ -1,6 +1,6 @@
 :root{
   --black:#111;
-  --purple:#c81cff;
+  --purple:#a41396;
 }
 
 /* RESET BÁSICO */
@@ -165,7 +165,9 @@ body{
 
 .phone{
   font-weight:700;
-  margin-top: -10px;
+}
+.social-up{
+  transform: translateY(-14px); 
 }
 
 /* =========================
@@ -181,11 +183,9 @@ body{
   margin-top:-10px ;      
 }
 .social-up{
-  transform: translateY(-10px); 
+  transform: translateY(-2px); 
 }
-.social-up2{
-  transform: translateY(-12px);   
-}
+
 
 /* =========================
    BURGER (MÓVIL)
@@ -415,5 +415,55 @@ body{
     height:40px;
     font-size:24px;
   }
+}
+
+
+/* =========================
+   LOGO – GIRO 360° HACIA ADENTRO
+========================= */
+
+@keyframes logoSpinIn {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  35% {
+    transform: rotate(140deg) scale(0.92);
+  }
+
+  65% {
+    transform: rotate(260deg) scale(0.88);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+
+
+@keyframes logoFadeInSlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+.brand img{
+  opacity: 0;
+  animation: logoFadeInSlow 3.5s cubic-bezier(.4,0,.2,1) forwards;
+  transform-origin: center center;
+  will-change: opacity, transform;
 }
 
