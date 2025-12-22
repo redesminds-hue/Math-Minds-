@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Minds</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -20,10 +24,19 @@
             <span class="menu-text">INICIO</span>
             <img class="flag" src="../Multimedia/GREENFLAG.png" alt="Bandera verde" />
           </a>
-          <a href="#"><img src="../Multimedia/ALEKS.jpeg" alt="ALEKS" width="200" height="42" /></a>
-          <a href="#">  MATERIAL<br/>CONCRETO</a>
-          <a href="#">COLEGIOS</a>
-          <a href="#">PRODUCTOS</a>
+          <a href="#" id="openAleks">
+            <img src="../Multimedia/ALEKS.jpeg" alt="ALEKS" width="200" height="42" />
+            </a>
+          <a href="#" id="openMaterialConcreto">
+            MATERIAL<br/>CONCRETO</a>
+          <a href="#" id="openRevealMath">  
+            REVEAL<br/>MATH</a>
+          <a href="#" id="openPrime">
+            PRIME</a>
+          <a href="#" id="openColegios">
+            COLEGIOS</a>
+          <a href="#" id="openProductos">
+            PRODUCTOS</a>
         </nav>
 
         <div class="searchbox">
@@ -31,7 +44,7 @@
           <input type="text" placeholder="" />
         </div>
 
-        <div class="contacto">
+        <div class="contact">
           <span class="phone-icon"><img src="../Multimedia/Telefono.png" alt="Teléfono" width="40" height="40" /></span>
           <span class="phone">+57 3013456259</span>
         </div>
@@ -46,9 +59,15 @@
     <div class="header-line"></div>
   </header>
   <div class="social">
-          <img class="social-up"src="../Multimedia/Instagram.png" alt="Instagram" width="50" height="50" /> 
-          <img class="social-up" src="../Multimedia/Facebook.png" alt="Facebook" width="45" height="45" />
-          <img class="social-up" src="../Multimedia/whatsapp.png" alt="WhatsApp" width="45" height="45" />
+          <a href="https://www.instagram.com/mathmindseducation?igsh=MTQ5b3NzM3hkOGo3bA==" target="_blank" rel="noopener">
+            <img class="social-up"src="../Multimedia/Instagram.png" alt="Instagram" width="50" height="50" />
+          </a>
+          <a href="https://www.facebook.com/share/16kbhGUz4P/?mibextid=wwXIfr" target="_blank" rel="noopener">
+            <img class="social-up" src="../Multimedia/Facebook.png" alt="Facebook" width="45" height="45" />
+          </a>
+          <a href="" target="_blank" rel="noopener">
+            <img class="social-up" src="../Multimedia/whatsapp.png" alt="WhatsApp" width="45" height="45" />
+          </a>
   </div>
 
  <main class="main">
@@ -56,7 +75,7 @@
     <div class="carousel" id="carousel">
 
       <div class="carousel-track">
-        <!-- SLIDES -->
+        <!-- CARRUSEL -->
         <div class="slide is-active">
           <img src="../Multimedia/Carrusel1.png" alt="ALEKS">
         </div>

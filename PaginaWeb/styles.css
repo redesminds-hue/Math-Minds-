@@ -25,14 +25,15 @@ body{
 ========================= */
 .header{
   width:100%;
-  background:#fff;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
   position:relative;
 }
 
 .header-inner{
   width:(2000px, calc(100% - 35px));
   margin:0 auto;
-  min-height:70px;
+  min-height:56px;
   position:relative;
 }
 
@@ -66,7 +67,9 @@ body{
   display:flex;
   align-items:flex-start;
   gap:14px;
-  padding:10px 0 0 14px;
+  padding:6px 0 0 14px;
+  text-align: center;
+  
 }
 
 /* =========================
@@ -78,21 +81,34 @@ body{
   gap:16px;
   padding-top:6px;
   font-weight:700;
-  letter-spacing:.2px;
-  margin-left: auto;
+  letter-spacing:.15px;
+  margin-right: 20px;
+  margin-left: 65px;
+  text-align: center;
+  
 }
 
 .menu a{
   text-decoration:none;
   color:var(--black);
-  font-size:13px;
+  font-size:16px;
   text-transform:uppercase;
-
+  margin-bottom: auto;
+  margin-top: auto;
+  text-align: center;
+  
   /* CLAVE para texto + imagen */
   display:inline-flex;
   align-items:center;
   gap:6px;
+
+  /* Fuente Poppins */
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  font-weight: 600;       
+  letter-spacing: 0.3px;
 }
+
+
 
 .menu a.active{
   text-decoration:underline;
@@ -103,9 +119,7 @@ body{
   line-height:.7;
 }
 
-/* =========================
-   BANDERITA
-========================= */
+/* Bandera */
 .flag{
   width:18px;
   height:auto;
@@ -113,7 +127,7 @@ body{
   transform-origin:left center;
 }
 
-/* Animación */
+/* Animación Bandera*/
 @keyframes flag-wave {
   0%   { transform: rotate(0deg) translateY(0); }
   25%  { transform: rotate(-6deg) translateY(-1px); }
@@ -132,7 +146,8 @@ body{
    SEARCH
 ========================= */
 .searchbox{
-  margin-left:auto;
+  margin-left: auto;
+  margin-right: auto;
   display:flex;
   align-items:center;
   gap:8px;
@@ -140,6 +155,8 @@ body{
   height:34px;
   width:260px;
   padding:0 10px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .searchbox input{
@@ -160,6 +177,7 @@ body{
   padding-top:3px;
   white-space:nowrap;
   margin-left: auto;
+  margin-right: auto;
   
 }
 
@@ -211,9 +229,9 @@ body{
 
 /* Línea inferior header */
 .header-line{
-  width:110%;
+  width:120%;
   height:2px;
-  background:var(--black);
+  background: rgb(0, 0, 0);
 }
 
 /* =========================
@@ -255,7 +273,8 @@ body{
 ========================= */
 @media (max-width: 980px){
   .searchbox{
-    width:200px;
+    width:500px;
+    margin-bottom: auto;
   }
   .menu{
     gap:10px;
@@ -308,6 +327,7 @@ body{
 .carousel-section{
   width:100vw;
   margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw) ;
   height:420px;                  /* altura del banner */
   background:#d9d9d9;
   border-top:2px solid var(--black);
@@ -362,7 +382,7 @@ body{
   width:48px;
   height:48px;
   border:2px solid var(--black);
-  background:rgba(255,255,255,0.95);
+  background:rgba(255, 255, 255, 0.327);
   border-radius:50%;
   cursor:pointer;
   font-size:30px;
@@ -467,3 +487,14 @@ body{
   will-change: opacity, transform;
 }
 
+/*Redes Sociales links*/
+
+.social a{
+  display:inline-flex;
+  align-items:center;
+}
+
+.social a:hover img{
+  transform: scale(1.08);
+  transition: transform 200ms ease;
+}
