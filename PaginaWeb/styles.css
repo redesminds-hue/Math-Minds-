@@ -1,6 +1,6 @@
 :root{
   --black:#111;
-  --purple:#a41396;
+  --purple:#e274d7;
 }
 
 /* RESET BÁSICO */
@@ -24,13 +24,13 @@ body{
 }
 
 .header-inner{
-  width: min(2000px, calc(100% - 35px)); /* ✅ corregido */
+  width: min(2000px, calc(100% - 35px)); 
   margin:0 auto;
   min-height:56px;
   position:relative;
 }
 
-/* Logo tipo placa izquierda */
+/* Logo */
 .brand{
   position:absolute;
   left:0;
@@ -163,21 +163,6 @@ body{
 }
 
 /* =========================
-   CONTACTO
-========================= */
-.contact{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding-top:3px;
-  white-space:nowrap;
-  margin-left:auto;
-  margin-right:auto;
-}
-
-.phone{ font-weight:700; }
-
-/* =========================
    REDES
 ========================= */
 .social{
@@ -230,11 +215,10 @@ body{
    MAIN
 ========================= */
 .main{
-  min-height: calc(100vh - 120px - 120px);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:40px 16px;
+  padding:40px 16px 80px; /* más espacio abajo */
 }
 
 /* =========================
@@ -547,5 +531,95 @@ body{
   background: var(--purple);
   color: #fff;
   transform: translateY(-1px);
+}
+ 
+/* =========================
+   FOOTER CONTACTO
+========================= */
+.footer{
+  height: auto; /* antes era fijo 120px */
+  padding: 22px 16px;
+  width: 100%;
+  background: var(--purple);
+  border-top: 2px solid var(--black);
+  border-top-left-radius: 26px;
+  border-top-right-radius: 26px;
+}
+
+.footer-inner{
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.footer-title{
+  color: #000000;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.footer-subtitle{
+  color: rgb(0, 0, 0);
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.footer-right{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.footer-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 6px;
+  transition: transform 200ms ease, background 200ms ease;
+}
+
+.footer-icon:hover{
+  transform: translateY(-2px) scale(1.05);
+  background: rgb(0, 0, 0);
+}
+
+.footer-icon img{
+  display:block;
+  height:auto;
+}
+
+.footer-phone{
+  color: #000000;
+  text-decoration: none;
+  font-weight: 700;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  letter-spacing: .2px;
+}
+
+.footer-phone:hover{
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Responsive footer */
+@media (max-width: 740px){
+  .footer-inner{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer-right{
+    justify-content: flex-start;
+  }
+}
+.footer{
+  margin-top: 40px; /* separa el morado del contenido */
 }
 

@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Minds</title>
 
-  <!-- SOLO UNA VEZ -->
   <link rel="stylesheet" href="styles.css" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,30 +30,21 @@
           <a href="#" id="openAleks" data-modal="modalAleks">
             <img src="../Multimedia/ALEKS.jpeg" alt="ALEKS" width="200" height="42" />
           </a>
-
-          <a href="#" id="openMaterialConcreto" data-modal="modalMaterial">
-            MATERIAL<br/>CONCRETO
-          </a>
-
           <a href="#" id="openRevealMath" data-modal="modalReveal">
             REVEAL<br/>MATH
           </a>
 
           <a href="#" id="openPrime" data-modal="modalPrime">PRIME</a>
-          <a href="#" id="openColegios" data-modal="modalColegios">COLEGIOS</a>
-          <a href="#" id="openProductos" data-modal="modalProductos">PRODUCTOS</a>
+
+           <a href="#" id="openMaterialConcreto" data-modal="modalMaterial">
+            MATERIAL<br/>CONCRETO
+          </a>
+
         </nav>
 
         <div class="searchbox">
           <span class="search-icon">🔎</span>
           <input type="text" placeholder="" />
-        </div>
-
-        <div class="contact">
-          <span class="phone-icon">
-            <img src="../Multimedia/Telefono.png" alt="Teléfono" width="40" height="40" />
-          </span>
-          <span class="phone">+57 3013456259</span>
         </div>
 
         <button class="burger" id="burger" aria-label="Menú">
@@ -63,29 +53,14 @@
       </div>
     </div>
 
-    <!-- La dejamos en HTML por si luego la quieres, pero la ocultamos por CSS -->
+
     <div class="header-line"></div>
   </header>
-
-  <div class="social">
-    <a href="https://www.instagram.com/mathmindseducation?igsh=MTQ5b3NzM3hkOGo3bA==" target="_blank" rel="noopener">
-      <img class="social-up" src="../Multimedia/Instagram.png" alt="Instagram" width="50" height="50" />
-    </a>
-
-    <a href="https://www.facebook.com/share/16kbhGUz4P/?mibextid=wwXIfr" target="_blank" rel="noopener">
-      <img class="social-up" src="../Multimedia/Facebook.png" alt="Facebook" width="45" height="45" />
-    </a>
-
-    <a href="" target="_blank" rel="noopener">
-      <img class="social-up" src="../Multimedia/whatsapp.png" alt="WhatsApp" width="45" height="45" />
-    </a>
-  </div>
 
   <main class="main">
     <section class="carousel-section">
       <div class="carousel" id="carousel">
 
-        <!-- ✅ TRACK CORRECTO: los 4 slides van AQUÍ adentro -->
         <div class="carousel-track">
           <div class="slide is-active">
             <img src="../Multimedia/Carrusel1.png" alt="ALEKS">
@@ -108,14 +83,41 @@
         <button class="carousel-arrow left" id="prevBtn" aria-label="Anterior">‹</button>
         <button class="carousel-arrow right" id="nextBtn" aria-label="Siguiente">›</button>
 
-        <!-- DOTS -->
+
         <div class="carousel-dots" id="carouselDots"></div>
 
       </div>
     </section>
   </main>
 
-  <footer class="footer"></footer>
+  <footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <h3 class="footer-title">Contáctanos</h3>
+      <p class="footer-subtitle">Estamos listos para ayudarte.</p>
+    </div>
+
+    <div class="footer-right">
+      <a class="footer-icon" href="https://www.instagram.com/mathmindseducation?igsh=MTQ5b3NzM3hkOGo3bA==" target="_blank" rel="noopener">
+        <img src="../Multimedia/Instagram.png" alt="Instagram" width="38" height="38">
+      </a>
+
+      <a class="footer-icon" href="https://www.facebook.com/share/16kbhGUz4P/?mibextid=wwXIfr" target="_blank" rel="noopener">
+        <img src="../Multimedia/Facebook.png" alt="Facebook" width="34" height="34">
+      </a>
+
+      
+      <a class="footer-icon" href="https://wa.me/573013456259" target="_blank" rel="noopener">
+        <img src="../Multimedia/whatsapp.png" alt="WhatsApp" width="34" height="34">
+      </a>
+          <span class="phone-icon">
+            <img src="../Multimedia/Telefono.png" alt="Teléfono" width="34" height="34">
+        </span>
+      <a class="footer-phone" href="tel:+573013456259">+57 301 345 6259</a>
+    </div>
+  </div>
+</footer>
+
 
   <script src="main.js"></script>
 

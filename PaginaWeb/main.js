@@ -20,7 +20,7 @@ burger?.addEventListener("click", () => {
   const track = carousel.querySelector(".carousel-track");
   if (!track) return;
 
-  // ✅ SOLO slides dentro del track
+
   const slides = [...track.querySelectorAll(".slide")];
 
   const prevBtn = document.getElementById("prevBtn");

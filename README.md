@@ -1,1 +1,1 @@
-# Math-Minds-
+# Math-Minds
