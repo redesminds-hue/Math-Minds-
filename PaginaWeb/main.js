@@ -1,3 +1,6 @@
+// ===============================
+// BURGER MENU
+// ===============================
 const burger = document.getElementById("burger");
 const menu = document.getElementById("menu");
 
@@ -5,6 +8,8 @@ burger?.addEventListener("click", () => {
   const isOpen = getComputedStyle(menu).display !== "none";
   menu.style.display = isOpen ? "none" : "flex";
 });
+
+
 // ===============================
 // CAROUSEL AUTO + CONTROLES
 // ===============================
@@ -12,7 +17,12 @@ burger?.addEventListener("click", () => {
   const carousel = document.getElementById("carousel");
   if (!carousel) return;
 
-  const slides = [...carousel.querySelectorAll(".slide")];
+  const track = carousel.querySelector(".carousel-track");
+  if (!track) return;
+
+  // ✅ SOLO slides dentro del track
+  const slides = [...track.querySelectorAll(".slide")];
+
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const dotsWrap = document.getElementById("carouselDots");
@@ -23,9 +33,10 @@ burger?.addEventListener("click", () => {
   const INTERVAL = 6000;
   let timer;
 
-  // Crear dots
-  const dots = slides.map((_, i) => {
+  // Crear dots (solo si existe el contenedor)
+  const dots = (dotsWrap ? slides.map((_, i) => {
     const dot = document.createElement("button");
+    dot.type = "button";
     dot.className = "dot" + (i === index ? " is-active" : "");
     dot.addEventListener("click", () => {
       goTo(i);
@@ -33,7 +44,7 @@ burger?.addEventListener("click", () => {
     });
     dotsWrap.appendChild(dot);
     return dot;
-  });
+  }) : []);
 
   function setActive(i){
     slides.forEach((s, idx) => s.classList.toggle("is-active", idx === i));
@@ -49,24 +60,24 @@ burger?.addEventListener("click", () => {
   function prev(){ goTo(index - 1); }
 
   function start(){
+    stop();
     timer = setInterval(next, INTERVAL);
   }
 
   function stop(){
-    clearInterval(timer);
+    if (timer) clearInterval(timer);
   }
 
   function restart(){
-    stop();
     start();
   }
 
-  nextBtn.addEventListener("click", () => {
+  nextBtn?.addEventListener("click", () => {
     next();
     restart();
   });
 
-  prevBtn.addEventListener("click", () => {
+  prevBtn?.addEventListener("click", () => {
     prev();
     restart();
   });
@@ -93,7 +104,10 @@ burger?.addEventListener("click", () => {
   start();
 })();
 
-// Pestañas MENU
+
+// ===============================
+// MODALES (MENÚ + BOTONES CARRUSEL)
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
 
   const triggers = document.querySelectorAll("[data-modal]");
@@ -126,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // CERRAR CON BOTÓN X
   closeButtons.forEach(btn => {
-    btn.addEventListener("click", e => {
+    btn.addEventListener("click", () => {
       const modal = btn.closest(".modal-overlay");
       if (modal) closeModal(modal);
     });
@@ -135,17 +149,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // CERRAR CLICK FUERA
   overlays.forEach(overlay => {
     overlay.addEventListener("click", e => {
-      if (e.target === overlay) {
-        closeModal(overlay);
-      }
+      if (e.target === overlay) closeModal(overlay);
     });
   });
 
   // CERRAR CON ESC
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") {
-      document.querySelectorAll(".modal-overlay.active")
-        .forEach(closeModal);
+      document.querySelectorAll(".modal-overlay.active").forEach(closeModal);
     }
   });
 
