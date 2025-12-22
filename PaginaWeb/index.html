@@ -24,19 +24,20 @@
             <span class="menu-text">INICIO</span>
             <img class="flag" src="../Multimedia/GREENFLAG.png" alt="Bandera verde" />
           </a>
-          <a href="#" id="openAleks">
+          <a href="#" id="openAleks" data-modal="modalAleks">
             <img src="../Multimedia/ALEKS.jpeg" alt="ALEKS" width="200" height="42" />
-            </a>
-          <a href="#" id="openMaterialConcreto">
-            MATERIAL<br/>CONCRETO</a>
-          <a href="#" id="openRevealMath">  
-            REVEAL<br/>MATH</a>
-          <a href="#" id="openPrime">
-            PRIME</a>
-          <a href="#" id="openColegios">
-            COLEGIOS</a>
-          <a href="#" id="openProductos">
-            PRODUCTOS</a>
+          </a>
+
+          <a href="#" id="openMaterialConcreto" data-modal="modalMaterial">
+            MATERIAL<br/>CONCRETO
+          </a>
+
+          <a href="#" id="openRevealMath" data-modal="modalReveal">
+            REVEAL<br/>MATH
+          </a>
+          <a href="#" id="openPrime" data-modal="modalPrime">PRIME</a>
+          <a href="#" id="openColegios" data-modal="modalColegios">COLEGIOS</a>
+          <a href="#" id="openProductos" data-modal="modalProductos">PRODUCTOS</a>
         </nav>
 
         <div class="searchbox">
@@ -109,5 +110,128 @@
 <footer class="footer"> </footer>
 
   <script src="main.js"></script>
+
+<!-- =========================
+     MODALES
+========================= -->
+
+<div class="modal-overlay" id="modalAleks" aria-hidden="true">
+  <div class="modal-box modal-compare" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+    <img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" />
+    <img src="../Multimedia/ALEKS ADVENTURE.png" alt="ALEKS Adventure Logo" width="300" height="40" />
+
+
+    <p class="modal-subtitle"><br> Experiencias con un mismo objetivo: aprendizaje personalizado en matemáticas.</p>
+
+    <div class="compare-grid">
+      <!-- ALEKS -->
+      <div class="compare-card">
+        <div class="compare-head">
+          <h3>ALEKS</h3>
+          <span class="tag">Adaptive Learning</span>
+        </div>
+
+        <ul class="compare-list">
+          <li>ALEKS® (Assessment and Learning in Knowledge Spaces) es una plataforma de matemáticas basada en inteligencia artificial que diagnostica con precisión qué sabe cada estudiante y construye un camino de aprendizaje individual, adaptándose en tiempo real a su progreso.
+          </li>
+          <li>Reportes detallados para docentes y colegios.</li>
+          <li>Ruta personalizada por estudiante</li>
+          <li>Refuerzo automático de vacíos de aprendizaje.</li>
+         
+        </ul>
+
+        <a class="btn primary full" href="https://tusitio.com/comprar-aleks">Comprar ALEKS</a>
+      </div>
+
+      <!-- ALEKS Adventure -->
+      <div class="compare-card highlight">
+        <div class="compare-head">
+          <h3>ALEKS Adventure</h3>
+          <span class="tag">Gamificado</span>
+        </div>
+
+        <ul class="compare-list">
+          <li>ALEKS Adventure® está diseñada para educación inicial y primaria, que combina la inteligencia artificial con un entorno visual, lúdico y exploratorio, donde los niños aprenden matemáticas a través de retos, historias y misiones.</li>
+          <li>Más motivación: progreso visual y recompensas.</li>
+          <li>Aprendizaje adaptativo desde edades tempranas.</li>
+          <li>Desarrollo del pensamiento matemático paso a paso.</li>
+        </ul>
+
+        <a class="btn secondary full" href="https://tusitio.com/comprar-aleks-adventure">Comprar Adventure</a>
+      </div>
+    </div>
+
+    <div class="modal-footnote">
+      ¿No sabes cuál elegir? <a href="https://tusitio.com/asesoria">Te ayudamos a escoger</a>.
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modalMaterial" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+    <h2>Material Concreto</h2>
+    <p>Manipulativos para enseñanza CPA: base ten blocks, cubos conectores, fracciones, etc.</p>
+    <div class="modal-actions">
+      <a class="btn primary" href="https://tusitio.com/material-concreto">Comprar</a>
+      <a class="btn secondary" href="https://tusitio.com/catalogo">Ver catálogo</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalReveal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+    <h2>Reveal Math</h2>
+    <p>Programa matemático basado en investigación, resolución de problemas y aprendizaje profundo.</p>
+    <div class="modal-actions">
+      <a class="btn primary" href="https://tusitio.com/reveal-math">Solicitar demo</a>
+      <a class="btn secondary" href="https://tusitio.com/reveal-info">Ver detalles</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPrime" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+    <h2>Prime</h2>
+    <p>Contenido y recursos para fortalecer el aprendizaje con metodología estructurada.</p>
+    <div class="modal-actions">
+      <a class="btn primary" href="https://tusitio.com/prime">Comprar</a>
+      <a class="btn secondary" href="https://tusitio.com/prime-info">Ver detalles</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalColegios" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+    <h2>Colegios</h2>
+    <p>Implementaciones institucionales, capacitación docente, pilotos y acompañamiento.</p>
+    <div class="modal-actions">
+      <a class="btn primary" href="https://tusitio.com/colegios">Agendar reunión</a>
+      <a class="btn secondary" href="https://tusitio.com/contacto">Contacto</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalProductos" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+    <h2>Productos</h2>
+    <p>Explora nuestras líneas: plataformas, libros, manipulativos y recursos.</p>
+    <div class="modal-actions">
+      <a class="btn primary" href="https://tusitio.com/productos">Ver productos</a>
+      <a class="btn secondary" href="https://tusitio.com/cotizar">Cotizar</a>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
 </body>
 </html>

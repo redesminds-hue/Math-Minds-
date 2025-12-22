@@ -93,3 +93,60 @@ burger?.addEventListener("click", () => {
   start();
 })();
 
+// Pestañas MENU
+document.addEventListener("DOMContentLoaded", () => {
+
+  const triggers = document.querySelectorAll("[data-modal]");
+  const overlays = document.querySelectorAll(".modal-overlay");
+  const closeButtons = document.querySelectorAll(".modal-close");
+
+  function openModal(modalId){
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal(modal){
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  // ABRIR
+  triggers.forEach(trigger => {
+    trigger.addEventListener("click", e => {
+      e.preventDefault();
+      const modalId = trigger.getAttribute("data-modal");
+      openModal(modalId);
+    });
+  });
+
+  // CERRAR CON BOTÓN X
+  closeButtons.forEach(btn => {
+    btn.addEventListener("click", e => {
+      const modal = btn.closest(".modal-overlay");
+      if (modal) closeModal(modal);
+    });
+  });
+
+  // CERRAR CLICK FUERA
+  overlays.forEach(overlay => {
+    overlay.addEventListener("click", e => {
+      if (e.target === overlay) {
+        closeModal(overlay);
+      }
+    });
+  });
+
+  // CERRAR CON ESC
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      document.querySelectorAll(".modal-overlay.active")
+        .forEach(closeModal);
+    }
+  });
+
+});
