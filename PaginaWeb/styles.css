@@ -34,9 +34,9 @@ body{
 .brand{
   position:absolute;
   left:0;
-  top: -70px;
-  width:250px;
-  height:250px;
+  top: -60px;
+  width:260px;
+  height:260px;
   
 
   
@@ -281,11 +281,11 @@ body{
   height:420px;
   background:#d9d9d9;
 
-  /* ✅ SE MANTIENE LA LÍNEA DEL CARRUSEL */
+  
   border-top:2px solid var(--black);
   border-bottom:2px solid var(--black);
-
-  position:relative;
+  margin-top:50px;
+  position: relative;
   overflow:hidden;
 }
 
