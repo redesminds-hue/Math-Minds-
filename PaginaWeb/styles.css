@@ -237,27 +237,29 @@ body{
 /* =========================
    FOOTER
 ========================= */
-/* =========================
-   FOOTER PRO (FRANJA MORADA)
-========================= */
+
 .footer{
   width:100%;
-  background: var(--purple);
-  border-top: 2px solid var(--black);
-  border-top-left-radius: 26px;
-  border-top-right-radius: 26px;
-  padding: 34px 18px;
+  background:#74e6ee;                 /* tu color */
+  border-top:2px solid #111;
+  border-top-left-radius:26px;
+  border-top-right-radius:26px;
+
+  padding:0 18px 34px;                /* 👈 0 arriba */
 }
+
 
 .footer-inner{
-  width: min(1200px, calc(100% - 40px));
-  margin: 0 auto;
+  width:min(1200px, calc(100% - 40px));
+  margin:0 auto;
+  padding-top:18px;                   /* aire para las columnas, no para el slogan */
 
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1.2fr;
-  gap: 28px;
-  align-items: start;
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1.2fr;
+  gap:28px;
+  align-items:start;
 }
+
 
 /* Tipografía */
 .footer h3, .footer h4{
@@ -775,4 +777,20 @@ body{
 /* Hover elegante */
 .menu-item:hover .menu-label{
   opacity: 1;
+}
+.footer-slogan{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  margin:0 !important;                /* 👈 fuerza a 0 */
+  padding:0 !important;               /* 👈 pegado total */
+  line-height:0;                      /* evita espacio “fantasma” */
+}
+.footer-slogan img{
+  display:block;
+  margin:0;
+  width:min(480px, 90vw);
+  height:auto;
 }
