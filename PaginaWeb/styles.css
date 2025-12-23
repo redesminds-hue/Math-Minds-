@@ -1,6 +1,6 @@
 :root{
   --black:#111;
-  --purple:#e274d7;
+  --purple:#13d6eba2;
 }
 
 /* RESET BÁSICO */
@@ -155,14 +155,14 @@ body{
 ========================= */
 .searchbox{
   margin-left: auto;      
-  margin-right: 0; 
-  margin-top: -40px;       
+  margin-right: 20px; 
+  margin-top: -10px;       
   display: flex;
   align-items: center;
   gap: 8px;
   border: 2px solid var(--black);
   height: 34px;
-  width: 160px;
+  width: 140px;
   padding: 0 10px;
 }
 
@@ -231,21 +231,128 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:40px 16px 80px; /* más espacio abajo */
+  padding:40px 16px 80px; 
 }
 
 /* =========================
    FOOTER
 ========================= */
+/* =========================
+   FOOTER PRO (FRANJA MORADA)
+========================= */
 .footer{
-  height:120px;
   width:100%;
-  background:var(--purple);
-  border-top:2px solid var(--black);
-  border-top-left-radius:26px;
-  border-top-right-radius:26px;
-  margin-top: auto;
+  background: var(--purple);
+  border-top: 2px solid var(--black);
+  border-top-left-radius: 26px;
+  border-top-right-radius: 26px;
+  padding: 34px 18px;
 }
+
+.footer-inner{
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1.2fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* Tipografía */
+.footer h3, .footer h4{
+  margin: 0 0 10px 0;
+  color: #111;
+}
+
+.footer p{
+  margin: 0 0 10px 0;
+  color: rgba(17,17,17,0.85);
+}
+
+.footer small{
+  display:block;
+  margin-top: 18px;
+  color: rgba(17,17,17,0.7);
+}
+
+/* Enlaces */
+.footer-links a{
+  display:block;
+  text-decoration: none;
+  color: rgba(17,17,17,0.85);
+  margin: 10px 0;
+  width: fit-content;
+  border-bottom: 1px solid transparent;
+}
+
+.footer-links a:hover{
+  border-bottom: 1px solid rgba(17,17,17,0.7);
+}
+
+/* Contacto */
+.footer-row{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin: 10px 0;
+  color: rgba(17,17,17,0.9);
+  font-weight: 600;
+}
+
+.footer-icon{
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.footer-mail{
+  color: rgba(17,17,17,0.85);
+  font-weight: 500;
+}
+
+/* Redes */
+.footer-social{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.footer-social a{
+  display:inline-flex;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(17,17,17,0.25);
+  align-items:center;
+  justify-content:center;
+  transition: transform .15s ease, background .15s ease;
+}
+
+.footer-social a:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.55);
+}
+
+.footer-social img{
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .footer-inner{
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .footer{
+    padding: 26px 16px;
+  }
+}
+
 
 /* =========================
    RESPONSIVE

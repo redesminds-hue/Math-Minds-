@@ -11,7 +11,7 @@ burger?.addEventListener("click", () => {
 
 
 // ===============================
-// CAROUSEL AUTO + CONTROLES
+// CAROUSEL Y CONTROLES
 // ===============================
 (() => {
   const carousel = document.getElementById("carousel");
@@ -33,7 +33,7 @@ burger?.addEventListener("click", () => {
   const INTERVAL = 6000;
   let timer;
 
-  // Crear dots (solo si existe el contenedor)
+  
   const dots = (dotsWrap ? slides.map((_, i) => {
     const dot = document.createElement("button");
     dot.type = "button";
