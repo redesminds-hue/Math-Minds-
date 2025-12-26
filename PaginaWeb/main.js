@@ -68,6 +68,42 @@ function openMenu(){
     menu.addEventListener('touchstart', menu._touchStartHandler, { passive:false });
     menu.addEventListener('touchmove', menu._touchMoveHandler, { passive:false });
   }
+
+  // Pointer-based drag scroll fallback (more reliable across devices)
+  if (!menu._pointerDownHandler){
+    menu._isPointerDown = false;
+    menu._pointerDownHandler = function(ev){
+      if (ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return;
+      menu._isPointerDown = true;
+      menu._pointerStartY = ev.clientY;
+      menu._pointerStartScroll = menu.scrollTop;
+      try{ menu.setPointerCapture && menu.setPointerCapture(ev.pointerId); }catch(e){}
+    };
+    menu._pointerMoveHandler = function(ev){
+      if (!menu._isPointerDown) return;
+      const dy = ev.clientY - (menu._pointerStartY || 0);
+      menu.scrollTop = (menu._pointerStartScroll || 0) - dy;
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+    menu._pointerUpHandler = function(ev){
+      if (!menu._isPointerDown) return;
+      menu._isPointerDown = false;
+      try{ menu.releasePointerCapture && menu.releasePointerCapture(ev.pointerId); }catch(e){}
+    };
+
+    menu.addEventListener('pointerdown', menu._pointerDownHandler, { passive:false });
+    menu.addEventListener('pointermove', menu._pointerMoveHandler, { passive:false });
+    menu.addEventListener('pointerup', menu._pointerUpHandler, { passive:false });
+    menu.addEventListener('pointercancel', menu._pointerUpHandler, { passive:false });
+  }
+
+  // Add a small visual 'grab' handle so users see they can drag the panel
+  if (!menu.querySelector('.menu-grab')){
+    const grab = document.createElement('div');
+    grab.className = 'menu-grab';
+    menu.insertBefore(grab, menu.firstChild);
+  }
 }
 
 function closeMenu(){
@@ -85,6 +121,21 @@ function closeMenu(){
     delete menu._touchStartHandler;
     delete menu._touchMoveHandler;
   }
+
+  // remove pointer handlers if present
+  if (menu._pointerDownHandler){
+    menu.removeEventListener('pointerdown', menu._pointerDownHandler, { passive:false });
+    menu.removeEventListener('pointermove', menu._pointerMoveHandler, { passive:false });
+    menu.removeEventListener('pointerup', menu._pointerUpHandler, { passive:false });
+    menu.removeEventListener('pointercancel', menu._pointerUpHandler, { passive:false });
+    delete menu._pointerDownHandler;
+    delete menu._pointerMoveHandler;
+    delete menu._pointerUpHandler;
+    delete menu._isPointerDown;
+  }
+
+  // remove grab handle if present
+  const grabEl = menu.querySelector('.menu-grab'); if (grabEl) grabEl.remove();
 
   // restore menu to its original parent location (if we moved it)
   if (menu._originalParent && menu.parentNode !== menu._originalParent){

@@ -1363,7 +1363,7 @@ img{ max-width:100%; height:auto; display:block; }
     max-height: calc(100vh - 96px);
     overflow-y:auto; /* vertical scrolling */
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
-    touch-action: pan-y; /* allow vertical gestures */
+    touch-action: none; /* we'll handle dragging with pointer events */
     overscroll-behavior: contain; /* prevent body from scrolling */
     z-index:100060; /* above overlay and header */
     background: rgba(255,255,255,0.98);
@@ -1389,6 +1389,10 @@ img{ max-width:100%; height:auto; display:block; }
 
   /* allow tapping without delay on mobile; do vertical-only gestures inside the panel */
   .menu a{ -webkit-tap-highlight-color: rgba(0,0,0,0.06); touch-action: manipulation; }
+
+  /* Grab handle to signal draggable panel */
+  .menu-grab{ width:40px; height:6px; background: rgba(0,0,0,0.08); border-radius:6px; margin:8px auto; cursor:grab; }
+  .menu-grab:active{ cursor:grabbing; }
 
   /* Menu items occupy full width inside panel */
   .menu.open a{ font-size:16px; padding:12px 10px; width:100%; border-bottom:1px solid rgba(0,0,0,0.04); color:var(--black); box-sizing:border-box; }
