@@ -262,6 +262,16 @@ body{
 .search-history li{ padding:8px 10px; border-radius:8px; cursor:pointer; border:1px solid transparent; }
 .search-history li:hover{ background: #fafafa; transform: translateX(2px); }
 
+/* Resultados de búsqueda */
+.search-results-list{ list-style:none; padding:0; margin:8px 0 0 0; display:block; }
+.search-results-list li{
+  display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; border:1px solid transparent; margin-bottom:8px; transition: background .12s ease, transform .12s ease;
+}
+.search-results-list li img{ width:48px; height:48px; object-fit:contain; border-radius:6px; }
+.search-results-list li .meta{ flex:1; }
+.search-results-list li .meta b{ display:block; margin-bottom:6px; }
+.search-results-list li:hover{ background:#fafafa; transform: translateY(-2px); }
+
 @media (max-width:740px){ .search-drawer{ width:100%; } }
 
 
@@ -722,9 +732,13 @@ body{
 
 .compare-card{
   border: 2px solid var(--black);
-  border-radius: 50px;
-  padding: 36px 40px;
+  border-radius: 18px;
+  padding: 28px 32px;
   background: #ffffff;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:12px;
 }
 
 .compare-card.highlight{
@@ -756,6 +770,76 @@ body{
   line-height: 1.55;
   font-size: 14px;
 }
+
+/* Alineación y estilo centrado para modales con 1 tarjeta */
+#modal-Scholastic .compare-grid,
+#modal-MathMinds .compare-grid{
+  max-width: 860px;
+  margin: 0 auto;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+#modal-Scholastic .compare-card,
+#modal-MathMinds .compare-card{
+  margin: 0 auto;
+  width: 100%;
+  max-width: 720px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  border-radius: 28px;
+}
+
+#modal-Scholastic .modal-text,
+#modal-MathMinds .modal-text{
+  text-align: center;
+}
+
+#modal-Scholastic .compare-card .compare-head h3 img,
+#modal-MathMinds .compare-card .compare-head h3 img{
+  max-width: 260px;
+  height: auto;
+}
+
+/* Video placeholder */
+.video-thumb{
+  height:160px;
+  background:#e9e9e9;
+  border-radius:10px;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+/* Make iframe fill the thumbnail */
+.video-wrapper{ position:absolute; inset:0; width:100%; height:100%; }
+.video-wrapper iframe{ width:100%; height:100%; border:0; display:block; }
+.video-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.video-thumb .play{
+  position:absolute;
+  font-size:28px;
+  background: rgba(0,0,0,0.35);
+  color:#fff;
+  width:46px; height:46px; border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events: none; /* allow clicks to pass through to iframe */
+}
+
+/* Make .compare-grid for ALEKS modal show side-by-side */
+.modal-compare .compare-grid{ grid-template-columns: 1fr 1fr; align-items:start; }
+.modal-compare .compare-card .btn.full{ width: 80%; margin: 12px auto 0 auto; }
+
+@media (max-width:900px){
+  .modal-compare .compare-grid{ grid-template-columns: 1fr; }
+  .video-thumb{ height:140px; }
+}
+
+#modal-Scholastic .compare-card .btn.full,
+#modal-MathMinds .compare-card .btn.full{
+  width: 60%;
+  margin: 12px auto 0 auto;
+}
+
 
 .btn.full{ width: 100%; }
 

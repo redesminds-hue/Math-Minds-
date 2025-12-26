@@ -179,6 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const HISTORY_KEY = 'mm_search_history_v1';
   const HISTORY_MAX = 8;
 
+  // Products dataset will be loaded from products.json
+  let PRODUCTS = [];
+
   function loadHistory(){
     try{
       const raw = localStorage.getItem(HISTORY_KEY);
@@ -203,6 +206,50 @@ document.addEventListener("DOMContentLoaded", () => {
       li.textContent = q;
       li.addEventListener('click', () => performSearch(q));
       historyList.appendChild(li);
+    });
+  }
+
+  // Cargar productos desde JSON
+  async function loadProducts(){
+    try{
+      const res = await fetch('products.json');
+      PRODUCTS = await res.json();
+    }catch(e){ PRODUCTS = []; }
+  }
+
+  function filterProducts(query){
+    if (!query) return [];
+    const q = query.toLowerCase();
+    return PRODUCTS.filter(p => (
+      p.title.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q) ||
+      (p.tags || []).some(t => t.toLowerCase().includes(q))
+    ));
+  }
+
+  function renderResults(items){
+    const wrap = document.getElementById('searchResults');
+    const noEl = document.getElementById('noResults');
+    wrap.innerHTML = '';
+    if (!items || items.length === 0){
+      noEl.style.display = 'block';
+      return;
+    }
+    noEl.style.display = 'none';
+
+    items.slice(0,8).forEach(p => {
+      const li = document.createElement('li');
+      li.tabIndex = 0;
+      li.innerHTML = `
+        <img src="${p.image}" alt="${p.title}" />
+        <div class="meta">
+          <b>${p.title}</b>
+          <small style="opacity:.8">${p.description}</small>
+        </div>
+      `;
+      li.addEventListener('click', () => { window.location.href = p.link; });
+      li.addEventListener('keydown', e => { if (e.key === 'Enter') window.location.href = p.link; });
+      wrap.appendChild(li);
     });
   }
 
@@ -244,16 +291,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = (q || searchInput?.value||'').trim();
     if (!query) return;
     addToHistory(query);
-    // por ahora redirigimos a productos con la query en la url
-    window.location.href = `productos.html?q=${encodeURIComponent(query)}`;
+
+    // Filtrar productos y mostrar resultados en el drawer
+    const results = filterProducts(query);
+    renderResults(results);
+
+    // Mantener botón "Ver tienda" con la query
+    const viewAllBtn = document.getElementById('viewAllBtn');
+    if (viewAllBtn) viewAllBtn.href = `productos.html?q=${encodeURIComponent(query)}`;
   }
 
   if (searchToggle && searchDrawer && searchOverlay){
+    // cargar productos al inicio
+    loadProducts().then(() => {
+      renderHistory();
+    });
+
     searchToggle.addEventListener('click', (ev) => { ev.preventDefault(); openDrawer(); });
     searchClose?.addEventListener('click', closeDrawer);
     searchOverlay.addEventListener('click', closeDrawer);
 
     searchSubmit?.addEventListener('click', () => performSearch());
+
+    searchInput?.addEventListener('input', () => {
+      // mostrar resultados en tiempo real mientras escribe
+      const q = (searchInput.value || '').trim();
+      if (q.length === 0){ renderResults([]); return; }
+      const results = filterProducts(q);
+      renderResults(results);
+    });
 
     searchInput?.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') performSearch();
@@ -262,6 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearHistoryBtn?.addEventListener('click', () => {
       clearHistory();
       searchInput?.focus();
+      renderResults([]);
     });
 
     // cerrar con ESC también

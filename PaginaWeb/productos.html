@@ -19,25 +19,48 @@
     </div>
   </header>
 
-  <main style="padding:40px; max-width:1000px; margin:0 auto;">
-    <h1>Productos</h1>
-    <p>Aquí puedes listar todos los productos disponibles. Reemplaza este texto con tus elementos, enlaces de compra, imágenes y detalles.</p>
+  <main style="padding:40px; max-width:1200px; margin:0 auto;">
+    <h1 id="pageTitle">Productos</h1>
+    <p id="pageIntro">Aquí puedes listar todos los productos disponibles. Usa la búsqueda para filtrar resultados.</p>
 
-    <!-- Ejemplo sencillo -->
-    <section style="margin-top:20px; display:grid; gap:12px;">
-      <article style="border:2px solid var(--black); padding:16px; border-radius:10px;">
-        <h3>ALEKS</h3>
-        <p>Plataforma de aprendizaje adaptativo para matemáticas.</p>
-        <a class="btn primary" href="https://tusitio.com/comprar-aleks" target="_blank">Comprar</a>
-      </article>
-
-      <article style="border:2px solid var(--black); padding:16px; border-radius:10px;">
-        <h3>Material Didáctico</h3>
-        <p>Bloques, fracciones, y otros recursos manipulativos.</p>
-        <a class="btn primary" href="https://tusitio.com/material-concreto" target="_blank">Comprar</a>
-      </article>
-    </section>
+    <section id="productsGrid" style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:18px;"></section>
   </main>
+
+  <script>
+    async function loadAndRender(){
+      try{
+        const res = await fetch('products.json');
+        const products = await res.json();
+        const url = new URL(window.location.href);
+        const q = (url.searchParams.get('q')||'').trim().toLowerCase();
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+
+        const filtered = q ? products.filter(p => (p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || (p.tags||[]).some(t=>t.includes(q)))) : products;
+
+        if (filtered.length === 0){
+          grid.innerHTML = '<p style="opacity:.8">No hay productos que coincidan.</p>';
+          return;
+        }
+
+        filtered.forEach(p => {
+          const card = document.createElement('article');
+          card.style.border = '2px solid var(--black)';
+          card.style.padding = '16px';
+          card.style.borderRadius = '12px';
+          card.innerHTML = `
+            <img src="${p.image}" alt="${p.title}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;"/>
+            <h3 style="margin:0 0 6px 0;">${p.title}</h3>
+            <p style="margin:0 0 10px 0;opacity:.85">${p.description}</p>
+            <a class="btn primary" href="${p.link}" target="_blank">Comprar</a>
+          `;
+          grid.appendChild(card);
+        });
+
+      }catch(e){ document.getElementById('productsGrid').innerHTML = '<p>Error cargando productos.</p>'; }
+    }
+    loadAndRender();
+  </script>
 
   <footer class="footer">
     <div class="footer-inner">

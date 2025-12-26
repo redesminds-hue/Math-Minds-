@@ -158,11 +158,11 @@
       </div>
 
       <div class="footer-social">
-        <a href="https://www.instagram.com/TU_USUARIO" target="_blank" rel="noopener">
+        <a href="https://www.instagram.com/mathmindseducation?igsh=MTQ5b3NzM3hkOGo3bA==" target="_blank" rel="noopener">
           <img src="../Multimedia/Instagram.png" alt="Instagram">
         </a>
 
-        <a href="https://www.facebook.com/TU_PAGINA" target="_blank" rel="noopener">
+        <a href="https://www.facebook.com/share/16kbhGUz4P/?mibextid=wwXIfr" target="_blank" rel="noopener">
           <img src="../Multimedia/Facebook.png" alt="Facebook">
         </a>
 
@@ -201,8 +201,18 @@
       </div>
 
       <div class="search-results">
-        <h4>Historial</h4>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <h4 style="margin:0;">Historial</h4>
+          <a id="viewAllBtn" class="btn secondary" href="productos.html">Ver tienda</a>
+        </div>
+
         <ul id="searchHistory" class="search-history"></ul>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #eee;">
+
+        <h4 style="margin:0 0 8px 0;">Resultados</h4>
+        <ul id="searchResults" class="search-results-list"></ul>
+        <div id="noResults" style="opacity:.8; display:none; margin-top:8px;">No se encontraron resultados.</div>
       </div>
     </div>
   </aside>
@@ -227,14 +237,27 @@
       <div class="compare-grid">
         <div class="compare-card">
           <div class="compare-head">
-            <h3><img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" /></h3>
+            <h3>ALEKS</h3>
             <span class="tag">Adaptive Learning</span>
           </div>
 
+          <div class="video-thumb" role="img" aria-label="Video ALEKS">
+           <div class="video-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/K1u8bKx13ok?rel=0&modestbranding=1"
+                title="Video ALEKS"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay"
+               allowfullscreen>
+              </iframe>
+            </div>
+
+            <div class="play">▶</div>
+          </div>
+
           <ul class="compare-list">
-            <li>ALEKS® (Assessment and Learning in Knowledge Spaces) es una plataforma de matemáticas basada en inteligencia artificial que diagnostica con precisión qué sabe cada estudiante y construye un camino de aprendizaje individual, adaptándose en tiempo real a su progreso.</li>
-            <li>Reportes detallados para docentes y colegios.</li>
-            <li>Evaluación diagnóstica continua.</li>
+            <li>Diagnóstico adaptativo</li>
+            <li>Ruta personalizada</li>
+            <li>Reportes detallados</li>
           </ul>
 
           <a class="btn primary full" href="https://tusitio.com/comprar-aleks">Comprar ALEKS</a>
@@ -242,15 +265,27 @@
 
         <div class="compare-card highlight">
           <div class="compare-head">
-            <h3><img src="../Multimedia/ALEKS ADVENTURE.png" alt="ALEKS Adventure Logo" width="300" height="40" /></h3>
+            <h3>ALEKS Adventure</h3>
             <span class="tag">Gamificado</span>
           </div>
 
+          <div class="video-thumb" role="img" aria-label="Video ALEKS Adventure">
+            <div class="video-wrapper">
+              <iframe
+                src="https://drive.google.com/file/d/1BbHpDc0VR7pEHM-oAkMPqORgleK6qZy0/preview"
+                title="Video ALEKS Adventure"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay"
+               allowfullscreen>
+              </iframe>
+            </div>
+
+            <div class="play">▶</div>
+          </div>
+
           <ul class="compare-list">
-            <li>ALEKS Adventure® está diseñada para educación inicial y primaria, que combina la inteligencia artificial con un entorno visual, lúdico y exploratorio, donde los niños aprenden matemáticas a través de retos, historias y misiones.</li>
-            <li>Más motivación: progreso visual y recompensas.</li>
-            <li>Aprendizaje adaptativo desde edades tempranas.</li>
-            <li>Desarrollo del pensamiento matemático paso a paso.</li>
+            <li>Aprendizaje gamificado</li>
+            <li>Ideal para primaria</li>
+            <li>Progreso visual</li>
           </ul>
 
           <a class="btn secondary full" href="https://tusitio.com/comprar-aleks-adventure">Comprar Adventure</a>
@@ -367,7 +402,7 @@
        <div class="compare-grid">
         <div class="compare-card">
           <div class="compare-head">
-            <h3><img src="../Multimedia/Scholastic.png" alt="Scholastic Logo" width="195" height="40" /></h3>
+            <h3><img src="../Multimedia/Logo_Prime.png" alt="Prime Logo" width="195" height="40" /></h3>
             <span class="tag">Libros & Recursos</span>
           </div>
 

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "aleks",
+    "title": "ALEKS",
+    "description": "Plataforma adaptativa de aprendizaje de matemáticas con diagnóstico individual.",
+    "link": "https://tusitio.com/comprar-aleks",
+    "image": "../Multimedia/ALEKS.jpeg",
+    "tags": ["plataforma","matemáticas"]
+  },
+  {
+    "id": "aleks-adventure",
+    "title": "ALEKS Adventure",
+    "description": "Versión gamificada para inicial y primaria.",
+    "link": "https://tusitio.com/comprar-aleks-adventure",
+    "image": "../Multimedia/ALEKS ADVENTURE.png",
+    "tags": ["gamificado","infantil"]
+  },
+  {
+    "id": "material",
+    "title": "Material Didáctico",
+    "description": "Manipulativos, bloques y recursos para enseñanza CPA.",
+    "link": "https://tusitio.com/material-concreto",
+    "image": "../Multimedia/MaterialConcreto.png",
+    "tags": ["material","manipulativo"]
+  },
+  {
+    "id": "reveal",
+    "title": "Reveal Math",
+    "description": "Programa de libros y recursos para aprendizaje profundo.",
+    "link": "https://tusitio.com/reveal-math",
+    "image": "../Multimedia/RevealMath.png",
+    "tags": ["libros","recurso"]
+  },
+  {
+    "id": "prime",
+    "title": "Prime",
+    "description": "Recursos y contenidos para fortalecer el aprendizaje estructurado.",
+    "link": "https://tusitio.com/prime",
+    "image": "../Multimedia/Prime.png",
+    "tags": ["libros","recursos"]
+  },
+  {
+    "id": "scholastic",
+    "title": "Scholastic",
+    "description": "Libros y programas de lectura escolar.",
+    "link": "https://tusitio.com/scholastic",
+    "image": "../Multimedia/Scholastic.png",
+    "tags": ["libros","lectura"]
+  },
+  {
+    "id": "mathminds",
+    "title": "Math Minds",
+    "description": "Soluciones educativas y formación docente.",
+    "link": "https://tusitio.com/mathminds",
+    "image": "../Multimedia/Logotipo_MathMinds.png",
+    "tags": ["programa","formación"]
+  }
+]
