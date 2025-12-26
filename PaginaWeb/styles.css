@@ -783,6 +783,10 @@ img{ max-width:100%; height:auto; display:block; }
 
 @media (max-width:740px){
   .modal-box{ width: calc(100% - 24px); padding:16px; border-radius:12px; }
+
+  /* Make logos inside modals adapt to narrow screens */
+  .compare-card .compare-head img,
+  .modal-box img{ max-width: 180px; width: 90%; height: auto; display:block; margin: 0 auto; }
 } 
 
 @keyframes modalIn{
@@ -1254,16 +1258,16 @@ img{ max-width:100%; height:auto; display:block; }
     position:relative;
     top:0;
     left:0;
-    width:110px;
-    height:110px;
-    margin:8px 0;
+    width:170px; /* larger on mobile */
+    height:170px;
+    margin:14px 0 6px 0;
     transform:none;
     border-radius:12px;
-    padding:8px;
+    padding:6px;
     background:#fff;
   }
 
-  .brand img{ width:80%; height:auto; }
+  .brand img{ width:94%; height:auto; }
 
   .header-inner{
     min-height:auto;
@@ -1336,7 +1340,10 @@ img{ max-width:100%; height:auto; display:block; }
     right:16px;
     width: min(360px, calc(100% - 32px));
     max-height: calc(100vh - 96px);
-    overflow:auto;
+    overflow-y:auto; /* vertical scrolling */
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    touch-action: pan-y; /* allow vertical gestures */
+    overscroll-behavior: contain; /* prevent body from scrolling */
     z-index:100060; /* above overlay and header */
     background: rgba(255,255,255,0.98);
     align-items:flex-start;
