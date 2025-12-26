@@ -753,14 +753,19 @@ body{
 .modal-text{
   text-align: center;
   margin-top: -60px;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 700;
 }
 
 .modal-subtitle{
-  margin: 12px 0 18px;
-  opacity: .85;
-  line-height: 1.4;
+  margin: 14px 0 20px;
+  opacity: .95;
+  line-height: 1.45;
   text-align: center;
-}
+  font-size: 16px;
+  color: rgba(17,17,17,0.9);
+} 
 
 .compare-grid{
   display: grid;
@@ -791,7 +796,7 @@ body{
   margin-bottom: 10px;
 }
 
-.compare-head h3{ margin: 0; font-size: 18px; }
+.compare-head h3{ margin: 0; font-size: 20px; font-weight:700; }
 
 .tag{
   font-size: 12px;
@@ -806,8 +811,23 @@ body{
   margin: 0 0 14px 18px;
   padding: 0;
   line-height: 1.55;
-  font-size: 14px;
+  font-size: 15px;
 }
+
+/* Responsive sizes for modal typography */
+@media (max-width: 900px){
+  .modal-text{ font-size:26px; }
+  .modal-subtitle{ font-size:26px; }
+  .compare-head h3{ font-size:25px; }
+  .compare-list{ font-size:22px; }
+}
+
+@media (max-width: 740px){
+  .modal-text{ font-size:20px; margin-top:-30px; }
+  .modal-subtitle{ font-size:14px; margin:10px 0 14px; }
+  .compare-head h3{ font-size:16px; }
+}
+
 
 /* Alineación y estilo centrado para modales con 1 tarjeta */
 #modal-Scholastic .compare-grid,
@@ -1080,9 +1100,9 @@ body{
   justify-content:center;
   align-items:center;
 
-  margin:0 !important;                /* 👈 fuerza a 0 */
-  padding:0 !important;               /* 👈 pegado total */
-  line-height:0;                      /* evita espacio “fantasma” */
+  margin:0 !important;              
+  padding:0 !important;              
+  line-height:0;                     
 }
 .footer-slogan img{
   display:block;
@@ -1100,7 +1120,7 @@ body{
 }
 
 .quienes-somos h2 {
-  color: #e91e63; /* rosado similar al ejemplo */
+  color: #e91e63; 
   font-size: 32px;
   margin-bottom: 20px;
   font-weight: bold;
@@ -1109,7 +1129,62 @@ body{
 .quienes-somos p {
   max-width: 900px;
   margin: 0 auto;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1.6;
   color: #333;
+}
+
+/* SECCIÓN CONTADOR */
+.contador-section {
+  position: relative;
+  background-image: url("img/contador-bg.jpg"); /* tu imagen */
+  background-size: cover;
+  background-position: center;
+  padding: 100px 20px;
+  color: #fff;
+}
+
+.contador-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.contador-container {
+  position: relative;
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 40px;
+  text-align: center;
+}
+
+.contador-item h2 {
+  font-size: 48px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.contador-item p {
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.contador-numero {
+  position: relative;
+  display: inline-block;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.contador-plus {
+  position: absolute;
+  top: -8px;
+  right: -14px;
+  font-size: 30px;
+  font-weight: 1500; /* más delgado */
+  color: #e91bd8e0;
 }

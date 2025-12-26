@@ -352,3 +352,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const counters = document.querySelectorAll(".contador");
+  const section = document.querySelector(".contador-section");
+  let started = false;
+
+  if (!section || counters.length === 0) return;
+
+  const startCounter = () => {
+    counters.forEach(counter => {
+      const target = Number(counter.dataset.target);
+      let current = 0;
+
+      // Velocidad del "reloj" (ms)
+      const intervalTime = 50; // ⏱️ más alto = más lento
+      const step = Math.ceil(target / 100); // pasos constantes
+
+      const timer = setInterval(() => {
+        current += step;
+
+        if (current >= target) {
+          counter.textContent = target;
+          clearInterval(timer);
+        } else {
+          counter.textContent = current;
+        }
+      }, intervalTime);
+    });
+  };
+
+  window.addEventListener("scroll", () => {
+    const sectionTop = section.getBoundingClientRect().top;
+    const windowHeight = window.innerHeight;
+
+    if (!started && sectionTop < windowHeight * 0.85) {
+      startCounter();
+      started = true;
+    }
+  });
+});
