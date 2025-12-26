@@ -786,7 +786,12 @@ img{ max-width:100%; height:auto; display:block; }
 
   /* Make logos inside modals adapt to narrow screens */
   .compare-card .compare-head img,
-  .modal-box img{ max-width: 180px; width: 90%; height: auto; display:block; margin: 0 auto; }
+  .modal-box img{ max-width: 140px; width: 85%; height: auto; display:block; margin: 0 auto; }
+}
+
+@media (max-width:480px){
+  .compare-card .compare-head img,
+  .modal-box img{ max-width: 120px; width: 80%; }
 } 
 
 @keyframes modalIn{
@@ -1361,10 +1366,12 @@ img{ max-width:100%; height:auto; display:block; }
   }
 
   /* ensure the non-open menu doesn't intercept pointer events */
-  .menu{ pointer-events: none; }
+  .menu:not(.open){ pointer-events: none; }
+  /* when open, the menu must accept pointer events so scrolling and taps work */
+  .menu{ pointer-events: auto; }
   .menu a{ pointer-events: auto; }
 
-  /* allow tapping without delay on mobile */
+  /* allow tapping without delay on mobile; do vertical-only gestures inside the panel */
   .menu a{ -webkit-tap-highlight-color: rgba(0,0,0,0.06); touch-action: manipulation; }
 
   /* Menu items occupy full width inside panel */
