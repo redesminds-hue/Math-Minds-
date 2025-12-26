@@ -15,8 +15,11 @@ function openMenu(){
   if (!ov){
     ov = document.createElement('div');
     ov.id = 'menuOverlay';
-    ov.className = 'menu-overlay';
+    ov.className = 'menu-overlay active'; // show only when present
     document.body.appendChild(ov);
+  } else {
+    // if it already exists, ensure it's visible
+    ov.classList.add('active');
   }
 
   // esc close
