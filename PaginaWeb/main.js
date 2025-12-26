@@ -8,6 +8,7 @@ const menu = document.getElementById("menu");
 function openMenu(){
   if (!menu || !burger) return;
   menu.classList.add('open');
+  menu.setAttribute('aria-hidden','false');
   burger.setAttribute('aria-expanded','true');
 
   // create overlay
@@ -16,10 +17,15 @@ function openMenu(){
     ov = document.createElement('div');
     ov.id = 'menuOverlay';
     ov.className = 'menu-overlay active'; // show only when present
-    document.body.appendChild(ov);
+    // insert the overlay after the header so it sits behind the panel
+    const headerEl = document.querySelector('.header');
+    if (headerEl && headerEl.parentNode) document.body.insertBefore(ov, headerEl.nextSibling);
+    else document.body.appendChild(ov);
+    ov.style.zIndex = '100040'; // explicit to avoid CSS override
   } else {
-    // if it already exists, ensure it's visible
+    // if it already exists, ensure it's visible and beneath the menu
     ov.classList.add('active');
+    ov.style.zIndex = '100040';
   }
 
   // esc close
