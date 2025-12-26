@@ -1211,6 +1211,9 @@ body{
 
 /* Mobile and small desktop improvements */
 @media (max-width: 740px){
+  /* Prevent horizontal overflow on small screens */
+  html, body{ overflow-x:hidden; }
+
   .brand{
     position:relative;
     top:0;
@@ -1234,10 +1237,12 @@ body{
     flex-direction:column;
     align-items:center;
     gap:6px;
+    width: calc(100% - 28px);
   }
 
+  /* Hide main menu by default on mobile; burger toggles it open */
   .menu{
-    display:flex;
+    display:none;
     flex-direction:column;
     gap:10px;
     align-items:center;
@@ -1245,17 +1250,19 @@ body{
     transform:translateY(0);
     padding:10px 0;
     justify-content:center;
+    width:100%;
   }
+  .menu.open{ display:flex; }
 
   .menu a{ font-size:14px; }
-  .menu .menu-item img{ max-width:140px; height:auto; }
+  .menu .menu-item img{ max-width:120px; height:auto; }
 
   .header-top{ margin-left:0; min-height:auto; }
   .header-line{ margin-top:8px; }
 
-  /* Make search / burger more compact */
+  /* Make search / burger more compact and visible */
   .search-btn{ margin-right:12px; transform:translateY(0); }
-  .burger{ display:block; }
+  .burger{ display:block; margin-left:auto; position:relative; z-index:100005; }
 
   /* Keep carousel tall enough for visual impact on mobile, but not overwhelming */
   .carousel-section{ height:360px; }

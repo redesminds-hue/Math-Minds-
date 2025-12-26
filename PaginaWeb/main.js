@@ -5,8 +5,10 @@ const burger = document.getElementById("burger");
 const menu = document.getElementById("menu");
 
 burger?.addEventListener("click", () => {
-  const isOpen = getComputedStyle(menu).display !== "none";
-  menu.style.display = isOpen ? "none" : "flex";
+  // Toggle 'open' class so CSS controls visibility and layout
+  if (!menu) return;
+  const isOpen = menu.classList.toggle('open');
+  burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
 
 
