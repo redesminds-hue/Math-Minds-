@@ -1203,8 +1203,13 @@ body{
 /* RESPONSIVE IMPROVEMENTS */
 
 /* General adjustments for medium screens */
+@media (max-width: 1400px){
+  .brand{ width:200px; height:200px; top:-40px; padding:10px; border-radius:14px; }
+  .header-top{ margin-left:220px; }
+}
+
 @media (max-width: 1024px){
-  .brand{ width:160px; height:160px; top:-40px; padding:8px; border-radius:14px; }
+  .brand{ width:160px; height:160px; top:-30px; padding:8px; border-radius:14px; }
   .header-inner{ min-height:120px; }
   .menu{ gap:18px; transform:translateY(20px); margin-right:0; justify-content:center; }
 }
@@ -1291,16 +1296,21 @@ body{
     height:100vh;
     z-index:100006;
     background: rgba(255,255,255,0.98);
-    padding-top:120px; /* leave space for header/logo */
+    padding-top:110px; /* leave space for header/logo */
     align-items:flex-start;
     flex-direction:column;
-    gap:12px;
+    gap:8px;
     overflow:auto;
+    padding-left:16px;
+    padding-right:16px;
   }
 
-  .menu.open a{ font-size:18px; padding:12px 18px; width:100%; border-bottom:1px solid rgba(0,0,0,0.04); }
+  .menu.open a{ font-size:18px; padding:14px 12px; width:100%; border-bottom:1px solid rgba(0,0,0,0.04); color:var(--black); }
 
   .menu-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.35); z-index:100005; display:block; }
+
+  /* extra spacing so menu is clearly distinct from carousel */
+  .carousel-section{ transform: translateY(30px); }
 }
 
 /* Ensure header sits above carousel */

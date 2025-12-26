@@ -4,45 +4,60 @@
 const burger = document.getElementById("burger");
 const menu = document.getElementById("menu");
 
+// Helper to open/close mobile menu with overlay
+function openMenu(){
+  if (!menu || !burger) return;
+  menu.classList.add('open');
+  burger.setAttribute('aria-expanded','true');
+
+  // create overlay
+  let ov = document.getElementById('menuOverlay');
+  if (!ov){
+    ov = document.createElement('div');
+    ov.id = 'menuOverlay';
+    ov.className = 'menu-overlay';
+    document.body.appendChild(ov);
+  }
+
+  // esc close
+  const escClose = (ev) => { if (ev.key === 'Escape') closeMenu(); };
+  document.addEventListener('keydown', escClose);
+  // store handler reference for removal
+  menu._escClose = escClose;
+
+  ov.addEventListener('click', closeMenu, { once:true });
+}
+
+function closeMenu(){
+  if (!menu || !burger) return;
+  menu.classList.remove('open');
+  burger.setAttribute('aria-expanded','false');
+  const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
+  if (menu._escClose) { document.removeEventListener('keydown', menu._escClose); delete menu._escClose; }
+}
+
 burger?.addEventListener("click", () => {
   if (!menu) return;
-  const isOpen = menu.classList.toggle('open');
-  burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-
-  // Manage overlay and close handlers
-  if (isOpen){
-    // create overlay
-    let ov = document.getElementById('menuOverlay');
-    if (!ov){
-      ov = document.createElement('div');
-      ov.id = 'menuOverlay';
-      ov.className = 'menu-overlay';
-      document.body.appendChild(ov);
-    }
-
-    const closeMenu = () => {
-      menu.classList.remove('open');
-      burger.setAttribute('aria-expanded','false');
-      const ov2 = document.getElementById('menuOverlay'); if (ov2) ov2.remove();
-      document.removeEventListener('keydown', escClose);
-    };
-
-    const escClose = (ev) => { if (ev.key === 'Escape') closeMenu(); };
-    document.addEventListener('keydown', escClose);
-    ov.addEventListener('click', closeMenu, { once: true });
-
-  } else {
-    const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
-  }
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) closeMenu(); else openMenu();
 });
 
 // Close menu when resizing to larger screens
 window.addEventListener('resize', () => {
   if (!menu) return;
   if (window.innerWidth > 1024 && menu.classList.contains('open')){
-    menu.classList.remove('open');
-    burger.setAttribute('aria-expanded','false');
-    const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
+    closeMenu();
+  }
+});
+
+// Close menu when clicking any link inside it (works for navigation and modal triggers)
+document.addEventListener('click', (e) => {
+  const link = e.target && e.target.closest && e.target.closest('.menu a');
+  if (!link) return;
+  // If a menu link is clicked and menu is open on small screens, close it first
+  if (menu && menu.classList.contains('open')){
+    // Small delay so any click handlers (e.g. data-modal) can run after close
+    setTimeout(() => { closeMenu(); }, 50);
   }
 });
 
