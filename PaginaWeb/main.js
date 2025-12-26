@@ -7,6 +7,18 @@ const menu = document.getElementById("menu");
 // Helper to open/close mobile menu with overlay
 function openMenu(){
   if (!menu || !burger) return;
+
+  // remember original place so we can restore later
+  if (!menu._originalParent){
+    menu._originalParent = menu.parentNode;
+    menu._nextSibling = menu.nextSibling;
+  }
+
+  // ensure the menu is a direct child of body while open so it isn't blocked by overlays
+  if (menu.parentNode !== document.body){
+    document.body.appendChild(menu);
+  }
+
   menu.classList.add('open');
   menu.setAttribute('aria-hidden','false');
   burger.setAttribute('aria-expanded','true');
@@ -40,9 +52,21 @@ function openMenu(){
 function closeMenu(){
   if (!menu || !burger) return;
   menu.classList.remove('open');
+  menu.setAttribute('aria-hidden','true');
   burger.setAttribute('aria-expanded','false');
   const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
   if (menu._escClose) { document.removeEventListener('keydown', menu._escClose); delete menu._escClose; }
+
+  // restore menu to its original parent location (if we moved it)
+  if (menu._originalParent && menu.parentNode !== menu._originalParent){
+    try{
+      if (menu._nextSibling && menu._originalParent.contains(menu._nextSibling)){
+        menu._originalParent.insertBefore(menu, menu._nextSibling);
+      } else {
+        menu._originalParent.appendChild(menu);
+      }
+    }catch(e){ /* ignore if DOM changed */ }
+  }
 }
 
 burger?.addEventListener("click", () => {

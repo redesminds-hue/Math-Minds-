@@ -1349,7 +1349,16 @@ img{ max-width:100%; height:auto; display:block; }
     transform-origin: top right;
     transition: transform .18s ease, opacity .12s ease;
     transform: translateY(0) scale(1);
+
+    pointer-events: auto; /* ensure it receives clicks */
   }
+
+  /* ensure the non-open menu doesn't intercept pointer events */
+  .menu{ pointer-events: none; }
+  .menu a{ pointer-events: auto; }
+
+  /* allow tapping without delay on mobile */
+  .menu a{ -webkit-tap-highlight-color: rgba(0,0,0,0.06); touch-action: manipulation; }
 
   /* Menu items occupy full width inside panel */
   .menu.open a{ font-size:16px; padding:12px 10px; width:100%; border-bottom:1px solid rgba(0,0,0,0.04); color:var(--black); box-sizing:border-box; }
