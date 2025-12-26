@@ -593,7 +593,7 @@ body{
   left:50%;
   bottom:32px;
   transform:translateX(-50%);
-  padding:12px 18px;
+  padding:20px 28px;
   border-radius:12px;
   border:2px solid rgba(0,0,0,0.06);
   background:var(--purple);
@@ -603,6 +603,7 @@ body{
   z-index:6;
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
   transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  font-size: 20px;
 }
 .slide .slide-cta:hover,
 .slide .slide-cta:focus{
@@ -612,7 +613,16 @@ body{
 }
 
 @media (max-width: 740px){
-  .slide .slide-cta{ bottom:18px; padding:10px 14px; font-size:14px; }
+  .slide .slide-cta{
+    left:50%;
+    right:auto;
+    bottom:18px;
+    top:auto;
+    transform:translateX(-50%);
+    padding:10px 14px;
+    font-size:23px;
+    border-radius:12px;
+  }
 }
 
 .carousel-arrow{
