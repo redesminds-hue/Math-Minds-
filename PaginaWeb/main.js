@@ -166,6 +166,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Abrir modal desde cualquier elemento con data-open (delegación para mayor fiabilidad)
+  document.addEventListener('click', (e) => {
+    const opener = e.target && e.target.closest && e.target.closest('[data-open]');
+    if (!opener) return;
+    e.preventDefault();
+    const dest = opener.getAttribute('data-open');
+    if (!dest) return;
+    // cerrar modal(s) activos
+    document.querySelectorAll('.modal-overlay.active').forEach(closeModal);
+    setTimeout(() => { openModal(dest); }, 120);
+  });
+
   // BÚSQUEDA: drawer lateral con historial
   const searchToggle = document.getElementById('searchToggle');
   const searchDrawer = document.getElementById('searchDrawer');
