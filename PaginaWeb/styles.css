@@ -38,17 +38,14 @@ img{ max-width:100%; height:auto; display:block; }
 .brand{
   position:absolute;
   left:0;
-  top: -60px;
-  width:260px;
-  height:260px;
-  
+  top: -40px; /* slightly less overlap so it doesn't block the carousel */
+  width:200px; /* reduced size to avoid covering content */
+  height:200px;
 
-  
   border: none;
-
   border-bottom-right-radius:18px;
-  padding:12px;
-  background:#fff;
+  padding:8px;
+  background: transparent; /* remove solid white block that could cover carousel */
 
   display:flex;
   align-items:center;
@@ -551,16 +548,15 @@ img{ max-width:100%; height:auto; display:block; }
   width:100vw;
   margin-left:calc(50% - 50vw);
   margin-right:calc(50% - 50vw);
-  height:720px;
+  height: min(720px, 60vh); /* responsive height */
   background:#d9d9d9;
 
-  
   border-top:2px solid var(--black);
   border-bottom:2px solid var(--black);
-  margin-top:-37px;
+  margin-top:-10px; /* smaller overlap to avoid being covered */
   position: relative;
   overflow:hidden;
-}
+} 
 
 .carousel{
   position:absolute;
@@ -603,7 +599,7 @@ img{ max-width:100%; height:auto; display:block; }
   left:50%;
   bottom:32px;
   transform:translateX(-50%);
-  padding:20px 28px;
+  padding: clamp(8px, 2.5vw, 20px);
   border-radius:12px;
   border:2px solid rgba(0,0,0,0.06);
   background:var(--purple);
@@ -613,8 +609,8 @@ img{ max-width:100%; height:auto; display:block; }
   z-index:6;
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
   transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-  font-size: 20px;
-}
+  font-size: clamp(14px, 4vw, 20px);
+} 
 .slide .slide-cta:hover,
 .slide .slide-cta:focus{
   transform:translateX(-50%) translateY(-4px);
@@ -761,9 +757,11 @@ img{ max-width:100%; height:auto; display:block; }
   inset: 0;
   background: rgba(0,0,0,0.55);
   display: none;
-  align-items: center;
+  align-items: flex-start; /* allow scrolling when modal taller than viewport */
   justify-content: center;
   z-index: 99999;
+  overflow: auto; /* enable internal scrolling */
+  padding: 24px 12px; /* give space so top of modal isn't hidden under notch */
 }
 
 .modal-overlay.active{ display: flex; }
@@ -776,7 +774,14 @@ img{ max-width:100%; height:auto; display:block; }
   padding: 28px;
   position: relative;
   animation: modalIn 0.35s ease;
+  max-height: calc(100vh - 64px);
+  overflow: auto; /* allow scrolling inside the modal */
+  margin: 8px auto;
 }
+
+@media (max-width:740px){
+  .modal-box{ width: calc(100% - 24px); padding:16px; border-radius:12px; }
+} 
 
 @keyframes modalIn{
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
@@ -1133,6 +1138,11 @@ img{ max-width:100%; height:auto; display:block; }
   .footer-right{
     justify-content: flex-start;
   }
+
+  .footer{ padding: 18px 12px; }
+  .footer-title{ font-size: 18px; }
+  .footer-subtitle{ font-size: 13px; }
+  .footer-slogan img{ max-width:260px; width:90%; height:auto; }
 }
 .footer{
   margin-top: 40px; /* separa el morado del contenido */

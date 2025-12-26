@@ -166,19 +166,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const overlays = document.querySelectorAll(".modal-overlay");
   const closeButtons = document.querySelectorAll(".modal-close");
 
+  let _mm_scrollY = 0;
+  function lockBodyScroll(){
+    _mm_scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${_mm_scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+  function unlockBodyScroll(){
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, _mm_scrollY || 0);
+    _mm_scrollY = 0;
+  }
+
   function openModal(modalId){
     const modal = document.getElementById(modalId);
     if (!modal) return;
 
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
   }
 
   function closeModal(modal){
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
+    unlockBodyScroll();
   }
 
   // ABRIR
