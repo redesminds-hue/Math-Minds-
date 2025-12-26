@@ -587,6 +587,34 @@ body{
   display:block;
 }
 
+/* CTA button on carousel slides */
+.slide .slide-cta{
+  position:absolute;
+  left:50%;
+  bottom:32px;
+  transform:translateX(-50%);
+  padding:12px 18px;
+  border-radius:12px;
+  border:2px solid rgba(0,0,0,0.06);
+  background:var(--purple);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  z-index:6;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.slide .slide-cta:hover,
+.slide .slide-cta:focus{
+  transform:translateX(-50%) translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.18);
+  outline: none;
+}
+
+@media (max-width: 740px){
+  .slide .slide-cta{ bottom:18px; padding:10px 14px; font-size:14px; }
+}
+
 .carousel-arrow{
   position:absolute;
   top:50%;
@@ -1051,4 +1079,27 @@ body{
   margin:0;
   width:min(480px, 90vw);
   height:auto;
+}
+
+.quienes-somos {
+  width: 100%;
+  padding: 80px 20px;
+  background-color: #ffffff;
+  text-align: center;
+  margin-top: -70px;
+}
+
+.quienes-somos h2 {
+  color: #e91e63; /* rosado similar al ejemplo */
+  font-size: 32px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.quienes-somos p {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #333;
 }
