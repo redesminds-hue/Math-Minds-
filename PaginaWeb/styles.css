@@ -1359,11 +1359,11 @@ img{ max-width:100%; height:auto; display:block; }
     position:fixed;
     top:72px; /* below header */
     right:16px;
-    width: min(360px, calc(100% - 32px));
-    max-height: calc(100vh - 96px);
+    width: min(300px, calc(100% - 32px)); /* a bit smaller */
+    max-height: 75vh; /* not too tall */
     overflow-y:auto; /* vertical scrolling */
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
-    touch-action: none; /* we'll handle dragging with pointer events */
+    touch-action: pan-y; /* allow vertical gestures */
     overscroll-behavior: contain; /* prevent body from scrolling */
     z-index:100060; /* above overlay and header */
     background: rgba(255,255,255,0.98);
@@ -1391,8 +1391,8 @@ img{ max-width:100%; height:auto; display:block; }
   .menu a{ -webkit-tap-highlight-color: rgba(0,0,0,0.06); touch-action: manipulation; }
 
   /* Grab handle to signal draggable panel */
-  .menu-grab{ width:40px; height:6px; background: rgba(0,0,0,0.08); border-radius:6px; margin:8px auto; cursor:grab; }
-  .menu-grab:active{ cursor:grabbing; }
+  .menu-grab{ width:48px; height:8px; background: rgba(0,0,0,0.08); border-radius:8px; margin:10px auto; cursor:grab; }
+  .menu-grab:active{ cursor:grabbing; transform: scale(0.98); }
 
   /* Menu items occupy full width inside panel */
   .menu.open a{ font-size:16px; padding:12px 10px; width:100%; border-bottom:1px solid rgba(0,0,0,0.04); color:var(--black); box-sizing:border-box; }

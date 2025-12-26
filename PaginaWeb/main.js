@@ -48,57 +48,26 @@ function openMenu(){
 
   ov.addEventListener('click', closeMenu, { once:true });
 
-  // Touch-scroll fallback for devices where native scrolling inside fixed elements is unreliable
-  if (!menu._touchStartHandler){
-    let _startY = 0, _startScroll = 0;
-    menu._touchStartHandler = function(e){
-      const t = e.touches ? e.touches[0] : null;
-      _startY = t ? t.clientY : (e.clientY || 0);
-      _startScroll = menu.scrollTop;
-    };
-    menu._touchMoveHandler = function(e){
-      const t = e.touches ? e.touches[0] : null;
-      if (!t) return;
-      const dy = t.clientY - _startY;
-      // apply scroll manually to ensure responsiveness
-      menu.scrollTop = _startScroll - dy;
-      e.stopPropagation();
-      e.preventDefault();
-    };
-    menu.addEventListener('touchstart', menu._touchStartHandler, { passive:false });
-    menu.addEventListener('touchmove', menu._touchMoveHandler, { passive:false });
+  // Use native scrolling for the menu panel (more reliable across devices).
+  // Remove any custom pointer/touch handlers that interfere with native scrolling.
+  if (menu._touchStartHandler){
+    try{
+      menu.removeEventListener('touchstart', menu._touchStartHandler, { passive:false });
+      menu.removeEventListener('touchmove', menu._touchMoveHandler, { passive:false });
+    }catch(e){}
+    delete menu._touchStartHandler; delete menu._touchMoveHandler;
+  }
+  if (menu._pointerDownHandler){
+    try{
+      menu.removeEventListener('pointerdown', menu._pointerDownHandler, { passive:false });
+      menu.removeEventListener('pointermove', menu._pointerMoveHandler, { passive:false });
+      menu.removeEventListener('pointerup', menu._pointerUpHandler, { passive:false });
+      menu.removeEventListener('pointercancel', menu._pointerUpHandler, { passive:false });
+    }catch(e){}
+    delete menu._pointerDownHandler; delete menu._pointerMoveHandler; delete menu._pointerUpHandler; delete menu._isPointerDown;
   }
 
-  // Pointer-based drag scroll fallback (more reliable across devices)
-  if (!menu._pointerDownHandler){
-    menu._isPointerDown = false;
-    menu._pointerDownHandler = function(ev){
-      if (ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return;
-      menu._isPointerDown = true;
-      menu._pointerStartY = ev.clientY;
-      menu._pointerStartScroll = menu.scrollTop;
-      try{ menu.setPointerCapture && menu.setPointerCapture(ev.pointerId); }catch(e){}
-    };
-    menu._pointerMoveHandler = function(ev){
-      if (!menu._isPointerDown) return;
-      const dy = ev.clientY - (menu._pointerStartY || 0);
-      menu.scrollTop = (menu._pointerStartScroll || 0) - dy;
-      ev.preventDefault();
-      ev.stopPropagation();
-    };
-    menu._pointerUpHandler = function(ev){
-      if (!menu._isPointerDown) return;
-      menu._isPointerDown = false;
-      try{ menu.releasePointerCapture && menu.releasePointerCapture(ev.pointerId); }catch(e){}
-    };
-
-    menu.addEventListener('pointerdown', menu._pointerDownHandler, { passive:false });
-    menu.addEventListener('pointermove', menu._pointerMoveHandler, { passive:false });
-    menu.addEventListener('pointerup', menu._pointerUpHandler, { passive:false });
-    menu.addEventListener('pointercancel', menu._pointerUpHandler, { passive:false });
-  }
-
-  // Add a small visual 'grab' handle so users see they can drag the panel
+  // Add a grab handle so users see they can scroll the panel
   if (!menu.querySelector('.menu-grab')){
     const grab = document.createElement('div');
     grab.className = 'menu-grab';
