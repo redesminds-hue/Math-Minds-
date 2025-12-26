@@ -64,7 +64,8 @@
     <img src="../Multimedia/Didactico.png" alt="Material Concreto" width="150" height="35" />
   </a>
 
-  <a href="productos.html" target="_blank" class="menu-item">
+  <!-- COMPRAR -->
+  <a href="productos.html" target="_blank" class="menu-item menu-buy" id="menuBuy">
     <span class="menu-label">TIENDA</span>
     <span class="menu-text">Comprar Productos</span>
   </a>
@@ -140,6 +141,7 @@
       <a href="#" data-modal="modalReveal">Reveal Math</a>
       <a href="#" data-modal="modalPrime">Prime</a>
       <a href="#" data-modal="modalMaterial">Material Didáctico</a>
+      <a href="productos.html">Tienda</a>
     </div>
 
     <!-- Columna 3 -->
@@ -183,12 +185,12 @@
 
   <aside id="searchDrawer" class="search-drawer" role="dialog" aria-modal="true" aria-hidden="true">
     <header class="search-drawer-header">
-      <div style="display:flex;align-items:center;gap:10px;">
+      <div class="left">
         <strong>Buscar</strong>
-      </div>
-      <div>
         <button class="btn secondary" id="clearHistoryBtn" title="Limpiar historial">Limpiar</button>
-        <button class="modal-close" id="searchClose" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="right">
+        <button class="modal-close search-close" id="searchClose" type="button" aria-label="Cerrar">×</button>
       </div>
     </header>
 

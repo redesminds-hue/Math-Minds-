@@ -156,7 +156,7 @@ body{
 .search-btn{
   margin-left: auto;
   margin-right: 20px;
-  margin-top: -10px;
+  margin-top: 0;
   height: 34px;
   width: 36px;
   border:2px solid var(--black);
@@ -170,6 +170,13 @@ body{
   position:relative; /* para controlar z-index */
   z-index:100002; /* arriba del drawer y overlay para que el botón siempre esté visible */
   -webkit-appearance: none;
+  transform: translateY(-15px); /* pequeño ajuste vertical para centrar mejor */
+  
+  transition: transform .15s ease;
+}
+
+@media (max-width: 740px){
+  .search-btn{ transform: translateY(0); }
 }
 
 /* Drawer de búsqueda */
@@ -206,6 +213,44 @@ body{
   justify-content:space-between;
   padding:14px 16px;
   border-bottom:1px solid rgba(0,0,0,0.06);
+}
+
+.search-drawer-header .left{ display:flex; align-items:center; gap:12px; }
+.search-drawer-header .right{ display:flex; align-items:center; gap:8px; }
+
+#clearHistoryBtn{
+  background:#fff;
+  color:var(--purple);
+  border:2px solid var(--purple);
+  padding:8px 10px;
+  border-radius:10px;
+  cursor:pointer;
+  transition: background .15s ease, color .15s ease, transform .12s ease;
+  margin-left: 150px;
+  
+}
+#clearHistoryBtn:hover,
+#clearHistoryBtn:focus{
+  background:var(--purple);
+  color:#fff;
+  transform: translateY(-2px);
+}
+
+.search-drawer .search-close{
+  background:#fff;
+  color:var(--black);
+  border:none;
+  font-size:22px;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  transition: background .15s ease, color .15s ease, transform .12s ease;
+}
+.search-drawer .search-close:hover,
+.search-drawer .search-close:focus{
+  background:var(--purple);
+  color:#fff;
+  transform: translateY(-2px);
 }
 
 .search-drawer-body{ padding:16px; overflow:auto; }
@@ -406,6 +451,40 @@ body{
   }
 }
 
+
+/* Comprar - botón en menú */
+.menu-buy{
+  background: #fff;
+  border: 2px solid transparent;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: background .18s ease, color .18s ease, transform .12s ease, border-color .12s ease;
+  color: var(--black);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  margin-left: 18px; /* separar del resto del menú */
+}
+
+.menu-buy .menu-label{ font-size:10px; opacity:0.8; color:inherit; }
+.menu-buy .menu-text{ font-weight:700; color:inherit; }
+
+.menu-buy:hover,
+.menu-buy:focus{
+  background: var(--purple);
+  color: #fff;
+  border-color: var(--purple);
+  transform: translateY(-4px);
+  text-decoration: none;
+}
+
+.menu-buy:focus{ outline: 3px solid rgba(19,214,235,0.18); outline-offset: 2px; }
+
+@media (max-width: 740px){
+  .menu-buy{ width:100%; box-shadow:none; }
+}
 
 /* =========================
    RESPONSIVE
