@@ -5,10 +5,45 @@ const burger = document.getElementById("burger");
 const menu = document.getElementById("menu");
 
 burger?.addEventListener("click", () => {
-  // Toggle 'open' class so CSS controls visibility and layout
   if (!menu) return;
   const isOpen = menu.classList.toggle('open');
   burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+  // Manage overlay and close handlers
+  if (isOpen){
+    // create overlay
+    let ov = document.getElementById('menuOverlay');
+    if (!ov){
+      ov = document.createElement('div');
+      ov.id = 'menuOverlay';
+      ov.className = 'menu-overlay';
+      document.body.appendChild(ov);
+    }
+
+    const closeMenu = () => {
+      menu.classList.remove('open');
+      burger.setAttribute('aria-expanded','false');
+      const ov2 = document.getElementById('menuOverlay'); if (ov2) ov2.remove();
+      document.removeEventListener('keydown', escClose);
+    };
+
+    const escClose = (ev) => { if (ev.key === 'Escape') closeMenu(); };
+    document.addEventListener('keydown', escClose);
+    ov.addEventListener('click', closeMenu, { once: true });
+
+  } else {
+    const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
+  }
+});
+
+// Close menu when resizing to larger screens
+window.addEventListener('resize', () => {
+  if (!menu) return;
+  if (window.innerWidth > 1024 && menu.classList.contains('open')){
+    menu.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+    const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
+  }
 });
 
 
