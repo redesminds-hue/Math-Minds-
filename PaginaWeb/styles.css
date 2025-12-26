@@ -773,7 +773,10 @@ body{
 
 /* Alineación y estilo centrado para modales con 1 tarjeta */
 #modal-Scholastic .compare-grid,
-#modal-MathMinds .compare-grid{
+#modal-MathMinds .compare-grid,
+#modalReveal .compare-grid,
+#modalPrime .compare-grid,
+#modalMaterial .compare-grid{
   max-width: 860px;
   margin: 0 auto;
   grid-template-columns: 1fr;
@@ -781,12 +784,23 @@ body{
 }
 
 #modal-Scholastic .compare-card,
-#modal-MathMinds .compare-card{
+#modal-MathMinds .compare-card,
+#modalReveal .compare-card,
+#modalPrime .compare-card,
+#modalMaterial .compare-card{
   margin: 0 auto;
   width: 100%;
   max-width: 720px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   border-radius: 28px;
+}
+
+#modal-Scholastic .modal-text,
+#modal-MathMinds .modal-text,
+#modalReveal .modal-text,
+#modalPrime .modal-text,
+#modalMaterial .modal-text{
+  text-align: center;
 }
 
 /* Material CTA inside Math Minds modal */
