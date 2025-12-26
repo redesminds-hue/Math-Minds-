@@ -57,10 +57,13 @@ window.addEventListener('resize', () => {
 document.addEventListener('click', (e) => {
   const link = e.target && e.target.closest && e.target.closest('.menu a');
   if (!link) return;
-  // If a menu link is clicked and menu is open on small screens, close it first
+  // If a menu link is clicked and menu is open on small screens, close it after a short delay
   if (menu && menu.classList.contains('open')){
-    // Small delay so any click handlers (e.g. data-modal) can run after close
-    setTimeout(() => { closeMenu(); }, 50);
+    // If the clicked link opens a modal or uses data-open, wait a bit longer
+    // so the modal's click handler runs first and can open properly on mobile.
+    const opensModal = link.hasAttribute('data-modal') || link.hasAttribute('data-open');
+    const delay = opensModal ? 220 : 50;
+    setTimeout(() => { closeMenu(); }, delay);
   }
 });
 
