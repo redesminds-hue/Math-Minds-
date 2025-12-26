@@ -157,7 +157,119 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") {
       document.querySelectorAll(".modal-overlay.active").forEach(closeModal);
+      // cerrar panel de búsqueda si está abierto
+      const sp = document.getElementById('searchPanel');
+      if (sp && sp.classList.contains('active')){
+        sp.classList.remove('active');
+        sp.setAttribute('aria-hidden','true');
+      }
     }
   });
+
+  // BÚSQUEDA: drawer lateral con historial
+  const searchToggle = document.getElementById('searchToggle');
+  const searchDrawer = document.getElementById('searchDrawer');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchClose = document.getElementById('searchClose');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  const searchInput = document.getElementById('searchInput');
+  const searchSubmit = document.getElementById('searchSubmit');
+  const historyList = document.getElementById('searchHistory');
+
+  const HISTORY_KEY = 'mm_search_history_v1';
+  const HISTORY_MAX = 8;
+
+  function loadHistory(){
+    try{
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+
+  function saveHistory(arr){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function renderHistory(){
+    const items = loadHistory();
+    historyList.innerHTML = '';
+    if (items.length === 0){
+      historyList.innerHTML = '<li style="opacity:.8">(Sin búsquedas todavía)</li>';
+      return;
+    }
+
+    items.forEach(q => {
+      const li = document.createElement('li');
+      li.textContent = q;
+      li.addEventListener('click', () => performSearch(q));
+      historyList.appendChild(li);
+    });
+  }
+
+  function addToHistory(q){
+    if (!q) return;
+    const items = loadHistory().filter(x => x !== q);
+    items.unshift(q);
+    if (items.length > HISTORY_MAX) items.length = HISTORY_MAX;
+    saveHistory(items);
+    renderHistory();
+  }
+
+  function clearHistory(){
+    saveHistory([]);
+    renderHistory();
+  }
+
+  function openDrawer(){
+    if (!searchDrawer) return;
+    searchDrawer.setAttribute('aria-hidden','false');
+    searchOverlay.classList.add('active');
+    searchOverlay.setAttribute('aria-hidden','false');
+    // esconder el botón de búsqueda para que no interfiera
+    if (searchToggle) searchToggle.style.display = 'none';
+    searchInput?.focus();
+    renderHistory();
+  }
+
+  function closeDrawer(){
+    if (!searchDrawer) return;
+    searchDrawer.setAttribute('aria-hidden','true');
+    searchOverlay.classList.remove('active');
+    searchOverlay.setAttribute('aria-hidden','true');
+    // restaurar el botón
+    if (searchToggle) searchToggle.style.display = '';
+  }
+
+  function performSearch(q){
+    const query = (q || searchInput?.value||'').trim();
+    if (!query) return;
+    addToHistory(query);
+    // por ahora redirigimos a productos con la query en la url
+    window.location.href = `productos.html?q=${encodeURIComponent(query)}`;
+  }
+
+  if (searchToggle && searchDrawer && searchOverlay){
+    searchToggle.addEventListener('click', (ev) => { ev.preventDefault(); openDrawer(); });
+    searchClose?.addEventListener('click', closeDrawer);
+    searchOverlay.addEventListener('click', closeDrawer);
+
+    searchSubmit?.addEventListener('click', () => performSearch());
+
+    searchInput?.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') performSearch();
+    });
+
+    clearHistoryBtn?.addEventListener('click', () => {
+      clearHistory();
+      searchInput?.focus();
+    });
+
+    // cerrar con ESC también
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') closeDrawer();
+    });
+
+    renderHistory();
+  }
 
 });

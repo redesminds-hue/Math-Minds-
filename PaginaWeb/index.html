@@ -64,12 +64,15 @@
     <img src="../Multimedia/Didactico.png" alt="Material Concreto" width="150" height="35" />
   </a>
 
+  <a href="productos.html" target="_blank" class="menu-item">
+    <span class="menu-label">TIENDA</span>
+    <span class="menu-text">Comprar Productos</span>
+  </a>
+
 </nav>
 
-        <div class="searchbox">
-          <span class="search-icon">🔎</span>
-          <input type="text" placeholder="" />
-        </div>
+        <!-- Drawer de búsqueda (se abre desde el lado derecho) -->
+        <button id="searchToggle" type="button" class="search-btn" aria-label="Buscar">🔎</button>
 
         <button class="burger" id="burger" aria-label="Menú">
           <span></span><span></span><span></span>
@@ -174,6 +177,33 @@
 
 
   <script src="main.js"></script>
+
+  <!-- Drawer de búsqueda (moved to body end so it sits above carousel) -->
+  <div id="searchOverlay" class="search-overlay" aria-hidden="true"></div>
+
+  <aside id="searchDrawer" class="search-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <header class="search-drawer-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <strong>Buscar</strong>
+      </div>
+      <div>
+        <button class="btn secondary" id="clearHistoryBtn" title="Limpiar historial">Limpiar</button>
+        <button class="modal-close" id="searchClose" type="button" aria-label="Cerrar">×</button>
+      </div>
+    </header>
+
+    <div class="search-drawer-body">
+      <div class="search-input-wrap">
+        <input id="searchInput" type="text" placeholder="Buscar productos, empresas..." aria-label="Buscar" />
+        <button id="searchSubmit" class="btn primary">Buscar</button>
+      </div>
+
+      <div class="search-results">
+        <h4>Historial</h4>
+        <ul id="searchHistory" class="search-history"></ul>
+      </div>
+    </div>
+  </aside>
 
   <!-- =========================
        MODALES
@@ -335,33 +365,17 @@
        <div class="compare-grid">
         <div class="compare-card">
           <div class="compare-head">
-            <h3><img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" /></h3>
-            <span class="tag">Adaptive Learning</span>
+            <h3><img src="../Multimedia/Scholastic.png" alt="Scholastic Logo" width="195" height="40" /></h3>
+            <span class="tag">Libros & Recursos</span>
           </div>
 
           <ul class="compare-list">
-            <li>ALEKS® (Assessment and Learning in Knowledge Spaces) es una plataforma de matemáticas basada en inteligencia artificial que diagnostica con precisión qué sabe cada estudiante y construye un camino de aprendizaje individual, adaptándose en tiempo real a su progreso.</li>
-            <li>Reportes detallados para docentes y colegios.</li>
-            <li>Evaluación diagnóstica continua.</li>
+            <li>Libros de lectura y recursos para primaria y secundaria.</li>
+            <li>Materiales que fomentan la comprensión lectora y el pensamiento crítico.</li>
+            <li>Programas de lectura escolar y bibliotecas escolares.</li>
           </ul>
 
-          <a class="btn primary full" href="https://tusitio.com/comprar-aleks">Comprar ALEKS</a>
-        </div>
-
-        <div class="compare-card highlight">
-          <div class="compare-head">
-            <h3><img src="../Multimedia/Logo_Reveal_Math.png" alt="RevealMath" width="160" height="42" /></h3>
-            <span class="tag">Gamificado</span>
-          </div>
-
-          <ul class="compare-list">
-            <li>ALEKS Adventure® está diseñada para educación inicial y primaria, que combina la inteligencia artificial con un entorno visual, lúdico y exploratorio, donde los niños aprenden matemáticas a través de retos, historias y misiones.</li>
-            <li>Más motivación: progreso visual y recompensas.</li>
-            <li>Aprendizaje adaptativo desde edades tempranas.</li>
-            <li>Desarrollo del pensamiento matemático paso a paso.</li>
-          </ul>
-
-          <a class="btn secondary full" href="https://tusitio.com/comprar-aleks-adventure">Comprar Adventure</a>
+          <a class="btn primary full" href="https://tusitio.com/scholastic">Ver catálogo</a>
         </div>
       </div>
       <div class="modal-actions">
@@ -385,33 +399,17 @@
        <div class="compare-grid">
         <div class="compare-card">
           <div class="compare-head">
-            <h3><img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" /></h3>
-            <span class="tag">Adaptive Learning</span>
+            <h3>Math Minds</h3>
+            <span class="tag">Soluciones educativas</span>
           </div>
 
           <ul class="compare-list">
-            <li>ALEKS® (Assessment and Learning in Knowledge Spaces) es una plataforma de matemáticas basada en inteligencia artificial que diagnostica con precisión qué sabe cada estudiante y construye un camino de aprendizaje individual, adaptándose en tiempo real a su progreso.</li>
-            <li>Reportes detallados para docentes y colegios.</li>
-            <li>Evaluación diagnóstica continua.</li>
+            <li>Programas y recursos propios para enseñanza de matemáticas.</li>
+            <li>Formación docente y evaluación formativa.</li>
+            <li>Material adaptado a currículo colombiano.</li>
           </ul>
 
-          <a class="btn primary full" href="https://tusitio.com/comprar-aleks">Comprar ALEKS</a>
-        </div>
-
-        <div class="compare-card highlight">
-          <div class="compare-head">
-            <h3><img src="../Multimedia/Logo_Reveal_Math.png" alt="RevealMath" width="160" height="42" /></h3>
-            <span class="tag">Gamificado</span>
-          </div>
-
-          <ul class="compare-list">
-            <li>ALEKS Adventure® está diseñada para educación inicial y primaria, que combina la inteligencia artificial con un entorno visual, lúdico y exploratorio, donde los niños aprenden matemáticas a través de retos, historias y misiones.</li>
-            <li>Más motivación: progreso visual y recompensas.</li>
-            <li>Aprendizaje adaptativo desde edades tempranas.</li>
-            <li>Desarrollo del pensamiento matemático paso a paso.</li>
-          </ul>
-
-          <a class="btn secondary full" href="https://tusitio.com/comprar-aleks-adventure">Comprar Adventure</a>
+          <a class="btn primary full" href="https://tusitio.com/mathminds">Conócenos</a>
         </div>
       </div>
       
