@@ -789,6 +789,23 @@ body{
   border-radius: 28px;
 }
 
+/* Material CTA inside Math Minds modal */
+.material-cta{ display:flex; justify-content:center; }
+.material-link{
+  display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px;
+  border:1px solid rgba(0,0,0,0.06); background:#fff; text-decoration:none; color:var(--black);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  transition: transform .12s ease, background .12s ease, color .12s ease;
+}
+.material-link:focus{ outline: 3px solid rgba(19,214,235,0.18); outline-offset:2px; }
+.material-link:hover{ background:var(--purple); color:#fff; transform: translateY(-3px); }
+.material-img{ width:72px; height:48px; object-fit:contain; display:block; }
+.material-label small{ display:block; opacity:.88; font-size:13px; margin-top:2px; }
+
+@media (max-width:740px){
+  .material-link{ width:100%; justify-content:flex-start; }
+  .material-img{ width:58px; height:40px; }
+}
 #modal-Scholastic .modal-text,
 #modal-MathMinds .modal-text{
   text-align: center;
@@ -798,6 +815,8 @@ body{
 #modal-MathMinds .compare-card .compare-head h3 img{
   max-width: 260px;
   height: auto;
+  align-items: center;
+  align-self: center;
 }
 
 /* Video placeholder */
