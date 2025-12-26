@@ -787,6 +787,22 @@ img{ max-width:100%; height:auto; display:block; }
   /* Make logos inside modals adapt to narrow screens */
   .compare-card .compare-head img,
   .modal-box img{ max-width: 140px; width: 85%; height: auto; display:block; margin: 0 auto; }
+
+  /* Specific smaller logos for certain modules */
+  #modal-Scholastic .compare-card .compare-head h3 img,
+  #modal-McGrawHill .compare-card .compare-head h3 img,
+  #modal-MathMinds .compare-card .compare-head h3 img{
+    max-width: 120px;
+    width: 80%;
+  }
+}
+
+@media (max-width:480px){
+  .compare-card .compare-head img,
+  .modal-box img{ max-width: 120px; width: 80%; }
+  #modal-Scholastic .compare-card .compare-head h3 img,
+  #modal-McGrawHill .compare-card .compare-head h3 img,
+  #modal-MathMinds .compare-card .compare-head h3 img{ max-width: 100px; }
 }
 
 @media (max-width:480px){

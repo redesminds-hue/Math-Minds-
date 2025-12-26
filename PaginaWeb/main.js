@@ -47,6 +47,27 @@ function openMenu(){
   menu._escClose = escClose;
 
   ov.addEventListener('click', closeMenu, { once:true });
+
+  // Touch-scroll fallback for devices where native scrolling inside fixed elements is unreliable
+  if (!menu._touchStartHandler){
+    let _startY = 0, _startScroll = 0;
+    menu._touchStartHandler = function(e){
+      const t = e.touches ? e.touches[0] : null;
+      _startY = t ? t.clientY : (e.clientY || 0);
+      _startScroll = menu.scrollTop;
+    };
+    menu._touchMoveHandler = function(e){
+      const t = e.touches ? e.touches[0] : null;
+      if (!t) return;
+      const dy = t.clientY - _startY;
+      // apply scroll manually to ensure responsiveness
+      menu.scrollTop = _startScroll - dy;
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    menu.addEventListener('touchstart', menu._touchStartHandler, { passive:false });
+    menu.addEventListener('touchmove', menu._touchMoveHandler, { passive:false });
+  }
 }
 
 function closeMenu(){
@@ -56,6 +77,14 @@ function closeMenu(){
   burger.setAttribute('aria-expanded','false');
   const ov = document.getElementById('menuOverlay'); if (ov) ov.remove();
   if (menu._escClose) { document.removeEventListener('keydown', menu._escClose); delete menu._escClose; }
+
+  // remove touch handlers if present
+  if (menu._touchStartHandler){
+    menu.removeEventListener('touchstart', menu._touchStartHandler, { passive:false });
+    menu.removeEventListener('touchmove', menu._touchMoveHandler, { passive:false });
+    delete menu._touchStartHandler;
+    delete menu._touchMoveHandler;
+  }
 
   // restore menu to its original parent location (if we moved it)
   if (menu._originalParent && menu.parentNode !== menu._originalParent){
