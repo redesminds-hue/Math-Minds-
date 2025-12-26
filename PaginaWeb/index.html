@@ -9,7 +9,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -26,7 +26,9 @@
     <span class="menu-text">INICIO</span>
   </a>
 
-  <img src="../Multimedia/McGrawHill.png" alt="McGraw Hill" width="50" height="42" />
+  <!-- Mc Graw Hill -->
+  <a href="#" id="openMcGrawHill" data-modal="modal-McGrawHill" class="menu-item">
+    <img src="../Multimedia/McGrawHill.png" alt="McGraw Hill" width="50" height="42" /> 
 
   <!-- ALEKS -->
   <a href="#" id="openAleks" data-modal="modalAleks" class="menu-item">
@@ -40,7 +42,10 @@
     <img src="../Multimedia/Logo_Reveal_Math.png" alt="Reveal Math" width="150" height="42" />
   </a>
 
-  <img src="../Multimedia/Scholastic.png" alt="Scholastic" width="50" height="42" />
+  <!-- SCHOLASTIC -->
+   <a href="#" id="openScholastic" data-modal="modal-Scholastic" class="menu-item">
+    <img src="../Multimedia/Scholastic.png" alt="Scholastic" width="50" height="42" />
+  </a>
 
   <!-- PRIME -->
   <a href="#" id="openPrime" data-modal="modalPrime" class="menu-item">
@@ -48,13 +53,17 @@
     <img src="../Multimedia/Logo_Prime.png" alt="Prime" width="150" height="40" />
   </a>
 
-  <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="45" height="44"/>
+  <!-- MATH MINDS -->
+   <a href="#" id="openMathMinds" data-modal="modal-MathMinds" class="menu-item">
+    <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="45" height="44"/>
+  </a>
 
   <!-- MATERIAL CONCRETO -->
   <a href="#" id="openMaterialConcreto" data-modal="modalMaterial" class="menu-item">
     <span class="menu-label">MATERIAL</span>
     <img src="../Multimedia/Didactico.png" alt="Material Concreto" width="150" height="35" />
   </a>
+
 </nav>
 
         <div class="searchbox">
@@ -124,10 +133,10 @@
     <div class="footer-col footer-links">
       <h4>Enlaces</h4>
       <a href="#">Inicio</a>
-      <a href="#">ALEKS</a>
-      <a href="#">Reveal Math</a>
-      <a href="#">Prime</a>
-      <a href="#">Material Concreto</a>
+      <a href="#" data-modal="modalAleks">ALEKS</a>
+      <a href="#" data-modal="modalReveal">Reveal Math</a>
+      <a href="#" data-modal="modalPrime">Prime</a>
+      <a href="#" data-modal="modalMaterial">Material Didáctico</a>
     </div>
 
     <!-- Columna 3 -->
@@ -174,15 +183,19 @@
     <div class="modal-box modal-compare" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" aria-label="Cerrar">×</button>
 
-      <img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" />
-      <img src="../Multimedia/ALEKS ADVENTURE.png" alt="ALEKS Adventure Logo" width="300" height="40" />
+      <img src="../Multimedia/McGrawHill.png" alt="McGraw Hill" width="100" height="84" /> 
+
+      <h2 class="modal-text">
+        Comparativa de ALEKS® y ALEKS Adventure®
+      </h2>
+      
 
       <p class="modal-subtitle">Dos experiencias, un mismo objetivo: aprendizaje personalizado en matemáticas.</p>
 
       <div class="compare-grid">
         <div class="compare-card">
           <div class="compare-head">
-            <h3>ALEKS</h3>
+            <h3><img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" /></h3>
             <span class="tag">Adaptive Learning</span>
           </div>
 
@@ -197,7 +210,7 @@
 
         <div class="compare-card highlight">
           <div class="compare-head">
-            <h3>ALEKS Adventure</h3>
+            <h3><img src="../Multimedia/ALEKS ADVENTURE.png" alt="ALEKS Adventure Logo" width="300" height="40" /></h3>
             <span class="tag">Gamificado</span>
           </div>
 
@@ -218,10 +231,11 @@
     </div>
   </div>
 
+  <!-- Material Didactico -->
   <div class="modal-overlay" id="modalMaterial" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" aria-label="Cerrar">×</button>
-      <h2>Material Concreto</h2>
+      <h2>Material Didáctico</h2>
       <p>Manipulativos para enseñanza CPA: base ten blocks, cubos conectores, fracciones, etc.</p>
       <div class="modal-actions">
         <a class="btn primary" href="https://tusitio.com/material-concreto">Comprar</a>
@@ -230,6 +244,7 @@
     </div>
   </div>
 
+  <!-- REVEAL MATH -->
   <div class="modal-overlay" id="modalReveal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" aria-label="Cerrar">×</button>
@@ -242,6 +257,7 @@
     </div>
   </div>
 
+  <!-- PRIME -->
   <div class="modal-overlay" id="modalPrime" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" aria-label="Cerrar">×</button>
@@ -254,26 +270,55 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalColegios" aria-hidden="true">
+
+  <!-- MCGRAW HILL -->
+  <div class="modal-overlay" id="modal-McGrawHill" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" aria-label="Cerrar">×</button>
-      <h2>Colegios</h2>
-      <p>Implementaciones institucionales, capacitación docente, pilotos y acompañamiento.</p>
+      <img src="../Multimedia/McGrawHill.png" alt="McGraw Hill" width="100" height="84" />
+      <h2 class="modal-text">
+        Nuestros productos McGraw Hill
+      </h2>
+      <p class="modal-subtitle">Soluciones educativas innovadoras para potenciar el aprendizaje.</p>
       <div class="modal-actions">
-        <a class="btn primary" href="https://tusitio.com/colegios">Agendar reunión</a>
-        <a class="btn secondary" href="https://tusitio.com/contacto">Contacto</a>
+        <a class="btn primary" href="https://tusitio.com/mcgraw">Ver productos</a>
+        <a class="btn secondary" href="https://tusitio.com/mcgraw-contacto">Contactar</a>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalProductos" aria-hidden="true">
+  <!-- SCHOLASTIC -->
+  <div class="modal-overlay" id="modal-Scholastic" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" aria-label="Cerrar">×</button>
-      <h2>Productos</h2>
-      <p>Explora nuestras líneas: plataformas, libros, manipulativos y recursos.</p>
+      <img src="../Multimedia/Scholastic.png" alt="Scholastic" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Nuestros productos Scholastic
+      </h2>
+      
+      <p class="modal-subtitle">Libros y recursos educativos para fomentar el amor por la lectura y el aprendizaje. </p>
       <div class="modal-actions">
-        <a class="btn primary" href="https://tusitio.com/productos">Ver productos</a>
-        <a class="btn secondary" href="https://tusitio.com/cotizar">Cotizar</a>
+        <a class="btn primary" href="https://tusitio.com/scholastic">Ver catálogo</a>
+        <a class="btn secondary" href="https://tusitio.com/scholastic-contacto">Pedir información</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATH MINDS -->
+  <div class="modal-overlay" id="modal-MathMinds" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Nuestros productos Math Minds
+      </h2>
+      <p class="modal-subtitle">Soluciones educativas integrales para el aprendizaje efectivo de las matemáticas.</p>
+      
+      <div class="modal-actions">
+        <a class="btn primary" href="https://tusitio.com/mathminds">Conócenos</a>
+        <a class="btn secondary" href="https://tusitio.com/contacto">Contacto</a>
       </div>
     </div>
   </div>

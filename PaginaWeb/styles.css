@@ -282,13 +282,19 @@ body{
 .footer-links a{
   display:block;
   text-decoration: none;
-  color: rgba(17,17,17,0.85);
+  color: rgba(17,17,17,0.95);
   margin: 10px 0;
   width: fit-content;
   border-bottom: 1px solid transparent;
+  font-family: 'Montserrat', 'Poppins', Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  transition: color .12s ease, transform .12s ease, border-bottom .12s ease;
 }
 
 .footer-links a:hover{
+  color: var(--black);
+  transform: translateY(-2px);
   border-bottom: 1px solid rgba(17,17,17,0.7);
 }
 
@@ -515,7 +521,7 @@ body{
 .modal-overlay.active{ display: flex; }
 
 .modal-box{
-  width: min(760px, 92vw);
+  width: min(1200px, calc(100% - 32px));
   background: #fff;
   border: 2px solid var(--black);
   border-radius: 18px;
@@ -572,10 +578,16 @@ body{
 /* Comparador ALEKS */
 .modal-compare{ text-align: left; }
 
+.modal-text{
+  text-align: center;
+  margin-top: -60px;
+}
+
 .modal-subtitle{
   margin: 12px 0 18px;
   opacity: .85;
   line-height: 1.4;
+  text-align: center;
 }
 
 .compare-grid{
@@ -667,7 +679,10 @@ body{
   border-top: 2px solid var(--black);
   border-top-left-radius: 26px;
   border-top-right-radius: 26px;
-}
+  font-family: 'Montserrat', 'Poppins', Arial, Helvetica, sans-serif;
+  color: #000;
+  letter-spacing: 0.2px;
+} 
 
 .footer-inner{
   width: min(1200px, calc(100% - 32px));
@@ -680,11 +695,13 @@ body{
 
 .footer-title{
   color: #000000;
-  font-family: 'Poppins', Arial, Helvetica, sans-serif;
-  font-size: 20px;
+  font-family: 'Montserrat', 'Poppins', Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
   margin: 0;
   line-height: 1.1;
-}
+  letter-spacing: 0.3px;
+} 
 
 .footer-subtitle{
   color: rgb(0, 0, 0);
