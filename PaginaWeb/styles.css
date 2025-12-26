@@ -38,7 +38,7 @@ img{ max-width:100%; height:auto; display:block; }
 .brand{
   position:absolute;
   left:0;
-  top: -40px; /* slightly less overlap so it doesn't block the carousel */
+  top: -20px; /* slightly less overlap so it doesn't block the carousel */
   width:200px; /* reduced size to avoid covering content */
   height:200px;
 
@@ -186,7 +186,7 @@ img{ max-width:100%; height:auto; display:block; }
   inset:0;
   background: rgba(0,0,0,0.35);
   display:none;
-  z-index: 100000; /* arriba de todo, por si el carrusel tiene stacking context */
+  z-index: 100030; /* above header */
 }
 .search-overlay.active{ display:block; }
 
@@ -201,10 +201,10 @@ img{ max-width:100%; height:auto; display:block; }
   border-left:2px solid var(--black);
   transform:translateX(100%);
   transition: transform 320ms cubic-bezier(.2,.9,.2,1);
-  z-index:100001; /* arriba del overlay */
+  z-index:100031; /* above header */
   display:flex;
   flex-direction:column;
-}
+} 
 
 .search-drawer[aria-hidden="false"]{ transform:translateX(0); }
 
@@ -710,11 +710,13 @@ img{ max-width:100%; height:auto; display:block; }
 #productsGrid .btn.secondary{ border-color:transparent; }
 
 
-.cart-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.35); display:none; z-index: 100000; }
+.cart-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.35); display:none; z-index: 100040; }
 .cart-overlay.active{ display:block; }
 
-.cart-drawer{ position:fixed; top:0; right:0; height:100vh; width:420px; max-width:95vw; background:#fff; border-left:2px solid var(--black); transform:translateX(100%); transition: transform 320ms cubic-bezier(.2,.9,.2,1); z-index:100001; display:flex; flex-direction:column; }
+.cart-drawer{ position:fixed; top:0; right:0; height:100vh; width:420px; max-width:95vw; background:#fff; border-left:2px solid var(--black); transform:translateX(100%); transition: transform 320ms cubic-bezier(.2,.9,.2,1); z-index:100041; display:flex; flex-direction:column; }
 .cart-drawer[aria-hidden="false"]{ transform:translateX(0); }
+
+.mini-cart-popup{ z-index: 100042; }
 
 .cart-drawer .search-drawer-header{ padding:14px 16px; border-bottom:1px solid rgba(0,0,0,0.06); }
 #cartList li{ display:flex; gap:10px; align-items:center; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.04); }
@@ -759,7 +761,7 @@ img{ max-width:100%; height:auto; display:block; }
   display: none;
   align-items: flex-start; /* allow scrolling when modal taller than viewport */
   justify-content: center;
-  z-index: 99999;
+  z-index: 100020; /* above header */
   overflow: auto; /* enable internal scrolling */
   padding: 24px 12px; /* give space so top of modal isn't hidden under notch */
 }
@@ -1133,16 +1135,20 @@ img{ max-width:100%; height:auto; display:block; }
 @media (max-width: 740px){
   .footer-inner{
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center; /* center columns */
+    justify-content: center;
+    text-align: center;
   }
   .footer-right{
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .footer{ padding: 18px 12px; }
   .footer-title{ font-size: 18px; }
   .footer-subtitle{ font-size: 13px; }
   .footer-slogan img{ max-width:260px; width:90%; height:auto; }
+
+  .footer-col{ text-align:center; }
 }
 .footer{
   margin-top: 40px; /* separa el morado del contenido */
@@ -1323,7 +1329,7 @@ img{ max-width:100%; height:auto; display:block; }
     left:0;
     right:0;
     height:100vh;
-    z-index:100006;
+    z-index:100050; /* above header */
     background: rgba(255,255,255,0.98);
     padding-top:110px; /* leave space for header/logo */
     align-items:flex-start;
@@ -1336,11 +1342,11 @@ img{ max-width:100%; height:auto; display:block; }
 
   .menu.open a{ font-size:18px; padding:14px 12px; width:100%; border-bottom:1px solid rgba(0,0,0,0.04); color:var(--black); }
 
-  .menu-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.35); z-index:100005; display:block; }
+  .menu-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.35); z-index:100049; display:block; }
 
   /* extra spacing so menu is clearly distinct from carousel */
   .carousel-section{ transform: translateY(30px); }
-}
+} 
 
 /* Ensure header sits above carousel */
 .header{ z-index:100007; }

@@ -453,15 +453,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  window.addEventListener("scroll", () => {
-    const sectionTop = section.getBoundingClientRect().top;
-    const windowHeight = window.innerHeight;
-
-    if (!started && sectionTop < windowHeight * 0.85) {
-      startCounter();
-      started = true;
-    }
-  });
+  // Use IntersectionObserver for reliable visibility detection (better on mobile)
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !started) {
+          startCounter();
+          started = true;
+          obs.disconnect();
+        }
+      });
+    }, { threshold: 0.45 });
+    observer.observe(section);
+  } else {
+    // Fallback for older browsers: keep scroll listener
+    const onScroll = () => {
+      const sectionTop = section.getBoundingClientRect().top;
+      const windowHeight = window.innerHeight;
+      if (!started && sectionTop < windowHeight * 0.85) {
+        startCounter();
+        started = true;
+        window.removeEventListener('scroll', onScroll);
+      }
+    };
+    window.addEventListener('scroll', onScroll);
+    // check immediately in case the section is already visible
+    onScroll();
+  }
 });
 
 /* =========================
