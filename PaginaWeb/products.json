@@ -5,6 +5,7 @@
     "description": "Plataforma adaptativa de aprendizaje de matemáticas con diagnóstico individual.",
     "link": "https://tusitio.com/comprar-aleks",
     "image": "../Multimedia/ALEKS.jpeg",
+    "price": 249.00,
     "tags": ["plataforma","matemáticas"]
   },
   {
@@ -13,6 +14,7 @@
     "description": "Versión gamificada para inicial y primaria.",
     "link": "https://tusitio.com/comprar-aleks-adventure",
     "image": "../Multimedia/ALEKS ADVENTURE.png",
+    "price": 129.00,
     "tags": ["gamificado","infantil"]
   },
   {
@@ -21,6 +23,7 @@
     "description": "Manipulativos, bloques y recursos para enseñanza CPA.",
     "link": "https://tusitio.com/material-concreto",
     "image": "../Multimedia/MaterialConcreto.png",
+    "price": 79.00,
     "tags": ["material","manipulativo"]
   },
   {
@@ -29,6 +32,7 @@
     "description": "Programa de libros y recursos para aprendizaje profundo.",
     "link": "https://tusitio.com/reveal-math",
     "image": "../Multimedia/RevealMath.png",
+    "price": 199.00,
     "tags": ["libros","recurso"]
   },
   {
@@ -37,6 +41,7 @@
     "description": "Recursos y contenidos para fortalecer el aprendizaje estructurado.",
     "link": "https://tusitio.com/prime",
     "image": "../Multimedia/Prime.png",
+    "price": 169.00,
     "tags": ["libros","recursos"]
   },
   {
@@ -45,6 +50,7 @@
     "description": "Libros y programas de lectura escolar.",
     "link": "https://tusitio.com/scholastic",
     "image": "../Multimedia/Scholastic.png",
+    "price": 89.00,
     "tags": ["libros","lectura"]
   },
   {
@@ -53,6 +59,7 @@
     "description": "Soluciones educativas y formación docente.",
     "link": "https://tusitio.com/mathminds",
     "image": "../Multimedia/Logotipo_MathMinds.png",
+    "price": 0.00,
     "tags": ["programa","formación"]
   }
 ]

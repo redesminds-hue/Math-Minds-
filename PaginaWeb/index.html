@@ -71,6 +71,9 @@
     <span class="menu-text">Comprar Productos</span>
   </a>
 
+  <!-- CARRITO -->
+  <a href="#" id="cartToggle" class="menu-item cart-link" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+
 </nav>
 
         <!-- Drawer de búsqueda (se abre desde el lado derecho) -->
@@ -269,6 +272,37 @@
       </div>
     </div>
   </aside>
+
+  <!-- CART DRAWER -->
+  <div id="cartOverlay" class="cart-overlay" aria-hidden="true"></div>
+
+  <aside id="cartDrawer" class="cart-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <header class="search-drawer-header">
+      <div class="left">
+        <strong>Carrito</strong>
+        <small id="cartItemsCount" style="opacity:.8;margin-left:8px;">(0 productos)</small>
+      </div>
+      <div class="right">
+        <button class="modal-close cart-close" id="cartClose" type="button" aria-label="Cerrar">×</button>
+      </div>
+    </header>
+
+    <div class="search-drawer-body" id="cartBody">
+      <div id="cartEmpty" style="text-align:center;padding:40px 0; opacity:.8;">Tu carrito está vacío.</div>
+      <ul id="cartList" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px;"></ul>
+
+      <div id="cartFooter" style="margin-top:18px;display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <strong>Total:</strong>
+          <strong id="cartTotal">$0.00</strong>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="clearCartBtn" class="btn secondary">Vaciar</button>
+          <button id="checkoutBtn" class="btn primary">Pagar</button>
+        </div>
+      </div>
+    </div>
+  </aside> 
 
   <!-- =========================
        MODALES

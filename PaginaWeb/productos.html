@@ -15,6 +15,7 @@
       <nav class="menu">
         <a href="index.html">Inicio</a>
         <a class="active" href="#">Productos</a>
+        <a href="#" id="cartToggle" class="menu-item cart-link" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></a>
       </nav>
     </div>
   </header>
@@ -25,8 +26,7 @@
 
     <section id="productsGrid" style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:18px;"></section>
   </main>
-
-  <script>
+  <script src="main.js"></script>  <script>
     async function loadAndRender(){
       try{
         const res = await fetch('products.json');
@@ -51,8 +51,11 @@
           card.innerHTML = `
             <img src="${p.image}" alt="${p.title}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;"/>
             <h3 style="margin:0 0 6px 0;">${p.title}</h3>
-            <p style="margin:0 0 10px 0;opacity:.85">${p.description}</p>
-            <a class="btn primary" href="${p.link}" target="_blank">Comprar</a>
+            <p style="margin:0 0 8px 0;opacity:.85">${p.description}</p>
+            <div style="display:flex;gap:8px;align-items:center; margin-top:8px;">
+              <a class="btn primary" href="${p.link}" target="_blank">Comprar</a>
+              <button class="btn secondary add-to-cart" data-id="${p.id}" data-title="${p.title}" data-price="${p.price || 0}" data-image="${p.image}">Añadir al carrito</button>
+            </div>
           `;
           grid.appendChild(card);
         });
@@ -60,6 +63,23 @@
       }catch(e){ document.getElementById('productsGrid').innerHTML = '<p>Error cargando productos.</p>'; }
     }
     loadAndRender();
+
+    // Delegated listener for 'Añadir al carrito' buttons
+    document.addEventListener('click', function handler(e){
+      const btn = e.target && e.target.closest && e.target.closest('.add-to-cart');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      const title = btn.getAttribute('data-title');
+      const price = Number(btn.getAttribute('data-price') || 0);
+      const image = btn.getAttribute('data-image');
+      if (window.Cart && window.Cart.addItem){
+        window.Cart.addItem({ id, title, price, image });
+        // open cart to show added items
+        window.Cart.open();
+      } else {
+        alert('Producto agregado al carrito.');
+      }
+    });
   </script>
 
   <footer class="footer">
