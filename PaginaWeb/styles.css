@@ -1407,6 +1407,9 @@ img{ max-width:100%; height:auto; display:block; }
 
   /* extra spacing so menu is clearly distinct from carousel */
   .carousel-section{ transform: translateY(30px); }
+  .menu a:last-child {
+    margin-bottom: 500px; /* Esto forzará que el contenido sea largo y el scroll aparezca */
+}
 }  
 
 /* Ensure header sits above carousel */
