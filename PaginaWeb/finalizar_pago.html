@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen de Compra - Math-Minds</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .layout-final { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; padding: 40px; max-width: 1100px; margin: auto; }
+        .card-resumen { background: white; border: 2px solid #111; border-radius: 20px; padding: 25px; }
+        
+        /* Datos fijos */
+        .info-estatica { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid var(--purple); }
+        .info-estatica p { margin: 5px 0; font-size: 14px; }
+        .info-estatica strong { text-transform: uppercase; font-size: 11px; color: #666; display: block; }
+
+        /* Estilo productos */
+        .item-carrito { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item-carrito img { width: 60px; height: 60px; object-fit: contain; }
+        
+        .total-final { font-size: 28px; font-weight: 900; color: #111; text-align: right; margin-top: 15px; }
+        
+        .header-mini { padding: 15px 40px; border-bottom: 1px solid #ddd; }
+        .logo-mini { width: 140px; height: auto; }
+    </style>
+</head>
+<body>
+
+    <header class="header-mini">
+        <img src="../Multimedia/Logo.png" alt="Math Minds" class="logo-mini">
+    </header>
+
+    <div class="layout-final">
+        <div class="card-resumen">
+            <h3 style="margin-top:0">Resumen de Productos</h3>
+            <div id="contenedor-items"></div>
+            <div id="precio-excel" class="total-final">Calculando total...</div>
+        </div>
+
+        <div class="card-resumen">
+            <h3>Detalles del Envío</h3>
+            
+            <div id="datos-fijos" class="info-estatica">
+                </div>
+
+            <div class="form-group">
+                <label style="font-weight:bold; display:block; margin-bottom:10px;">NOMBRE DEL ESTUDIANTE</label>
+                <input type="text" id="childName" placeholder="Nombre completo del alumno" style="width:100%; padding:15px; border-radius:12px; border:2px solid #111;">
+            </div>
+
+            <button onclick="enviarPedido()" class="btn-pay" style="width:100%; margin-top:20px; background:var(--purple); color:white; border:none; padding:18px; border-radius:15px; font-weight:800; cursor:pointer;">
+                PAGAR
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_URL = 'TU_LINK_CSV_AQUI';
+
+        async function render() {
+            const entrega = JSON.parse(localStorage.getItem('datos_entrega'));
+            const carrito = JSON.parse(localStorage.getItem('cart')) || [];
+
+            if (!entrega) { window.location.href = 'pago.html'; return; }
+
+            // 1. Mostrar datos que YA NO se pueden cambiar
+            document.getElementById('datos-fijos').innerHTML = `
+                <p><strong>Acudiente</strong> ${entrega.acudiente} (CC: ${entrega.documento})</p>
+                <p><strong>Colegio / Curso</strong> ${entrega.colegio} - ${entrega.curso}</p>
+                <p><strong>Dirección</strong> ${entrega.direccion} (${entrega.ciudad})</p>
+            `;
+
+            // 2. Mostrar productos con imagen
+            document.getElementById('contenedor-items').innerHTML = carrito.map(i => `
+                <div class="item-carrito">
+                    <img src="${i.image}" alt="">
+                    <div>
+                        <strong>${i.title}</strong><br>
+                        <span>Cantidad: ${i.quantity}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // 3. Obtener precio del Excel
+            try {
+                const res = await fetch(SHEET_URL);
+                const csv = await res.text();
+                const filas = csv.split('\n');
+                const match = filas.find(f => f.toLowerCase().includes(entrega.colegio.toLowerCase()));
+                
+                if (match) {
+                    const precio = match.split(',')[1];
+                    document.getElementById('precio-excel').innerText = `Total: $${precio}`;
+                    localStorage.setItem('total_final', precio);
+                }
+            } catch (e) { console.log("Error en Excel"); }
+        }
+
+        function enviarPedido() {
+            const entrega = JSON.parse(localStorage.getItem('datos_entrega'));
+            const estudiante = document.getElementById('childName').value;
+            const precio = localStorage.getItem('total_final');
+
+            if (!estudiante) { alert("Por favor ingresa el nombre del estudiante"); return; }
+
+            const mensaje = `*NUEVO PEDIDO*%0A` +
+                            `*ACUDIENTE:* ${entrega.acudiente}%0A` +
+                            `*COLEGIO:* ${entrega.colegio}%0A` +
+                            `*CURSO:* ${entrega.curso}%0A` +
+                            `*ESTUDIANTE:* ${estudiante}%0A` +
+                            `*DIRECCIÓN:* ${entrega.direccion}%0A` +
+                            `*TOTAL:* $${precio}`;
+
+            window.open(`https://wa.me/573001234567?text=${mensaje}`, '_blank');
+        }
+
+        render();
+    </script>
+</body>
+</html>

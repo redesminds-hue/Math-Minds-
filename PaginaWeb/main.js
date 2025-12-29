@@ -816,3 +816,69 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener('DOMContentLoaded', () => { API.init(); });
 
 })();
+
+// Reemplaza esto con el enlace .csv que copiaste de Google Sheets
+const SHEET_URL = 'Thttps://docs.google.com/spreadsheets/d/e/2PACX-1vR8rDwu04L8NMJb85GCX4Hk3ojROvNgGT-ZktglPnC4QGG4iCVLCKKGLT9xB0HtnLOQKlpQSPJ5vTu9/pub?output=csv';
+
+let datosColegios = [];
+
+async function cargarDatos() {
+    try {
+        const response = await fetch(SHEET_URL);
+        const data = await response.text();
+        
+        // Convertir el CSV en un Array de objetos
+        const filas = data.split('\n').slice(1); // Omitir encabezado
+        datosColegios = filas.map(fila => {
+            const [colegio, grado, precio] = fila.split(',');
+            return { colegio: colegio.trim(), grado: grado.trim(), precio: precio.trim() };
+        });
+
+        actualizarSelectColegios();
+    } catch (error) {
+        console.error("Error cargando precios:", error);
+    }
+}
+
+function actualizarSelectColegios() {
+    const select = document.getElementById('college');
+    // Sacar nombres de colegios únicos
+    const nombresUnicos = [...new Set(datosColegios.map(d => d.colegio))];
+    
+    select.innerHTML = '<option value="" disabled selected>Selecciona colegio</option>';
+    nombresUnicos.forEach(nombre => {
+        const option = document.createElement('option');
+        option.value = nombre;
+        option.textContent = nombre;
+        select.appendChild(option);
+    });
+}
+
+// Llamar a la función al cargar la página
+cargarDatos();
+document.getElementById('payForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // 1. Validar si el carrito tiene productos
+    const carrito = JSON.parse(localStorage.getItem('cart')) || [];
+    if (carrito.length === 0) {
+        alert("Tu carrito está vacío. Añade productos antes de continuar.");
+        window.location.href = 'index.html'; // Lo mandamos a comprar
+        return;
+    }
+
+    // 2. Guardar datos del Acudiente y Colegio
+    const datosEntrega = {
+        acudiente: document.getElementById('parentName').value,
+        documento: document.getElementById('documentId').value,
+        colegio: document.getElementById('college').value, // El colegio se elige aquí
+        ciudad: document.getElementById('city').value,
+        direccion: document.getElementById('address').value,
+        telefono: document.getElementById('phone').value
+    };
+    
+    localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
+
+    // 3. Abrir nueva pestaña para datos del estudiante
+    window.open('finalizar-estudiante.html', '_blank');
+});

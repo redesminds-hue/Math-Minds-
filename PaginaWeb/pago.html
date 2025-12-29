@@ -166,36 +166,39 @@
     <header class="header-checkout">
         <div class="header-container">
             <a href="index.html" class="brand-checkout">
-                <img src="Multimedia/Logo.png" alt="Math Minds">
+                <img src="../Multimedia/Logo.png" alt="Math Minds">
             </a>
-            <a href="productos.html" class="btn-back">
-                ← Regresar
-            </a>
+            <a href="productos.html" class="btn-back">← Seguir Comprando</a>
         </div>
     </header>
 
     <main class="checkout-main">
         <div class="checkout-card">
-            <h2 class="form-title">Finalizar Pedido</h2>
+            <h2 class="form-title">Datos de Entrega</h2>
             <form id="payForm">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Nombre del Acudiente</label>
-                        <input type="text" id="parentName" required placeholder="Nombre de quien compra">
+                        <input type="text" id="parentName" required placeholder="Quién realiza la compra">
                     </div>
 
                     <div class="form-group">
                         <label>Documento (C.C.)</label>
-                        <input type="text" id="documentId" required placeholder="C.C. sin puntos">
+                        <input type="text" id="documentId" required placeholder="Número de identificación">
                     </div>
 
                     <div class="form-group">
-                        <label>Nombre del Estudiante</label>
-                        <input type="text" id="name" required placeholder="Nombre del alumno">
+                        <label>Colegio</label>
+                        <select id="college" required>
+                            <option value="" disabled selected>Selecciona colegio</option>
+                            <option value="Colegio 1">Colegio 1</option>
+                            <option value="Colegio 2">Colegio 2</option>
+                            <option value="Otro">Otro Colegio</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Grado / Curso</label>
+                        <label>Curso / Grado</label>
                         <select id="grade" required>
                             <option value="" disabled selected>Selecciona grado</option>
                             <option value="Pre-Jardin">Pre-Jardín</option>
@@ -206,83 +209,59 @@
                             <option value="Tercero">Tercero</option>
                             <option value="Cuarto">Cuarto</option>
                             <option value="Quinto">Quinto</option>
-                            <option value="Sexto a Once">Sexto a Once</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Colegio</label>
-                        <select id="college" required>
-                            <option value="" disabled selected>Selecciona colegio</option>
-                            <option value="Colegio 1">Colegio 1</option>
-                            <option value="Colegio 2">Colegio 2</option>
-                            <option value="Colegio 3">Colegio 3</option>
-                            <option value="Colegio 4">Colegio 4</option>
-                            <option value="Colegio 5">Colegio 5</option>
-                            <option value="Colegio 6">Colegio 6</option>
-                            <option value="Colegio 7">Colegio 7</option>
-                            <option value="Colegio 8">Colegio 8</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ciudad de Envío</label>
+                        <label>Ciudad</label>
                         <select id="city" required>
                             <option value="Bogotá">Bogotá D.C.</option>
-                            <option value="Chía/Cajicá">Chía / Cajicá / Tabio</option>
-                            <option value="Medellín">Medellín</option>
-                            <option value="Cali">Cali</option>
-                            <option value="Barranquilla">Barranquilla</option>
-                            <option value="Bucaramanga">Bucaramanga</option>
-                            <option value="Otras Ciudades">Otras Ciudades (Nacional)</option>
+                            <option value="Chía/Cajicá">Chía o Cajicá</option>
+                            <option value="Nacional">Otras ciudades</option>
                         </select>
                     </div>
 
-                    <div class="form-group full-width">
-                        <label>Dirección Completa y Barrio</label>
-                        <input type="text" id="address" required placeholder="Ej: Calle 123 #45-67, Torre 2 Apto 501">
+                    <div class="form-group">
+                        <label>Teléfono Celular</label>
+                        <input type="tel" id="phone" required placeholder="3XXXXXXXXX">
                     </div>
 
                     <div class="form-group full-width">
-                        <label>Celular WhatsApp</label>
-                        <input type="tel" id="phone" required placeholder="3XXXXXXXXX">
+                        <label>Dirección y Barrio</label>
+                        <input type="text" id="address" required placeholder="Ej: Calle 123 #45-67, Barrio">
                     </div>
                 </div>
 
-                <button type="submit" class="btn-pay">Confirmar Pedido</button>
+                <button type="submit" class="btn-pay">CONFIRMAR Y CONTINUAR</button>
             </form>
         </div>
     </main>
 
-    <footer class="footer" style="padding: 15px 0;">
-        <div class="footer-inner" style="justify-content: center;">
-            <p style="font-size: 12px; font-weight: 700;">Math-Minds © 2025</p>
-        </div>
-    </footer>
-
     <script>
         document.getElementById('payForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const parent = document.getElementById('parentName').value;
-            const doc = document.getElementById('documentId').value;
-            const student = document.getElementById('name').value;
-            const grade = document.getElementById('grade').value;
-            const col = document.getElementById('college').value;
-            const city = document.getElementById('city').value;
-            const addr = document.getElementById('address').value;
-            const tel = document.getElementById('phone').value;
 
-            const text = `*NUEVO PEDIDO - MATH MINDS*%0A%0A` +
-                         `*ACUDIENTE:* ${parent} (${doc})%0A` +
-                         `*ESTUDIANTE:* ${student}%0A` +
-                         `*GRADO:* ${grade}%0A` +
-                         `*COLEGIO:* ${col}%0A%0A` +
-                         `*ENTREGA:* ${city}%0A` +
-                         `*DIRECCIÓN:* ${addr}%0A` +
-                         `*WHATSAPP:* ${tel}`;
+            // 1. Verificar si hay productos en el carrito
+            // Nota: Cambia 'cart' por 'carrito' si ese es el nombre que usas en main.js
+            const carrito = JSON.parse(localStorage.getItem('cart')) || [];
             
-            window.open(`https://wa.me/573001234567?text=${text}`, '_blank');
+           
+
+            // 2. Guardar datos en el navegador para la siguiente página
+            const datosEntrega = {
+                acudiente: document.getElementById('parentName').value,
+                documento: document.getElementById('documentId').value,
+                colegio: document.getElementById('college').value,
+                curso: document.getElementById('grade').value,
+                ciudad: document.getElementById('city').value,
+                direccion: document.getElementById('address').value,
+                telefono: document.getElementById('phone').value
+            };
+            
+            localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
+            
+            // 3. Abrir la página del estudiante (Usa guion bajo como en tu VS Code)
+            window.location.href = 'finalizar_pago.html'; 
         });
     </script>
 </body>
