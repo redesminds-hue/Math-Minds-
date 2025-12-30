@@ -992,6 +992,7 @@ function renderizarProductos(col, gra) {
                 <h3>${p.producto}</h3>
                 <p style="font-size: 12px; color: #777;">${p.colegio} - ${p.grado}</p>
                 <p class="precio">$${p.costo.toLocaleString()}</p>
+              
                 <button class="btn primary full" onclick="agregarAlCarrito('${p.producto}', ${p.costo})">
                     Añadir al carrito
                 </button>
@@ -1000,6 +1001,45 @@ function renderizarProductos(col, gra) {
         contenedor.appendChild(card);
     });
 }
+
+// Usamos un nombre diferente para evitar conflictos con otras partes de tu código
+let carritoTienda = JSON.parse(localStorage.getItem('carritoMathMinds')) || [];
+
+function agregarAlCarrito(nombre, precio) {
+    // 1. Creamos el objeto del producto usando los datos de tus listas 
+    const productoNuevo = {
+        nombre: nombre,
+        precio: parseFloat(precio),
+        id: Date.now() 
+    };
+
+    // 2. Lo añadimos a la nueva variable
+    carritoTienda.push(productoNuevo);
+
+    // 3. Guardamos en el navegador con una clave única
+    localStorage.setItem('carritoMathMinds', JSON.stringify(carritoTienda));
+
+    // 4. Actualizamos los contadores visuales
+    actualizarContadoresVisuales();
+
+    // 5. Confirmación al usuario
+    alert(`Añadido: ${nombre}`);
+}
+
+function actualizarContadoresVisuales() {
+    const total = carritoTienda.length;
+    
+    // Contador del menú
+    const badgeMenu = document.getElementById('cartCount');
+    if (badgeMenu) badgeMenu.innerText = total;
+
+    // Contador del botón flotante que creamos para el celular
+    const badgeFlotante = document.getElementById('cartCountFlotante');
+    if (badgeFlotante) badgeFlotante.innerText = total;
+}
+
+// Cargar el estado al iniciar la página
+document.addEventListener('DOMContentLoaded', actualizarContadoresVisuales);
 
 // 6. MANEJO DEL FORMULARIO DE PAGO (Si existe en la página)
 document.addEventListener('submit', (e) => {
@@ -1056,3 +1096,96 @@ function actualizarContadorCarrito(total) {
     const cartCountFlotante = document.getElementById('cartCountFlotante');
     if(cartCountFlotante) cartCountFlotante.innerText = total;
 }
+
+// 1. Array para almacenar los productos
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+// 2. Función que activa el botón "Agregar"
+function agregarAlCarrito(nombre, precio) {
+    // Creamos el objeto del producto
+    const nuevoProducto = {
+        id: Date.now(), // ID único para cada clic
+        nombre: nombre,
+        precio: parseFloat(precio)
+    };
+
+    // Lo agregamos al carrito
+    carrito.push(nuevoProducto);
+
+    // Guardamos en la memoria del navegador
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+
+    // Actualizamos visualmente el número en el carrito y el botón flotante
+    actualizarContadores();
+    
+    // Animación de confirmación (Opcional)
+    alert("¡Producto añadido con éxito!");
+}
+
+// 3. Función para actualizar los números en pantalla
+function actualizarContadores() {
+    const totalItems = carrito.length;
+    
+    // Actualiza el número en el menú
+    const cartBadge = document.getElementById('cartCount');
+    if(cartBadge) cartBadge.innerText = totalItems;
+
+    // Actualiza el número en el botón flotante que creamos antes
+    const floatBadge = document.getElementById('cartCountFlotante');
+    if(floatBadge) floatBadge.innerText = totalItems;
+}
+
+// Ejecutar al cargar la página para recuperar datos previos
+document.addEventListener('DOMContentLoaded', actualizarContadores);
+
+// Variable única para tu pedido
+let pedidoMathMinds = JSON.parse(localStorage.getItem('mm_pedido')) || [];
+
+// LA FUNCIÓN DEL BOTÓN
+function agregarAlCarrito(nombre, precioRaw) {
+    console.log("Botón presionado para:", nombre);
+
+    // 1. Limpiar el precio (Quita $, puntos y espacios)
+    let precioLimpio = String(precioRaw).replace(/[^0-9]/g, "");
+    let precioFinal = parseInt(precioLimpio);
+
+    if (isNaN(precioFinal) || precioFinal <= 0) {
+        console.error("Precio inválido para:", nombre);
+        return;
+    }
+
+    // 2. Crear el objeto
+    const producto = {
+        id: Date.now(),
+        nombre: nombre,
+        precio: precioFinal
+    };
+
+    // 3. Guardar
+    pedidoMathMinds.push(producto);
+    localStorage.setItem('mm_pedido', JSON.stringify(pedidoMathMinds));
+
+    // 4. Actualizar la interfaz
+    actualizarContadores();
+
+    // 5. Feedback visual
+    alert(`✅ ${nombre} añadido al carrito.`);
+}
+
+// FUNCIÓN PARA ACTUALIZAR LOS NÚMEROS
+function actualizarContadores() {
+    const cantidad = pedidoMathMinds.length;
+    
+    // Contador del menú
+    const cMenu = document.getElementById('cartCount');
+    if (cMenu) cMenu.innerText = cantidad;
+
+    // Contador flotante del celular
+    const cFlotante = document.getElementById('cartCountFlotante');
+    if (cFlotante) cFlotante.innerText = cantidad;
+    
+    console.log("Total en carrito:", cantidad);
+}
+
+// Ejecutar al cargar la página
+window.addEventListener('load', actualizarContadores);

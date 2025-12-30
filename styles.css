@@ -1849,3 +1849,20 @@ img{ max-width:100%; height:auto; display:block; }
     font-weight: bold;
     border: 2px solid white;
 }
+
+.btn.primary.full {
+    background: linear-gradient(135deg, #00d2ff, #0077b6);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn.primary.full:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
