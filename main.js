@@ -1124,16 +1124,21 @@ function agregarAlCarrito(nombre, precio) {
 
 // 3. Función para actualizar los números en pantalla
 function actualizarContadores() {
-    const totalItems = carrito.length;
-    
-    // Actualiza el número en el menú
-    const cartBadge = document.getElementById('cartCount');
-    if(cartBadge) cartBadge.innerText = totalItems;
+    // Obtenemos lo que hay guardado en la memoria
+    const pedido = JSON.parse(localStorage.getItem('mm_pedido')) || [];
+    const cantidad = pedido.length;
 
-    // Actualiza el número en el botón flotante que creamos antes
-    const floatBadge = document.getElementById('cartCountFlotante');
-    if(floatBadge) floatBadge.innerText = totalItems;
+    // 1. Actualiza el carrito del menú (el de arriba)
+    const cMenu = document.getElementById('cartCount');
+    if (cMenu) cMenu.innerText = cantidad;
+
+    // 2. Actualiza el carrito flotante (el azul)
+    const cFlotante = document.getElementById('cartCountFlotante');
+    if (cFlotante) cFlotante.innerText = cantidad;
 }
+
+// Llama a esta función siempre que la página cargue
+window.onload = actualizarContadores;
 
 // Ejecutar al cargar la página para recuperar datos previos
 document.addEventListener('DOMContentLoaded', actualizarContadores);
