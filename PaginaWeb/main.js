@@ -606,8 +606,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       CartUI.clearBtn = document.getElementById('clearCartBtn');
       CartUI.checkoutBtn = document.getElementById('checkoutBtn');
+      
       if (CartUI.clearBtn) CartUI.clearBtn.addEventListener('click', ()=> { API.items = []; API.save(); API.render(); });
-      if (CartUI.checkoutBtn) CartUI.checkoutBtn.addEventListener('click', ()=> { alert('Funcionalidad de pago no implementada en este prototipo.'); });
+      
+      // MODIFICACIÓN AQUÍ: Redirección a la página de pagos
+     // Busca esto dentro de API.init()
+      // Busca esto dentro de API.init()
+      CartUI.checkoutBtn = document.getElementById('checkoutBtn');
+
+      if (CartUI.checkoutBtn) {
+          CartUI.checkoutBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (API.items.length > 0) {
+                  // Esto es lo que hace que el botón funcione
+                  window.location.href = 'finalizar_pago.html'; 
+              } else {
+                  API.showEmptyNotice('El carrito está vacío');
+              }
+          });
+      }
 
       // buttons inside cart (delegation)
       document.addEventListener('click', (e) => {
@@ -763,38 +780,49 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     render(){
-      // Update counts/summary even if the full drawer is not present on this page
+      // 1. Actualizar contadores
       const count = API.count();
       const countSpan = CartUI.cartCountSpan; if (countSpan) countSpan.textContent = count;
       const itemsCountEl = CartUI.cartItemsCount; if (itemsCountEl) itemsCountEl.textContent = `(${count} productos)`;
-      const totalEl = CartUI.cartTotal; if (totalEl) totalEl.textContent = ` `; // prices hidden for now
+      
+      // Mostrar el total (aunque sea $0 por ahora)
+      const totalEl = CartUI.cartTotal; if (totalEl) totalEl.textContent = `$${API.total().toLocaleString()}`; 
 
-      if (!CartUI.cartList) return; // no drawer on this page, nothing more to render
+      if (!CartUI.cartList) return; 
 
-      const list = CartUI.cartList; list.innerHTML = '';
+      // 2. Limpiar lista actual
+      const list = CartUI.cartList; 
+      list.innerHTML = '';
+
+      // 3. LÓGICA DE VISIBILIDAD: Aquí estaba el error
       if (API.items.length === 0){
-        if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = '';
+        if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'block';
         if (CartUI.cartFooter) CartUI.cartFooter.style.display = 'none';
       } else {
         if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'none';
-        if (CartUI.cartFooter) CartUI.cartFooter.style.display = '';
+        if (CartUI.cartFooter) {
+            CartUI.cartFooter.style.setProperty('display', 'block', 'important'); // Forzamos que se vea
+        }
       }
 
+      // 4. Dibujar los productos
       API.items.forEach(it => {
         const li = document.createElement('li');
+        li.style.borderBottom = "1px solid #eee";
+        li.style.paddingBottom = "10px";
         li.innerHTML = `
-          <img src="${it.image}" alt="${it.title}" />
-          <div style="flex:1;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-              <strong style="font-size:15px;">${it.title}</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-              <div class="cart-qty">
-                <button data-dec="${it.id}" aria-label="Disminuir">−</button>
-                <span style="min-width:26px;text-align:center">${it.qty}</span>
-                <button data-inc="${it.id}" aria-label="Aumentar">+</button>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <img src="${it.image}" alt="${it.title}" style="width:50px; height:50px; object-fit:contain;" />
+            <div style="flex:1;">
+              <strong style="font-size:14px; display:block;">${it.title}</strong>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                <div class="cart-qty">
+                  <button data-dec="${it.id}" style="cursor:pointer; padding:2px 8px;">−</button>
+                  <span style="margin:0 8px;">${it.qty}</span>
+                  <button data-inc="${it.id}" style="cursor:pointer; padding:2px 8px;">+</button>
+                </div>
+                <button data-remove="${it.id}" style="color:red; background:none; border:none; cursor:pointer; font-size:12px;">Eliminar</button>
               </div>
-              <button data-remove="${it.id}" class="btn secondary">Eliminar</button>
             </div>
           </div>
         `;
@@ -818,7 +846,7 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 
 // Reemplaza esto con el enlace .csv que copiaste de Google Sheets
-const SHEET_URL = 'Thttps://docs.google.com/spreadsheets/d/e/2PACX-1vR8rDwu04L8NMJb85GCX4Hk3ojROvNgGT-ZktglPnC4QGG4iCVLCKKGLT9xB0HtnLOQKlpQSPJ5vTu9/pub?output=csv';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8rDwu04L8NMJb85GCX4Hk3ojROvNgGT-ZktglPnC4QGG4iCVLCKKGLT9xB0HtnLOQKlpQSPJ5vTu9/pub?output=csv';
 
 let datosColegios = [];
 
@@ -860,7 +888,7 @@ document.getElementById('payForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     // 1. Validar si el carrito tiene productos
-    const carrito = JSON.parse(localStorage.getItem('cart')) || [];
+    const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
     if (carrito.length === 0) {
         alert("Tu carrito está vacío. Añade productos antes de continuar.");
         window.location.href = 'index.html'; // Lo mandamos a comprar

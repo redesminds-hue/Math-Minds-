@@ -163,30 +163,30 @@
 </head>
 <body>
 
-    <header class="header-checkout">
+   <header class="header-checkout">
         <div class="header-container">
-            <a href="index.html" class="brand-checkout">
-                <img src="../Multimedia/Logo.png" alt="Math Minds">
-            </a>
-            <a href="productos.html" class="btn-back">← Seguir Comprando</a>
+            <a href="index.html" class="brand-checkout"><img src="../Multimedia/Logo.png" alt="Math Minds"></a>
+            <a href="productos.html" class="btn-back">← Regresar</a>
         </div>
     </header>
 
     <main class="checkout-main">
         <div class="checkout-card">
-            <h2 class="form-title">Datos de Entrega</h2>
+            <h2 class="form-title">Datos del Acudiente</h2>
             <form id="payForm">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Nombre del Acudiente</label>
-                        <input type="text" id="parentName" required placeholder="Quién realiza la compra">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="parentName" required placeholder="Nombre de quien compra">
                     </div>
-
                     <div class="form-group">
                         <label>Documento (C.C.)</label>
-                        <input type="text" id="documentId" required placeholder="Número de identificación">
+                        <input type="text" id="documentId" required placeholder="C.C.">
                     </div>
-
+                    <div class="form-group full-width">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="parentEmail" required placeholder="ejemplo@correo.com">
+                    </div>
                     <div class="form-group">
                         <label>Colegio</label>
                         <select id="college" required>
@@ -196,43 +196,32 @@
                             <option value="Otro">Otro Colegio</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label>Curso / Grado</label>
                         <select id="grade" required>
                             <option value="" disabled selected>Selecciona grado</option>
-                            <option value="Pre-Jardin">Pre-Jardín</option>
                             <option value="Jardin">Jardín</option>
-                            <option value="Transicion">Transición</option>
                             <option value="Primero">Primero</option>
                             <option value="Segundo">Segundo</option>
-                            <option value="Tercero">Tercero</option>
-                            <option value="Cuarto">Cuarto</option>
-                            <option value="Quinto">Quinto</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label>Ciudad</label>
                         <select id="city" required>
                             <option value="Bogotá">Bogotá D.C.</option>
-                            <option value="Chía/Cajicá">Chía o Cajicá</option>
                             <option value="Nacional">Otras ciudades</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label>Teléfono Celular</label>
+                        <label>Celular</label>
                         <input type="tel" id="phone" required placeholder="3XXXXXXXXX">
                     </div>
-
                     <div class="form-group full-width">
                         <label>Dirección y Barrio</label>
-                        <input type="text" id="address" required placeholder="Ej: Calle 123 #45-67, Barrio">
+                        <input type="text" id="address" required placeholder="Calle 123 # 45-67, Barrio">
                     </div>
                 </div>
-
-                <button type="submit" class="btn-pay">CONFIRMAR Y CONTINUAR</button>
+                <button type="submit" class="btn-pay">CONTINUAR AL ÚLTIMO PASO</button>
             </form>
         </div>
     </main>
@@ -240,17 +229,18 @@
     <script>
         document.getElementById('payForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
-            // 1. Verificar si hay productos en el carrito
-            // Nota: Cambia 'cart' por 'carrito' si ese es el nombre que usas en main.js
-            const carrito = JSON.parse(localStorage.getItem('cart')) || [];
+            const STORAGE_KEY = 'mm_cart_v1';
+            const carrito = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             
-           
+            if (carrito.length === 0) {
+                alert("⚠️ El carrito está vacío.");
+                return;
+            }
 
-            // 2. Guardar datos en el navegador para la siguiente página
             const datosEntrega = {
                 acudiente: document.getElementById('parentName').value,
                 documento: document.getElementById('documentId').value,
+                email: document.getElementById('parentEmail').value,
                 colegio: document.getElementById('college').value,
                 curso: document.getElementById('grade').value,
                 ciudad: document.getElementById('city').value,
@@ -259,8 +249,6 @@
             };
             
             localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
-            
-            // 3. Abrir la página del estudiante (Usa guion bajo como en tu VS Code)
             window.location.href = 'finalizar_pago.html'; 
         });
     </script>

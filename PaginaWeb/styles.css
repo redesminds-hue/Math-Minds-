@@ -1478,3 +1478,46 @@ img{ max-width:100%; height:auto; display:block; }
   background-image: url("img/pattern-math.svg");
   background-size: 200px;
 }
+#checkoutBtn.btn.primary {
+    background-color: #13d6eba2; /* Tu color de marca */
+    color: white;
+    flex: 2; /* Esto hace que el botón de pagar sea más ancho que el de vaciar */
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+#checkoutBtn.btn.primary:hover {
+    background-color: #111;
+    transform: scale(1.05);
+}
+
+/* Forzar que el pie del carrito se vea cuando hay productos */
+#cartFooter {
+    background: #fff;
+    padding: 15px;
+    border-top: 1px solid #eee;
+    display: block !important;
+    padding: 20px;
+    background: white;
+    position: relative;
+    z-index: 10;
+}
+
+/* Estilo profesional para tu botón de Pagar */
+#checkoutBtn {
+    background-color: #13d6eba2 !important; /* Tu color celeste/morado */
+    color: white !important;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    flex: 2; /* Lo hace más largo que el botón de vaciar */
+    text-transform: uppercase;
+}
+
+#checkoutBtn:hover {
+    background-color: #111 !important;
+}
