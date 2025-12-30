@@ -1709,50 +1709,116 @@ img{ max-width:100%; height:auto; display:block; }
 
 /* --- AJUSTES PARA CELULAR --- */
 @media (max-width: 768px) {
-    .navbar {
-        flex-direction: column; /* Pone el logo arriba y el menú abajo */
-        padding: 10px;
+    /* Estilos Base Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-toggle {
+    display: none; /* Escondido en PC */
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--secondary);
+}
+
+/* --- RESPONSIVO MÓVIL --- */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block; /* Aparece en celular */
     }
 
-    .filters-wrapper {
-        grid-template-columns: 1fr; /* Los selectores se ponen uno debajo del otro */
-        padding: 20px;
-        gap: 15px;
-    }
-
-    .main-container {
-        margin: 20px auto;
-        padding: 0 15px;
-    }
-
-    .store-header h1 {
-        font-size: 1.8rem; /* Texto más pequeño para que no se corte */
-    }
-
-    /* Hacer que las tarjetas de productos ocupen casi todo el ancho */
-    .productos-grid {
-        grid-template-columns: 1fr; 
-        gap: 20px;
-    }
-
-    /* IMPORTANTE: El botón del carrito debe ser flotante o muy visible */
-    .cart-icon-container {
+    .nav-menu {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: var(--primary);
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        z-index: 1000;
+        top: 70px;
+        left: -100%; /* Escondido a la izquierda */
+        flex-direction: column;
+        background: #fff;
+        width: 100%;
+        height: calc(100vh - 70px); /* Ocupa el resto de la pantalla */
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 10px rgba(0,0,0,0.1);
+        padding-top: 20px;
+        overflow-y: auto; /* PERMITE BAJAR SI HAY MUCHOS BOTONES */
     }
+
+    .nav-menu.active {
+        left: 0; /* Se desliza hacia adentro */
+    }
+
+    .nav-menu a {
+        display: block;
+        padding: 20px;
+        font-size: 1.2rem;
+        border-bottom: 1px solid #eee;
+    }
+}
 }
 
 .card-producto:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+/* --- DISEÑO PARA COMPUTADORA (Escritorio) --- */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* --- DISEÑO PARA CELULAR --- */
+@media (max-width: 992px) {
+  .menu-toggle {
+    display: block; /* Muestra el botón de abrir */
+    background: #00d2ff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .menu {
+    display: none; /* Escondemos el menú original */
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: white;
+    flex-direction: column; /* Alineamos todo hacia abajo */
+    padding: 20px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    
+    /* ESTO ARREGLA TU PROBLEMA: Permite bajar con el dedo si el menú es largo */
+    max-height: 80vh; 
+    overflow-y: auto; 
+    z-index: 1000;
+  }
+
+  .menu.open {
+    display: flex; /* Se muestra al hacer clic */
+  }
+
+  .menu-item {
+    width: 100%;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    justify-content: center;
+  }
+  
+  .menu-item img {
+    max-width: 120px; /* Ajustamos las imágenes para que no se vean gigantes */
+    height: auto;
+  }
+}

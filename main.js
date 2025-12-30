@@ -1028,3 +1028,21 @@ document.addEventListener('submit', (e) => {
 
 // 7. INICIAR CUANDO EL DOCUMENTO ESTÉ LISTO
 document.addEventListener('DOMContentLoaded', inicializarTienda);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.getElementById('mobile-menu');
+    const navList = document.getElementById('nav-list');
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navList.classList.toggle('active');
+            // Cambia el icono de barras a una X
+            const icon = menuToggle.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+    }
+});
+document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+    document.getElementById('menu').classList.toggle('open');
+});
