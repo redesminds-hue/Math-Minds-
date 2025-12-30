@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productos - Math Minds</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="../Multimedia/Logo.png" alt="Math Minds" />
+      </div>
+      <nav class="menu">
+        <a href="index.html">Inicio</a>
+        <a class="active" href="#">Productos</a>
+        <a href="#" id="cartToggle" class="menu-item cart-link">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="tienda-container">
+    <section class="tienda-header">
+      <h1>Tienda Educativa Math Minds</h1>
+      <p>Selecciona tu institución para ver los materiales correspondientes.</p>
+      
+      <div class="filtros-container">
+          <div class="filter-group">
+              <label for="selectColegio">Colegio:</label>
+              <select id="selectColegio">
+                  <option value="">Cargando colegios...</option>
+              </select>
+          </div>
+          <div class="filter-group">
+              <label for="selectGrado">Grado:</label>
+              <select id="selectGrado" disabled>
+                  <option value="">Primero seleccione colegio</option>
+              </select>
+          </div>
+      </div>
+    </section>
+
+    <div id="contenedorProductos" class="productos-grid">
+        <div class="mensaje-bienvenida">
+            <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100">
+            <p>Por favor, selecciona tu colegio y grado para ver tus productos y precios.</p>
+        </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <h3>Contáctanos</h3>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

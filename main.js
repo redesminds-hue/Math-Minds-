@@ -1,3 +1,4 @@
+
 // ===============================
 // BURGER MENU
 // ===============================
@@ -609,9 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (CartUI.clearBtn) CartUI.clearBtn.addEventListener('click', ()=> { API.items = []; API.save(); API.render(); });
       
-      // MODIFICACIÓN AQUÍ: Redirección a la página de pagos
-     // Busca esto dentro de API.init()
-      // Busca esto dentro de API.init()
+     
       CartUI.checkoutBtn = document.getElementById('checkoutBtn');
 
       if (CartUI.checkoutBtn) {
@@ -619,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
               e.preventDefault();
               if (API.items.length > 0) {
                   // Esto es lo que hace que el botón funcione
-                  window.location.href = 'finalizar_pago.html'; 
+                  window.location.href = 'pago.html'; 
               } else {
                   API.showEmptyNotice('El carrito está vacío');
               }
@@ -719,7 +718,34 @@ document.addEventListener("DOMContentLoaded", () => {
         mini.id = 'miniCartPopup';
         mini.className = 'mini-cart-popup';
         mini.setAttribute('role','dialog');
-        mini.innerHTML = `<div class="mini-header"><strong>Carrito</strong><button class="close-mini" aria-label="Cerrar">×</button></div><div class="mini-body"></div>`;
+        // Busca esta parte dentro de API.open() en main.js
+        mini.innerHTML = `
+          <div class="mini-header" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+            <strong>Carrito</strong>
+            <button class="close-mini" aria-label="Cerrar" style="border:none; background:none; font-size:20px; cursor:pointer;">×</button>
+          </div>
+          <div class="mini-body" style="max-height:300px; overflow-y:auto;"></div>
+          
+          <div class="mini-footer" style="padding:15px; border-top:1px solid #eee; background:#fff;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <strong>Total:</strong>
+              <strong>$${API.total().toLocaleString()}</strong>
+            </div>
+            <button id="btnPagarMini" style="width:100%; background:#13d6eba2; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
+              PAGAR AHORA
+            </button>
+          </div>
+        `;
+
+        // Justo debajo de donde pones el innerHTML, añade la función del botón:
+        setTimeout(() => {
+          const btnPagar = document.getElementById('btnPagarMini');
+          if (btnPagar) {
+            btnPagar.onclick = () => {
+              window.location.href = 'pago.html';
+            };
+          }
+        }, 50);
         document.body.appendChild(mini);
 
         const body = mini.querySelector('.mini-body');
@@ -794,15 +820,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const list = CartUI.cartList; 
       list.innerHTML = '';
 
-      // 3. LÓGICA DE VISIBILIDAD: Aquí estaba el error
-      if (API.items.length === 0){
-        if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'block';
-        if (CartUI.cartFooter) CartUI.cartFooter.style.display = 'none';
+      // 1. Mostrar siempre el footer para asegurar que el botón exista
+      if (CartUI.cartFooter) {
+          CartUI.cartFooter.style.setProperty('display', 'block', 'important'); 
+      }
+
+      // 2. Actualizar el texto del total
+      if (CartUI.cartTotal) {
+          CartUI.cartTotal.textContent = `$${API.total().toLocaleString()}`;
+      }
+      
+      // 3. Controlar solo el mensaje de "Carrito Vacío"
+      if (API.items.length === 0) {
+          if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'block';
+          // Quitamos la línea que ponía el footer en 'none'
       } else {
-        if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'none';
-        if (CartUI.cartFooter) {
-            CartUI.cartFooter.style.setProperty('display', 'block', 'important'); // Forzamos que se vea
-        }
+          if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'none';
       }
 
       // 4. Dibujar los productos
@@ -845,68 +878,153 @@ document.addEventListener("DOMContentLoaded", () => {
 
 })();
 
-// Reemplaza esto con el enlace .csv que copiaste de Google Sheets
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8rDwu04L8NMJb85GCX4Hk3ojROvNgGT-ZktglPnC4QGG4iCVLCKKGLT9xB0HtnLOQKlpQSPJ5vTu9/pub?output=csv';
+/**
+ * ARCHIVO UNIFICADO: main.js
+ * Sistema de Tienda Educativa Math Minds
+ */
 
-let datosColegios = [];
+// 1. VARIABLE GLOBAL ÚNICA
+let baseDeDatos = [];
 
-async function cargarDatos() {
+// 2. CARGA DE DATOS DESDE GOOGLE SHEETS
+async function inicializarTienda() {
+    const URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8rDwu04L8NMJb85GCX4Hk3ojROvNgGT-ZktglPnC4QGG4iCVLCKKGLT9xB0HtnLOQKlpQSPJ5vTu9/pub?output=csv";
+    
     try {
-        const response = await fetch(SHEET_URL);
-        const data = await response.text();
+        console.log("Iniciando carga de datos...");
+        const respuesta = await fetch(URL_CSV);
+        const datos = await respuesta.text();
         
-        // Convertir el CSV en un Array de objetos
-        const filas = data.split('\n').slice(1); // Omitir encabezado
-        datosColegios = filas.map(fila => {
-            const [colegio, grado, precio] = fila.split(',');
-            return { colegio: colegio.trim(), grado: grado.trim(), precio: precio.trim() };
-        });
+        // Separar por filas y eliminar las vacías
+        const filas = datos.split(/\r?\n/).filter(linea => linea.trim() !== "");
+        
+        // Mapeo de columnas: 0:Colegio, 1:Grado, 2:Producto, 3:Costo
+        baseDeDatos = filas.slice(1).map(fila => {
+            const c = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+            return {
+                colegio: c[0]?.replace(/"/g, '').trim(),
+                grado: c[1]?.replace(/"/g, '').trim(),
+                producto: c[2]?.replace(/"/g, '').trim(),
+                costo: parseInt(c[3]?.replace(/[^0-9]/g, "")) || 0
+            };
+        }).filter(p => p.colegio && p.grado);
 
-        actualizarSelectColegios();
-    } catch (error) {
-        console.error("Error cargando precios:", error);
+        console.log("Carga completa. Registros:", baseDeDatos.length);
+        poblarColegios();
+    } catch (e) {
+        console.error("Error cargando base de datos:", e);
     }
 }
 
-function actualizarSelectColegios() {
-    const select = document.getElementById('college');
-    // Sacar nombres de colegios únicos
-    const nombresUnicos = [...new Set(datosColegios.map(d => d.colegio))];
+// 3. LLENAR SELECTOR DE COLEGIOS
+function poblarColegios() {
+    const selectCol = document.getElementById('selectColegio');
+    if (!selectCol) return;
+
+    // Obtener nombres únicos de colegios y ordenar
+    const colegiosUnicos = [...new Set(baseDeDatos.map(p => p.colegio))].sort();
     
-    select.innerHTML = '<option value="" disabled selected>Selecciona colegio</option>';
-    nombresUnicos.forEach(nombre => {
-        const option = document.createElement('option');
-        option.value = nombre;
-        option.textContent = nombre;
-        select.appendChild(option);
+    selectCol.innerHTML = '<option value="">Seleccione un colegio...</option>';
+    colegiosUnicos.forEach(col => {
+        let opt = new Option(col, col);
+        selectCol.add(opt);
     });
 }
 
-// Llamar a la función al cargar la página
-cargarDatos();
-document.getElementById('payForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// 4. ESCUCHAR CAMBIOS EN LOS FILTROS
+document.addEventListener('change', (e) => {
+    // Si cambia el Colegio -> Cargar sus Grados
+    if (e.target.id === 'selectColegio') {
+        const colSeleccionado = e.target.value;
+        const selectGra = document.getElementById('selectGrado');
+        const contenedor = document.getElementById('contenedorProductos');
+        
+        if (!selectGra) return;
 
-    // 1. Validar si el carrito tiene productos
-    const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
-    if (carrito.length === 0) {
-        alert("Tu carrito está vacío. Añade productos antes de continuar.");
-        window.location.href = 'index.html'; // Lo mandamos a comprar
+        selectGra.innerHTML = '<option value="">Seleccione un grado...</option>';
+        if (contenedor) contenedor.innerHTML = '<p>Ahora selecciona tu grado para ver los materiales.</p>';
+
+        if (colSeleccionado) {
+            // Filtrar todos los grados que pertenecen a este colegio
+            const gradosDelColegio = baseDeDatos
+                .filter(p => p.colegio === colSeleccionado)
+                .map(p => p.grado);
+
+            // Quitar duplicados y ordenar
+            const gradosUnicos = [...new Set(gradosDelColegio)].sort();
+
+            gradosUnicos.forEach(g => selectGra.add(new Option(g, g)));
+            selectGra.disabled = false;
+        } else {
+            selectGra.disabled = true;
+        }
+    }
+
+    // Si cambia el Grado -> Mostrar Productos
+    if (e.target.id === 'selectGrado') {
+        const col = document.getElementById('selectColegio').value;
+        const gra = e.target.value;
+        if (col && gra) {
+            renderizarProductos(col, gra);
+        }
+    }
+});
+
+// 5. MOSTRAR PRODUCTOS EN PANTALLA
+function renderizarProductos(col, gra) {
+    const contenedor = document.getElementById('contenedorProductos');
+    if (!contenedor) return;
+
+    const filtrados = baseDeDatos.filter(p => p.colegio === col && p.grado === gra);
+    contenedor.innerHTML = ""; 
+
+    if (filtrados.length === 0) {
+        contenedor.innerHTML = "<p>No hay productos disponibles para esta selección.</p>";
         return;
     }
 
-    // 2. Guardar datos del Acudiente y Colegio
-    const datosEntrega = {
-        acudiente: document.getElementById('parentName').value,
-        documento: document.getElementById('documentId').value,
-        colegio: document.getElementById('college').value, // El colegio se elige aquí
-        ciudad: document.getElementById('city').value,
-        direccion: document.getElementById('address').value,
-        telefono: document.getElementById('phone').value
-    };
-    
-    localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
+    filtrados.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card-producto';
+        card.innerHTML = `
+            <div class="producto-info">
+                <img src="../Multimedia/Logotipo_MathMinds.png" width="50" style="margin-bottom:10px;">
+                <h3>${p.producto}</h3>
+                <p style="font-size: 12px; color: #777;">${p.colegio} - ${p.grado}</p>
+                <p class="precio">$${p.costo.toLocaleString()}</p>
+                <button class="btn primary full" onclick="agregarAlCarrito('${p.producto}', ${p.costo})">
+                    Añadir al carrito
+                </button>
+            </div>
+        `;
+        contenedor.appendChild(card);
+    });
+}
 
-    // 3. Abrir nueva pestaña para datos del estudiante
-    window.open('finalizar-estudiante.html', '_blank');
+// 6. MANEJO DEL FORMULARIO DE PAGO (Si existe en la página)
+document.addEventListener('submit', (e) => {
+    if (e.target.id === 'payForm') {
+        e.preventDefault();
+        const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
+        
+        if (carrito.length === 0) {
+            alert("Tu carrito está vacío.");
+            return;
+        }
+
+        const datosEntrega = {
+            acudiente: document.getElementById('parentName')?.value,
+            documento: document.getElementById('documentId')?.value,
+            colegio: document.getElementById('college')?.value,
+            ciudad: document.getElementById('city')?.value,
+            direccion: document.getElementById('address')?.value,
+            telefono: document.getElementById('phone')?.value
+        };
+        
+        localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
+        window.open('finalizar_pago.html', '_blank');
+    }
 });
+
+// 7. INICIAR CUANDO EL DOCUMENTO ESTÉ LISTO
+document.addEventListener('DOMContentLoaded', inicializarTienda);
