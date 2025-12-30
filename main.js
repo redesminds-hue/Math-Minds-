@@ -1046,3 +1046,13 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('mobile-menu-btn').addEventListener('click', function() {
     document.getElementById('menu').classList.toggle('open');
 });
+
+function actualizarContadorCarrito(total) {
+    // Actualiza el del menú normal
+    const cartCount = document.getElementById('cartCount');
+    if(cartCount) cartCount.innerText = total;
+
+    // Actualiza el botón flotante
+    const cartCountFlotante = document.getElementById('cartCountFlotante');
+    if(cartCountFlotante) cartCountFlotante.innerText = total;
+}

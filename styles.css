@@ -1776,49 +1776,76 @@ img{ max-width:100%; height:auto; display:block; }
   gap: 15px;
 }
 
-/* --- DISEÑO PARA CELULAR --- */
 @media (max-width: 992px) {
-  .menu-toggle {
-    display: block; /* Muestra el botón de abrir */
-    background: #00d2ff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-
   .menu {
-    display: none; /* Escondemos el menú original */
+    display: none; 
     position: absolute;
     top: 60px;
-    left: 0;
-    width: 100%;
+    left: 5%;
+    width: 90%; /* Dejamos un margen a los lados */
     background: white;
-    flex-direction: column; /* Alineamos todo hacia abajo */
-    padding: 20px;
-    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     
-    /* ESTO ARREGLA TU PROBLEMA: Permite bajar con el dedo si el menú es largo */
-    max-height: 80vh; 
-    overflow-y: auto; 
+    /* ESTO ES LO MÁS IMPORTANTE */
+    max-height: 75vh; /* El menú no puede ser más alto que el 75% de la pantalla */
+    overflow-y: auto; /* Activa el scroll si el contenido es muy largo */
     z-index: 1000;
   }
 
   .menu.open {
-    display: flex; /* Se muestra al hacer clic */
+    display: flex; /* Se muestra al hacer clic en el botón de hamburguesa */
   }
 
   .menu-item {
-    width: 100%;
-    padding: 15px 0;
+    padding: 12px;
     border-bottom: 1px solid #f0f0f0;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  
+
+  /* Reducimos un poco los logos para que quepa "Material Didáctico" */
   .menu-item img {
-    max-width: 120px; /* Ajustamos las imágenes para que no se vean gigantes */
+    max-width: 100px; 
     height: auto;
   }
+}
+
+.carrito-flotante {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: linear-gradient(135deg, #00d2ff, #0077b6);
+    color: white;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.carrito-flotante:active {
+    transform: scale(0.9); /* Efecto de pulsación al tocarlo */
+}
+
+.badge-flotante {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff4757;
+    color: white;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: 2px solid white;
 }
