@@ -1707,6 +1707,51 @@ img{ max-width:100%; height:auto; display:block; }
     transition: 0.3s;
 }
 
+/* --- AJUSTES PARA CELULAR --- */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Pone el logo arriba y el menú abajo */
+        padding: 10px;
+    }
+
+    .filters-wrapper {
+        grid-template-columns: 1fr; /* Los selectores se ponen uno debajo del otro */
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .main-container {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .store-header h1 {
+        font-size: 1.8rem; /* Texto más pequeño para que no se corte */
+    }
+
+    /* Hacer que las tarjetas de productos ocupen casi todo el ancho */
+    .productos-grid {
+        grid-template-columns: 1fr; 
+        gap: 20px;
+    }
+
+    /* IMPORTANTE: El botón del carrito debe ser flotante o muy visible */
+    .cart-icon-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--primary);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+}
+
 .card-producto:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
