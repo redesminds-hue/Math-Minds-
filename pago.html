@@ -431,8 +431,58 @@
                 });
             }
 
+           
+            const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzJntUsVXAyJNZY7wmvZ0vZQyZUcYWFxo_PYK8ypJSZ3pXsrUTl-il7iKbZdF2MT0oKMw/exec'; // <-- paste your Apps Script URL here
+
+            async function sendToSheet(payload){
+                if (!SHEET_WEBHOOK_URL) return { ok: false, error: 'NO_ENDPOINT' };
+                try{
+                    const controller = new AbortController();
+                    const id = setTimeout(() => controller.abort(), 8000); // 8s timeout
+                    const resp = await fetch(SHEET_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal,
+                        mode: 'cors'
+                    });
+                    clearTimeout(id);
+                    if (!resp.ok) return { ok: false, status: resp.status };
+                    const data = await resp.json().catch(()=>null);
+                    return { ok: true, data };
+                }catch(err){ return { ok: false, error: err && err.name ? err.name : String(err) }; }
+            }
+
+            // Queue pending submissions when offline or endpoint fails
+            function queuePendingSubmission(entry){
+                try{
+                    const key = 'mm_pending_submissions';
+                    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+                    arr.push({ ts: Date.now(), entry });
+                    localStorage.setItem(key, JSON.stringify(arr));
+                }catch(e){ console.warn('Failed to queue submission', e); }
+            }
+
+            // Try to flush pending submissions (called on load)
+            async function flushPending(){
+                const key = 'mm_pending_submissions';
+                try{
+                    const pending = JSON.parse(localStorage.getItem(key) || '[]');
+                    if (!pending || !pending.length) return;
+                    const remaining = [];
+                    for (const item of pending){
+                        const r = await sendToSheet(item.entry);
+                        if (!r.ok) remaining.push(item);
+                    }
+                    if (remaining.length) localStorage.setItem(key, JSON.stringify(remaining)); else localStorage.removeItem(key);
+                }catch(e){ console.warn('flushPending error', e); }
+            }
+
+            // Attempt to flush pending on load (non-blocking)
+            setTimeout(() => { flushPending(); }, 2000);
+
             // Handle form submit
-            document.getElementById('payForm').addEventListener('submit', function(e){
+            document.getElementById('payForm').addEventListener('submit', async function(e){
                 e.preventDefault();
                 const carrito = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
                 if (carrito.length === 0){ alert('⚠️ El carrito está vacío.'); return; }
@@ -445,10 +495,33 @@
                     curso: document.getElementById('grade').value,
                     ciudad: document.getElementById('city').value,
                     direccion: document.getElementById('address').value,
-                    telefono: document.getElementById('phone').value
+                    telefono: document.getElementById('phone').value,
+                    carrito: carrito
                 };
 
-                localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
+                // persist locally as before for the app flow
+                try{ localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega)); }catch(e){}
+
+                // Try to send to spreadsheet endpoint; don't block user if fails
+                if (SHEET_WEBHOOK_URL){
+                    try{
+                        const result = await sendToSheet(datosEntrega);
+                        if (!result.ok){
+                            console.warn('sendToSheet failed, queueing locally', result);
+                            queuePendingSubmission(datosEntrega);
+                        } else {
+                            console.log('sendToSheet ok', result.data);
+                        }
+                    }catch(e){
+                        console.warn('sendToSheet exception, queueing', e);
+                        queuePendingSubmission(datosEntrega);
+                    }
+                } else {
+                    // no endpoint configured -> queue locally so admin can export later
+                    queuePendingSubmission(datosEntrega);
+                }
+
+                // continue to confirmation step regardless
                 window.location.href = 'finalizar_pago.html';
             });
         });
