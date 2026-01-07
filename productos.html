@@ -15,8 +15,15 @@
       <nav class="menu">
         <a href="index.html">Inicio</a>
         <a class="active" href="#">Productos</a>
-        <a href="#" id="cartToggle" class="menu-item cart-link">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+
       </nav>
+      <div class="header-controls">
+        <button id="searchToggle" type="button" class="search-btn" aria-label="Buscar">🔎</button>
+        <button id="cartToggle" class="cart-btn" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></button>
+        <button class="burger" id="burger" aria-label="Menú">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -48,10 +55,7 @@
         </div>
     </div>
   </main>
-  <div class="cart-icon-container" onclick="abrirCarrito()">
-    <i class="fas fa-shopping-cart" style="color: white; font-size: 1.5rem;"></i>
-    <span id="cartCount">0</span>
-</div>
+
 
   <footer class="footer">
     <div class="footer-slogan">

@@ -70,17 +70,18 @@
     <span class="menu-text">Comprar Productos</span>
   </a>
 
-  <!-- CARRITO -->
-  <a href="#" id="cartToggle" class="menu-item cart-link" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+
 
 </nav>
 
-        <!-- Drawer de búsqueda (se abre desde el lado derecho) -->
-        <button id="searchToggle" type="button" class="search-btn" aria-label="Buscar">🔎</button>
-
-        <button class="burger" id="burger" aria-label="Menú">
-          <span></span><span></span><span></span>
-        </button>
+        <!-- Grouped header controls (search, cart, burger) -->
+        <div class="header-controls">
+          <button id="searchToggle" type="button" class="search-btn" aria-label="Buscar">🔎</button>
+          <button id="cartToggle" class="cart-btn" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></button>
+          <button class="burger" id="burger" aria-label="Menú">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -576,9 +577,6 @@
         </div>
         </div>
     </div>
-  </div>
-  <div class="carrito-flotante" onclick="location.href='#cartToggle'">
-    <img src="../Multimedia/Didactico.png" alt="Carrito" class="icono-carrito-img" style="display:none;"> <i class="fas fa-shopping-cart"></i> <span id="cartCountFlotante" class="badge-flotante">0</span>
   </div>
 </div>
 </body>

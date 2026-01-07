@@ -1032,10 +1032,6 @@ function actualizarContadoresVisuales() {
     // Contador del menú
     const badgeMenu = document.getElementById('cartCount');
     if (badgeMenu) badgeMenu.innerText = total;
-
-    // Contador del botón flotante que creamos para el celular
-    const badgeFlotante = document.getElementById('cartCountFlotante');
-    if (badgeFlotante) badgeFlotante.innerText = total;
 }
 
 // Cargar el estado al iniciar la página
@@ -1091,10 +1087,6 @@ function actualizarContadorCarrito(total) {
     // Actualiza el del menú normal
     const cartCount = document.getElementById('cartCount');
     if(cartCount) cartCount.innerText = total;
-
-    // Actualiza el botón flotante
-    const cartCountFlotante = document.getElementById('cartCountFlotante');
-    if(cartCountFlotante) cartCountFlotante.innerText = total;
 }
 
 // 1. Array para almacenar los productos
@@ -1131,10 +1123,6 @@ function actualizarContadores() {
     // 1. Actualiza el carrito del menú (el de arriba)
     const cMenu = document.getElementById('cartCount');
     if (cMenu) cMenu.innerText = cantidad;
-
-    // 2. Actualiza el carrito flotante (el azul)
-    const cFlotante = document.getElementById('cartCountFlotante');
-    if (cFlotante) cFlotante.innerText = cantidad;
 }
 
 // Llama a esta función siempre que la página cargue
@@ -1184,10 +1172,6 @@ function actualizarContadores() {
     // Contador del menú
     const cMenu = document.getElementById('cartCount');
     if (cMenu) cMenu.innerText = cantidad;
-
-    // Contador flotante del celular
-    const cFlotante = document.getElementById('cartCountFlotante');
-    if (cFlotante) cFlotante.innerText = cantidad;
     
     console.log("Total en carrito:", cantidad);
 }
