@@ -9,6 +9,12 @@
 <body>
   <header class="header">
     <div class="header-inner">
+      <div class="header-left">
+        <button class="burger" id="burger" aria-label="Menú">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="tag-btn" id="tagBtn" aria-label="Categorías">🏷️</button>
+      </div>
       <div class="brand">
         <img src="../Multimedia/Logo.png" alt="Math Minds" />
       </div>
@@ -20,10 +26,12 @@
       <div class="header-controls">
         <button id="searchToggle" type="button" class="search-btn" aria-label="Buscar">🔎</button>
         <button id="cartToggle" class="cart-btn" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></button>
-        <button class="burger" id="burger" aria-label="Menú">
-          <span></span><span></span><span></span>
-        </button>
       </div>
+    </div>
+
+    <div class="mobile-search" aria-hidden="true">
+      <input id="mobileSearchInput" type="search" placeholder="Buscar producto o marca..." />
+      <button id="mobileSearchBtn" class="mobile-search-btn" aria-label="Buscar">🔍</button>
     </div>
   </header>
 

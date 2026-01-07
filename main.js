@@ -147,6 +147,16 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Tag button (mobile-only): redirect to store (productos.html)
+const tagBtns = document.querySelectorAll('.tag-btn');
+if (tagBtns && tagBtns.length){
+  tagBtns.forEach(btn => btn.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    // On mobile we want to send users to the store
+    window.location.href = 'productos.html';
+  }));
+}
+
 
 // ===============================
 // CAROUSEL Y CONTROLES
@@ -481,6 +491,23 @@ document.addEventListener("DOMContentLoaded", () => {
     searchOverlay.addEventListener('click', closeDrawer);
 
     searchSubmit?.addEventListener('click', () => performSearch());
+
+    // Mobile search input/button (header) -> reuse drawer logic
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    if (mobileSearchBtn && mobileSearchInput){
+      mobileSearchBtn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const q = (mobileSearchInput.value || '').trim();
+        if (searchInput) searchInput.value = q; // copy to drawer input
+        openDrawer();
+        if (q) performSearch(q);
+      });
+
+      mobileSearchInput.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter'){ ev.preventDefault(); mobileSearchBtn.click(); }
+      });
+    }
 
     searchInput?.addEventListener('input', () => {
       // mostrar resultados en tiempo real mientras escribe
