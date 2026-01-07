@@ -22,16 +22,21 @@ img{ max-width:100%; height:auto; display:block; }
 ========================= */
 .header{
   width:100%;
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(6px);
+  background:#fff; /* solid header bar */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06); /* subtle lift */
+  border-bottom: 1px solid rgba(0,0,0,0.08);
   position:relative;
-}
+  z-index:10000;
+  backdrop-filter: blur(6px);
+} 
 
 .header-inner{
   width: min(2000px, calc(100% - 35px)); 
   margin:0 auto;
   min-height:56px;
   position:relative;
+  padding-top:52px; /* vertical spacing to align menu with logo */
+  padding-bottom:52px;
 
   display:flex; /* layout: logo + center menu + right controls */
   align-items:center;
