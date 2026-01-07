@@ -110,6 +110,26 @@ img{ max-width:100%; height:auto; display:block; }
   justify-content:center; /* center menu items horizontally */
 }
 
+/* Drawer-related elements should be hidden on desktop to avoid disrupting layout */
+.menu-drawer-header,
+.menu-drawer-footer,
+.menu-top-badges{ display:none; }
+
+/* Reveal drawer elements only when the menu is open on smaller screens */
+@media (max-width:1024px){
+  .menu.open .menu-drawer-header,
+  .menu.open .menu-drawer-footer,
+  .menu.open .menu-top-badges{ display:block; }
+  .menu.open .menu-top-badges{ display:flex; flex-direction:column; gap:8px; }
+}
+
+/* Ensure absolutely hidden on larger screens */
+@media (min-width:1025px){
+  .menu-drawer-header,
+  .menu-drawer-footer,
+  .menu-top-badges{ display:none !important; }
+}
+
 .header-controls{
   display:flex;
   align-items:center;
