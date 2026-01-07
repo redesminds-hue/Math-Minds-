@@ -182,27 +182,44 @@
             `;
 
             const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
-            document.getElementById('lista-productos').innerHTML = carrito.map(i => `
-                <div class="producto-row">
-                    <img src="${i.image}">
-                    <div style="flex:1"><strong>${i.title}</strong><br><span>Cantidad: ${i.qty}</span></div>
-                </div>
-            `).join('');
+                // Load DB snapshot (saved by main.js) to get product prices
+                let bdb = [];
+                try{ bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]'); }catch(e){ bdb = []; }
 
-            fetchPrecio(entrega.colegio);
-        }
+                function norm(s){ try{ return String(s||'').normalize('NFC').trim().toLowerCase(); }catch(e){ return String(s||'').trim().toLowerCase(); } }
 
-        async function fetchPrecio(col) {
-            try {
-                const r = await fetch(EXCEL_URL);
-                const t = await r.text();
-                const fila = t.split('\n').find(f => f.toLowerCase().includes(col.toLowerCase()));
-                if(fila) {
-                    const p = fila.split(',')[1];
-                    document.getElementById('total-precio').innerText = `Total: $${p}`;
-                    localStorage.setItem('total_calc', p);
-                }
-            } catch(e) { document.getElementById('total-precio').innerText = "Consultar total..."; }
+                // Build product rows with resolved price (from baseDeDatos) or fallback to item.price
+                let total = 0;
+                const rowsHtml = carrito.map(i => {
+                    const title = i.title || i.nombre || '';
+                    const qty = Number(i.qty || 1);
+                    // Prefer matching DB row by item-level colegio/grado if present
+                    const itemColegio = (i.colegio) ? norm(i.colegio) : (entrega && entrega.colegio ? norm(entrega.colegio) : null);
+                    const itemGrado = (i.grado) ? norm(i.grado) : (entrega && entrega.curso ? norm(entrega.curso) : null);
+                    let match = null;
+                    if (itemColegio && itemGrado){
+                        match = bdb.find(r => norm(r.colegio) === itemColegio && norm(r.grado) === itemGrado && (norm(r.producto) === norm(title) || norm(title).includes(norm(r.producto))));
+                    }
+                    if (!match && itemColegio){
+                        match = bdb.find(r => norm(r.colegio) === itemColegio && (norm(r.producto) === norm(title) || norm(title).includes(norm(r.producto))));
+                    }
+                    // global fallback
+                    if (!match){ match = bdb.find(r => norm(r.producto) === norm(title)) || bdb.find(r => norm(title).includes(norm(r.producto))) || null; }
+                    const unit = match ? Number(match.costo || 0) : (Number(i.price || i.precio || 0) || 0);
+                    const subtotal = unit * qty;
+                    total += subtotal;
+                    return `
+                        <div class="producto-row">
+                            <img src="${i.image || ''}" alt="">
+                            <div style="flex:1"><strong>${title}</strong><br><span>Cantidad: ${qty} • Precio unitario: $${unit.toLocaleString()}</span></div>
+                            <div style="font-weight:800">$${subtotal.toLocaleString()}</div>
+                        </div>
+                    `;
+                }).join('') || '<p>No hay productos en el carrito.</p>';
+
+                document.getElementById('lista-productos').innerHTML = rowsHtml;
+                document.getElementById('total-precio').innerText = `Total: $${total.toLocaleString()}`;
+                try{ localStorage.setItem('total_calc', total); }catch(e){}
         }
 
         function enviarWhatsApp() {

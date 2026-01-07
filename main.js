@@ -3,7 +3,7 @@
 // BURGER MENU
 // ===============================
 const burger = document.getElementById("burger");
-const menu = document.getElementById("menu");
+let menu = document.getElementById("menu") || document.querySelector('.menu');
 
 // Helper to open/close mobile menu with overlay
 function openMenu(){
@@ -362,6 +362,17 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { openModal(dest); }, 120);
   });
 
+  // Delegated handler for elements with data-modal (works for dynamically added elements)
+  document.addEventListener('click', (e) => {
+    const dm = e.target && e.target.closest && e.target.closest('[data-modal]');
+    if (!dm) return;
+    e.preventDefault();
+    const dest = dm.getAttribute('data-modal');
+    if (!dest) return;
+    document.querySelectorAll('.modal-overlay.active').forEach(closeModal);
+    setTimeout(() => { openModal(dest); }, 120);
+  });
+
   // BÚSQUEDA: drawer lateral con historial
   const searchToggle = document.getElementById('searchToggle');
   const searchDrawer = document.getElementById('searchDrawer');
@@ -407,10 +418,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Cargar productos desde JSON
   async function loadProducts(){
+    // If baseDeDatos already present, build PRODUCTS from it and avoid fetching products.json (prevents 404 noise)
+    if (window.baseDeDatos && window.baseDeDatos.length){
+      buildProductsFromDB();
+      return;
+    }
+
+    // Otherwise, wait briefly for baseDeDatosReady event (in case CSV is still loading).
+    const readyPromise = new Promise((resolve) => {
+      const onReady = () => { buildProductsFromDB(); resolve(true); };
+      window.addEventListener('baseDeDatosReady', onReady, { once:true });
+      // timeout -> resolve false so we attempt fetch as fallback
+      setTimeout(() => resolve(false), 1800);
+    });
+
+    const ready = await readyPromise;
+    if (ready) return;
+
+    // If still not ready, attempt to fetch products.json as last resort
     try{
       const res = await fetch('products.json');
-      PRODUCTS = await res.json();
-    }catch(e){ PRODUCTS = []; }
+      if (res.ok){ PRODUCTS = await res.json(); return; }
+      throw new Error('products.json not found');
+    }catch(e){
+      // Final fallback: build from baseDeDatos if it became available
+      const db = window.baseDeDatos || [];
+      if (db && db.length){
+        buildProductsFromDB();
+        console.warn('products.json missing — using baseDeDatos for PRODUCTS, items:', PRODUCTS.length);
+      } else {
+        PRODUCTS = [];
+        console.warn('products.json missing and baseDeDatos empty — PRODUCTS empty');
+      }
+    }
   }
 
   function filterProducts(query){
@@ -837,7 +877,7 @@ document.addEventListener("DOMContentLoaded", () => {
         API.items.forEach(it => {
           const qty = Number(it.qty || 1);
           for (let i = 0; i < qty; i++){
-            pedidoArr.push({ id: it.id, nombre: it.title, precio: Number(it.price||0) });
+            pedidoArr.push({ id: it.id, nombre: it.title, precio: Number(it.price||0), colegio: it.colegio || '', grado: it.grado || '' });
           }
         });
         localStorage.setItem('mm_pedido', JSON.stringify(pedidoArr));
@@ -846,11 +886,14 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     addItem(product){
-      if (!product || !product.id) return;
-      const idx = API.items.findIndex(it => it.id === product.id);
-      if (idx >= 0){ API.items[idx].qty += 1; }
-      else{ API.items.push({ id: product.id, title: product.title, price: Number(product.price||0), image: product.image, qty: 1 }); }
-      API.save();
+        if (!product || !product.id) return;
+        const idx = API.items.findIndex(it => it.id === product.id);
+        if (idx >= 0){ API.items[idx].qty += 1; }
+        else{
+          // preserve colegio/grado metadata if provided
+          API.items.push({ id: product.id, title: product.title, price: Number(product.price||0), image: product.image, qty: 1, colegio: product.colegio || '', grado: product.grado || '' });
+        }
+        API.save();
     },
 
     remove(id){ API.items = API.items.filter(i => i.id !== id); API.save(); },
@@ -1110,6 +1153,53 @@ async function inicializarTienda() {
 
         console.log("Carga completa. Registros:", baseDeDatos.length);
         poblarColegios();
+        // Populate PRODUCTS from the loaded baseDeDatos so search works even if products.json was missing
+        try{ buildProductsFromDB(); }catch(e){}
+        // Ensure selectColegio change is handled even if delegated listener missed it
+        try{
+          const sel = document.getElementById('selectColegio');
+          if (sel && !sel._mm_listener_attached){
+            sel.addEventListener('change', (ev) => {
+              const val = ev.target.value;
+              console.log('Direct selectColegio change ->', val);
+              // reuse existing logic: show loading and render by colegio
+              const contenedor = document.getElementById('contenedorProductos');
+              if (contenedor){ contenedor.innerHTML = '<div class="loading">Cargando productos del colegio seleccionado…</div>'; }
+              setTimeout(()=>{
+                try{
+                  if (typeof window.renderizarProductos === 'function'){
+                    console.log('Calling renderizarProductos (direct listener)');
+                    try{ localStorage.setItem('mm_selected_colegio', val); }catch(e){}
+                    window.renderizarProductos(val, null);
+                    return;
+                  }
+                }catch(err){ console.error('Error calling renderizarProductos:', err); }
+
+                // Fallback: render directly from baseDeDatos
+                try{
+                  const rows = (window.baseDeDatos || []).filter(r => _norm(r.colegio) === _norm(val));
+                  // dedupe by producto
+                  const vistos = new Set();
+                  const únicos = [];
+                  for (const p of rows){ const clave = (_norm(p.producto)||''); if (!clave) continue; if (vistos.has(clave)) continue; vistos.add(clave); únicos.push(p); }
+                  if (!contenedor) return;
+                  if (únicos.length === 0){ contenedor.innerHTML = '<p>No hay productos disponibles para este colegio.</p>'; return; }
+                  contenedor.innerHTML = '';
+                  únicos.forEach(p => {
+                    const card = document.createElement('div'); card.className='card-producto';
+                    const info = document.createElement('div'); info.className='producto-info';
+                    const img = document.createElement('img'); img.src = chooseLogoForText(p.producto||''); img.width=50; img.style.marginBottom='10px';
+                    const title = document.createElement('h3'); title.textContent = p.producto;
+                    const btn = document.createElement('button'); btn.className='btn primary full add-to-cart-btn'; btn.type='button'; btn.textContent='Añadir al carrito'; btn.dataset.product = p.producto; btn.dataset.price = 0;
+                    info.appendChild(img); info.appendChild(title); info.appendChild(btn); card.appendChild(info); contenedor.appendChild(card);
+                  });
+                  console.log('Rendered', únicos.length, 'products (fallback render)');
+                }catch(e){ console.error('Fallback render error', e); }
+              }, 60);
+            });
+            sel._mm_listener_attached = true;
+          }
+        }catch(e){}
         // Notify other pages/scripts that the database is ready
         try{ window.dispatchEvent(new Event('baseDeDatosReady')); }catch(e){}
         try{ localStorage.setItem('mm_baseDeDatos', JSON.stringify(baseDeDatos)); }catch(e){ /* ignore storage errors */ }
@@ -1117,8 +1207,22 @@ async function inicializarTienda() {
         try{
           const params = new URLSearchParams(window.location.search || '');
           const q = params.get('q');
-          if (q) renderizarProductos(null, null, q);
-          else renderizarProductos();
+          if (q) {
+            renderizarProductos(null, null, q);
+          } else {
+            // If we're on productos page, do not auto-render all products —
+            // require the user to select colegio/grado first.
+            const onProducts = window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('productos.html');
+            if (onProducts) {
+              // Ensure colegio select is present and populated (poblarColegios already ran)
+              const cont = document.getElementById('contenedorProductos');
+              if (cont) {
+                cont.innerHTML = '<div class="mensaje-bienvenida"><img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100"><p>Por favor selecciona tu colegio y grado para ver los productos.</p></div>';
+              }
+            } else {
+              renderizarProductos();
+            }
+          }
         }catch(e){ /* renderizarProductos puede definirse después; ignorar si aún no existe */ }
     } catch (e) {
         console.error("Error cargando base de datos:", e);
@@ -1138,51 +1242,100 @@ function poblarColegios() {
         let opt = new Option(col, col);
         selectCol.add(opt);
     });
+    // If there was a previously selected colegio, preselect it and populate grados
+    try{
+      const stored = localStorage.getItem('mm_selected_colegio');
+      if (stored){ selectCol.value = stored; /* trigger change handler later */ }
+    }catch(e){}
+}
+
+// Populate grados for a given colegio into #selectGrado
+function poblarGradosParaColegio(colegio){
+  const sel = document.getElementById('selectGrado');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Seleccione grado...</option>';
+  const grados = [...new Set((baseDeDatos || []).filter(r => _norm(r.colegio) === _norm(colegio)).map(r => r.grado))].filter(Boolean).sort();
+  grados.forEach(g => sel.add(new Option(g, g)));
+  sel.disabled = !(grados.length > 0);
+  // if stored grade exists and matches, preselect it
+  try{ const sg = localStorage.getItem('mm_selected_grade'); if (sg && grados.includes(sg)) { sel.value = sg; } }catch(e){}
+}
+
+// Helper: normalize string for robust comparisons (trim, lowercase, NFC)
+function _norm(s){ try{ return String(s||'').normalize('NFC').trim().toLowerCase(); }catch(e){ return (s||'').toString().trim().toLowerCase(); } }
+
+// Build PRODUCTS array from baseDeDatos so search works when products.json is missing
+function buildProductsFromDB(){
+  try{
+    const db = window.baseDeDatos || [];
+    if (!db || db.length === 0) return;
+    PRODUCTS = db.map(r => ({
+      title: r.producto || '',
+      description: `${r.colegio || ''} • ${r.grado || ''}`,
+      tags: [],
+      image: chooseLogoForText(r.producto || '')
+    }));
+    console.log('PRODUCTS built from baseDeDatos, items:', PRODUCTS.length);
+  }catch(e){ console.error('buildProductsFromDB error', e); }
 }
 
 // 4. ESCUCHAR CAMBIOS EN LOS FILTROS
 document.addEventListener('change', (e) => {
-    // Si cambia el Colegio -> Cargar sus Grados
+    // Si cambia el Colegio -> Mostrar todos los productos de ese colegio
     if (e.target.id === 'selectColegio') {
-        const colSeleccionado = e.target.value;
-        const selectGra = document.getElementById('selectGrado');
-        const contenedor = document.getElementById('contenedorProductos');
-        
-        if (!selectGra) return;
+      const colSeleccionado = e.target.value;
+      const contenedor = document.getElementById('contenedorProductos');
+      if (!contenedor) return;
 
-        selectGra.innerHTML = '<option value="">Seleccione un grado...</option>';
-        if (contenedor) contenedor.innerHTML = '<p>Ahora selecciona tu grado para ver los materiales.</p>';
+      console.log('Filtro colegio seleccionado ->', colSeleccionado, 'baseDeDatos registros:', (baseDeDatos||[]).length);
 
-        if (colSeleccionado) {
-            // Filtrar todos los grados que pertenecen a este colegio
-            const gradosDelColegio = baseDeDatos
-                .filter(p => p.colegio === colSeleccionado)
-                .map(p => p.grado);
+      if (!colSeleccionado) {
+        // limpiar vista
+        contenedor.innerHTML = '<div class="mensaje-bienvenida"><img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100"><p>Por favor selecciona tu colegio para ver los productos.</p></div>';
+        return;
+      }
 
-            // Quitar duplicados y ordenar
-            const gradosUnicos = [...new Set(gradosDelColegio)].sort();
+      // Mostrar un indicador leve mientras se filtra
+      contenedor.innerHTML = '<div class="loading">Cargando productos del colegio seleccionado…</div>';
 
-            gradosUnicos.forEach(g => selectGra.add(new Option(g, g)));
-            selectGra.disabled = false;
-        } else {
-            selectGra.disabled = true;
-        }
+      // Populate grades for this colegio, and require grado selection to render
+      try{ localStorage.setItem('mm_selected_colegio', colSeleccionado); }catch(e){}
+      poblarGradosParaColegio(colSeleccionado);
+      // clear any previous render and prompt user to select grado
+      contenedor.innerHTML = '<div class="mensaje-bienvenida"><p>Selecciona el grado para ver los productos del colegio seleccionado.</p></div>';
+      return;
     }
 
-    // Si cambia el Grado -> Mostrar Productos
+    // Si cambia el Grado -> mostrar productos de colegio+grado
     if (e.target.id === 'selectGrado') {
-        const col = document.getElementById('selectColegio').value;
-        const gra = e.target.value;
-        if (col && gra) {
-            renderizarProductos(col, gra);
-        }
+      const col = document.getElementById('selectColegio')?.value;
+      const gra = e.target.value;
+      if (!col || !gra) return;
+      try{ localStorage.setItem('mm_selected_grade', gra); }catch(e){}
+      const contenedor = document.getElementById('contenedorProductos');
+      if (contenedor) contenedor.innerHTML = '<div class="loading">Cargando productos del colegio y grado seleccionados…</div>';
+      setTimeout(()=>{ renderizarProductos(col, gra); }, 60);
+      return;
     }
+});
+
+// Click handler for limpiarFiltro button (borra la selección y restaura la vista)
+document.addEventListener('click', (e) => {
+  const btn = e.target && e.target.closest && e.target.closest('#limpiarFiltro');
+  if (!btn) return;
+  e.preventDefault();
+  const selectCol = document.getElementById('selectColegio');
+  const contenedor = document.getElementById('contenedorProductos');
+  if (selectCol) selectCol.value = '';
+  try{ localStorage.removeItem('mm_selected_colegio'); localStorage.removeItem('mm_selected_grade'); }catch(e){}
+  if (contenedor) contenedor.innerHTML = '<div class="mensaje-bienvenida"><img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100"><p>Por favor selecciona tu colegio para ver los productos.</p></div>';
 });
 
 // 5. MOSTRAR PRODUCTOS EN PANTALLA
 function renderizarProductos(col, gra, query) {
     const contenedor = document.getElementById('contenedorProductos');
     if (!contenedor) return;
+  console.log('renderizarProductos called with', { col, gra, query, baseLen: (baseDeDatos||[]).length });
   // Si viene una query, filtrar por producto/colegio/grado que contenga la query
   let filtrados;
   if (query && String(query).trim()){
@@ -1191,7 +1344,14 @@ function renderizarProductos(col, gra, query) {
       return ((p.producto||'').toLowerCase().includes(q)) || ((p.colegio||'').toLowerCase().includes(q)) || ((p.grado||'').toLowerCase().includes(q));
     });
   } else if (col && gra) {
-    filtrados = baseDeDatos.filter(p => p.colegio === col && p.grado === gra);
+    // Normalize and compare to avoid casing/spacing mismatches
+    const nc = _norm(col);
+    const ng = _norm(gra);
+    filtrados = baseDeDatos.filter(p => _norm(p.colegio) === nc && _norm(p.grado) === ng);
+  } else if (col && !gra) {
+    // Only colegio provided -> show all products for that colegio
+    const normCol = _norm(col);
+    filtrados = baseDeDatos.filter(p => _norm(p.colegio) === normCol);
   } else {
     filtrados = baseDeDatos.slice();
   }
@@ -1199,6 +1359,7 @@ function renderizarProductos(col, gra, query) {
   contenedor.innerHTML = "";
 
   if (filtrados.length === 0) {
+    console.log('renderizarProductos -> filtrados empty for', { col, gra, query });
     contenedor.innerHTML = "<p>No hay productos disponibles.</p>";
     return;
   }
@@ -1249,6 +1410,9 @@ function renderizarProductos(col, gra, query) {
     btn.dataset.product = p.producto;
     // No exponer el precio en la UI; pasar 0 al carrito para evitar mostrar precio
     btn.dataset.price = 0;
+    // Attach colegio/grado so cart knows item origin
+    if (p.colegio) btn.dataset.colegio = p.colegio;
+    if (p.grado) btn.dataset.grado = p.grado;
     // Note: delegated click handler on document handles `.add-to-cart-btn` clicks.
     // Avoid adding a direct listener here to prevent duplicate additions.
 
@@ -1337,15 +1501,17 @@ if (mmBtn) {
 var pedidoMathMinds = JSON.parse(localStorage.getItem('mm_pedido')) || [];
 
 // Unified add-to-cart function used by product buttons
-function agregarAlCarrito(nombre, precioRaw) {
-    console.log('agregarAlCarrito called with', nombre, precioRaw);
+function agregarAlCarrito(nombre, precioRaw, meta) {
+  console.log('agregarAlCarrito called with', nombre, precioRaw, meta);
     // Normalize price (accept numbers or formatted strings)
     const precioNum = Number(String(precioRaw).replace(/[^0-9.-]+/g, '')) || 0;
 
     const producto = {
         id: Date.now().toString(),
         nombre: String(nombre),
-        precio: precioNum
+        precio: precioNum,
+        colegio: (meta && meta.colegio) ? String(meta.colegio) : '',
+        grado: (meta && meta.grado) ? String(meta.grado) : ''
     };
 
     // Ensure in-memory array exists and load fresh state
@@ -1362,7 +1528,7 @@ function agregarAlCarrito(nombre, precioRaw) {
     // If the Cart API is present, add to it too so the drawer stays in sync
     try{
       if (window.Cart && typeof window.Cart.addItem === 'function'){
-        window.Cart.addItem({ id: producto.id, title: producto.nombre, price: producto.precio, image: '' });
+        window.Cart.addItem({ id: producto.id, title: producto.nombre, price: producto.precio, image: '', colegio: producto.colegio, grado: producto.grado });
       }
     }catch(e){ console.error('Cart.addItem error', e); }
 
@@ -1431,7 +1597,13 @@ document.addEventListener('click', (e) => {
   if (!btn) return;
   const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
   const price = btn.dataset.price || btn.getAttribute('data-price') || null;
-  if (prod) agregarAlCarrito(prod, price);
+  const colegio = btn.dataset.colegio || btn.getAttribute('data-colegio') || '';
+  const grado = btn.dataset.grado || btn.getAttribute('data-grado') || '';
+  if (prod) {
+    // add to legacy pedido and modern Cart API with metadata
+    agregarAlCarrito(prod, price, { colegio, grado });
+    try{ if (window.Cart && typeof window.Cart.addItem === 'function') window.Cart.addItem({ id: Date.now().toString(), title: prod, price: Number(price||0), image: '', colegio, grado }); }catch(e){}
+  }
 });
 
 // Ensure counters are set on load
@@ -1442,3 +1614,119 @@ window.testAddToCart = function(){ agregarAlCarrito('Producto prueba', 100); };
 
 // Debug panel removed: helper functions and auto-render removed to avoid
 // showing a floating debug box in the UI. No-op kept for compatibility.
+
+// Fallback wiring for pages that don't include the full search drawer (e.g., productos.html)
+document.addEventListener('DOMContentLoaded', () => {
+  const searchToggle = document.getElementById('searchToggle');
+  const searchDrawer = document.getElementById('searchDrawer');
+  const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+  const mobileSearchInput = document.getElementById('mobileSearchInput');
+
+  // If there's no drawer, make the header search toggle either focus the inline input
+  // on the products page or navigate to the store.
+  if (searchToggle && !searchDrawer){
+    searchToggle.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const onProducts = window.location.pathname && window.location.pathname.toLowerCase().includes('productos.html');
+      if (onProducts){
+        // Create a lightweight search drawer in-page if missing, then open it
+        ensureSearchDrawerExists();
+        const sd = document.getElementById('searchDrawer');
+        if (sd){ sd.setAttribute('aria-hidden','false'); const so = document.getElementById('searchOverlay'); if (so) so.classList.add('active'); const input = document.getElementById('searchInput'); if (input) input.focus(); }
+        return;
+      }
+      // otherwise go to store
+      window.location.href = 'productos.html';
+    });
+  }
+
+    // Build minimal search drawer markup dynamically when missing
+    function ensureSearchDrawerExists(){
+      if (document.getElementById('searchDrawer')) return;
+      const drawer = document.createElement('div'); drawer.id = 'searchDrawer'; drawer.className = 'search-drawer'; drawer.setAttribute('aria-hidden','true');
+      const overlay = document.createElement('div'); overlay.id = 'searchOverlay'; overlay.className = 'search-overlay';
+      overlay.addEventListener('click', () => { drawer.setAttribute('aria-hidden','true'); overlay.classList.remove('active'); });
+
+      drawer.innerHTML = `
+        <div class="search-drawer-inner">
+          <button id="searchClose" class="search-close">×</button>
+          <div class="search-input-wrap">
+            <input id="searchInput" placeholder="Buscar producto o marca..." />
+            <button id="searchSubmit">Buscar</button>
+          </div>
+          <ul id="searchHistory" class="search-history"></ul>
+          <ul id="searchResults" class="search-results"></ul>
+          <div id="noResults" style="padding:12px;opacity:.8;display:none;">Sin resultados</div>
+          <a id="viewAllBtn" href="productos.html" class="btn-view-all">Ver tienda</a>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      document.body.appendChild(drawer);
+
+      // wire handlers using baseDeDatos as data source (works on productos.html)
+      const searchInputEl = document.getElementById('searchInput');
+      const searchSubmitEl = document.getElementById('searchSubmit');
+      const searchCloseEl = document.getElementById('searchClose');
+
+      function localSearch(q){
+        const ql = (q||'').toString().toLowerCase().trim();
+        if (!ql) return [];
+        const tokens = ql.split(/\s+/).filter(Boolean);
+        const rows = (window.baseDeDatos || []).map(r => ({ title: r.producto || '', desc: `${r.colegio} • ${r.grado}`, image: chooseLogoForText(r.producto||'') }));
+        const scored = rows.map(r => {
+          let score = 0; const t = (r.title||'').toLowerCase(); const d = (r.desc||'').toLowerCase();
+          if (t.includes(ql)) score += 20; if (d.includes(ql)) score += 3;
+          for (const tk of tokens){ if (!tk) continue; if (t.includes(tk)) score += 4; else if (d.includes(tk)) score += 1; }
+          return { r, score };
+        }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.r);
+        return scored.slice(0,12);
+      }
+
+      searchSubmitEl?.addEventListener('click', () => {
+        const q = (searchInputEl.value || '').trim();
+        if (!q) return;
+        // go to productos with query so the store shows the item
+        window.location.href = `productos.html?q=${encodeURIComponent(q)}`;
+      });
+
+      searchInputEl?.addEventListener('input', () => {
+        const q = (searchInputEl.value || '').trim();
+        if (!q){ document.getElementById('searchResults').innerHTML=''; document.getElementById('noResults').style.display='block'; return; }
+        const res = localSearch(q);
+        const wrap = document.getElementById('searchResults'); wrap.innerHTML = '';
+        if (!res || res.length === 0){ document.getElementById('noResults').style.display='block'; return; }
+        document.getElementById('noResults').style.display='none';
+        res.forEach(p => {
+          const li = document.createElement('li'); li.tabIndex=0;
+          li.innerHTML = `<img src="${p.image}" style="width:44px;height:44px;object-fit:contain;border-radius:6px;"/><div class="meta"><b>${escapeHtml(p.title)}</b><small style="opacity:.8">${escapeHtml(p.desc)}</small></div>`;
+          li.addEventListener('click', ()=>{ window.location.href = `productos.html?q=${encodeURIComponent(p.title)}`; });
+          wrap.appendChild(li);
+        });
+      });
+
+      searchInputEl?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter'){ ev.preventDefault(); searchSubmitEl.click(); } });
+      searchCloseEl?.addEventListener('click', () => { drawer.setAttribute('aria-hidden','true'); overlay.classList.remove('active'); });
+
+      // show history placeholder
+      try{ const h = document.getElementById('searchHistory'); h.innerHTML = '<li style="opacity:.8">(Sin búsquedas recientes)</li>'; }catch(e){}
+    }
+
+  // Ensure mobile search button works even if the drawer is not present
+  if (mobileSearchBtn && mobileSearchInput){
+    mobileSearchBtn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const q = (mobileSearchInput.value || '').trim();
+      const onProducts = window.location.pathname && window.location.pathname.toLowerCase().includes('productos.html');
+      if (onProducts){
+        // apply in-page filter
+        if (q) renderizarProductos(null, null, q);
+      } else {
+        // navigate to store with query
+        const url = 'productos.html' + (q ? `?q=${encodeURIComponent(q)}` : '');
+        window.location.href = url;
+      }
+    });
+
+    mobileSearchInput.addEventListener('keydown', (ev) => { if (ev.key === 'Enter'){ ev.preventDefault(); mobileSearchBtn.click(); } });
+  }
+});

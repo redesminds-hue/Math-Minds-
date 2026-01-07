@@ -18,11 +18,57 @@
       <div class="brand">
         <img src="../Multimedia/Logo.png" alt="Math Minds" />
       </div>
-      <nav class="menu">
+      <nav class="menu" id="menu">
         <!-- Close button inside the panel (mobile only) -->
         <button class="menu-close" aria-label="Cerrar menú">×</button>
-        <a href="index.html">Inicio</a>
-        <a class="active" href="#">Productos</a>
+        <a class="active" href="index.html">
+          <span class="menu-text">INICIO</span>
+        </a>
+
+        <!-- Mc Graw Hill -->
+        <a href="#" id="openMcGrawHill" data-modal="modal-McGrawHill" class="menu-item">
+          <img src="../Multimedia/McGrawHill.png" alt="McGraw Hill" width="50" height="42" /> 
+        </a>
+
+        <!-- ALEKS -->
+        <a href="#" id="openAleks" data-modal="modalAleks" class="menu-item">
+          <span class="menu-label">PLATAFORMA</span>
+          <img src="../Multimedia/ALEKS 2.png" alt="ALEKS" width="160" height="38" />
+        </a>
+
+        <!-- REVEAL -->
+        <a href="#" id="openRevealMath" data-modal="modalReveal" class="menu-item">
+          <span class="menu-label">LIBROS</span>
+          <img src="../Multimedia/Logo_Reveal_Math.png" alt="Reveal Math" width="150" height="42" />
+        </a>
+
+        <!-- SCHOLASTIC -->
+         <a href="#" id="openScholastic" data-modal="modal-Scholastic" class="menu-item">
+          <img src="../Multimedia/Scholastic.png" alt="Scholastic" width="50" height="42" />
+        </a>
+
+        <!-- PRIME -->
+        <a href="#" id="openPrime" data-modal="modalPrime" class="menu-item">
+          <span class="menu-label">LIBROS</span>
+          <img src="../Multimedia/Logo_Prime.png" alt="Prime" width="150" height="40" />
+        </a>
+
+        <!-- MATH MINDS -->
+         <a href="#" id="openMathMinds" data-modal="modal-MathMinds" class="menu-item">
+          <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="45" height="44"/>
+        </a>
+
+        <!-- MATERIAL CONCRETO -->
+        <a href="#" id="openMaterialConcreto" data-modal="modalMaterial" class="menu-item">
+          <span class="menu-label">MATERIAL</span>
+          <img src="../Multimedia/Didactico.png" alt="Material Concreto" width="150" height="35" />
+        </a>
+
+        <!-- COMPRAR -->
+        <a href="productos.html" target="_blank" class="menu-item menu-buy" id="menuBuy">
+          <span class="menu-label">TIENDA</span>
+          <span class="menu-text">Comprar Productos</span>
+        </a>
 
       </nav>
       <div class="header-controls">
@@ -42,6 +88,27 @@
       <h1>Tienda Educativa Math Minds</h1>
         <p>Explora todos nuestros materiales disponibles.</p>
     </section>
+    
+    <section id="filtroColegio" class="filtro-colegio" aria-label="Filtro Colegio">
+      <div class="filtro-inner">
+        <div class="filtro-left">
+          <label for="selectColegio">Colegio</label>
+          <select id="selectColegio" aria-label="Seleccionar colegio">
+            <option value="">Cargando colegios...</option>
+          </select>
+        </div>
+        <div class="filtro-center">
+          <label for="selectGrado">Grado</label>
+          <select id="selectGrado" aria-label="Seleccionar grado" disabled>
+            <option value="">Seleccione colegio primero</option>
+          </select>
+        </div>
+        <div class="filtro-right">
+          <button id="limpiarFiltro" class="btn secondary" type="button">Borrar selección</button>
+        </div>
+      </div>
+      <div class="filtro-ayuda" style="margin-top:10px;opacity:.9;font-size:14px;">Selecciona tu colegio para ver los productos disponibles.</div>
+    </section>
 
     <div id="contenedorProductos" class="productos-grid">
         <div class="mensaje-bienvenida">
@@ -49,7 +116,6 @@
             <p>Por favor, selecciona tu colegio y grado para ver tus productos</p>
         </div>
     </div>
-  </main>
 
 
   <footer class="footer">
@@ -112,5 +178,243 @@
 
 
   <script src="main.js"></script>
+  
+  <!-- Drawer de búsqueda (copiado desde index para que funcione en productos) -->
+  <div id="searchOverlay" class="search-overlay" aria-hidden="true"></div>
+
+  <aside id="searchDrawer" class="search-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+    <header class="search-drawer-header">
+      <div class="left">
+        <strong>Buscar</strong>
+        <button class="btn secondary" id="clearHistoryBtn" title="Limpiar historial">Limpiar</button>
+      </div>
+      <div class="right">
+        <button class="modal-close search-close" id="searchClose" type="button" aria-label="Cerrar">×</button>
+      </div>
+    </header>
+
+    <div class="search-drawer-body">
+      <div class="search-input-wrap">
+        <input id="searchInput" type="text" placeholder="Buscar productos, empresas..." aria-label="Buscar" />
+        <button id="searchSubmit" class="btn primary">Buscar</button>
+      </div>
+
+      <div class="search-results">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <h4 style="margin:0;">Historial</h4>
+          <a id="viewAllBtn" class="btn secondary" href="productos.html">Ver tienda</a>
+        </div>
+
+        <ul id="searchHistory" class="search-history"></ul>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #eee;">
+
+        <h4 style="margin:0 0 8px 0;">Resultados</h4>
+        <ul id="searchResults" class="search-results-list"></ul>
+        <div id="noResults" style="opacity:.8; display:none; margin-top:8px;">No se encontraron resultados.</div>
+      </div>
+    </div>
+  </aside>
+  
+  <!-- MODALES COPIADOS DESDE index.html -->
+
+  <!-- Material Didactico -->
+  <div class="modal-overlay" id="modalMaterial" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Material Didáctico
+      </h2>
+      <p class="modal-subtitle">Manipulativos y recursos prácticos para el aula.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-head">
+            <h3><img src="../Multimedia/Didactico.png" alt="Math Minds Logo" width="270" height="70"  /></h3>
+            <span class="tag">Manipulativos</span>
+          </div>
+
+          <img src ="../Multimedia/MaterialDidactico.png" alt="Material Didactico" width="700" height="50"  />
+          <ul class="compare-list">
+              <li>Material manipulativo que convierte lo abstracto en concreto.</li>
+              <li>Recursos visuales para comprender fracciones y figuras.</li>
+              <li>Kits diseñados para aprender haciendo.</li>
+
+          <a href="https://tusitio.com/material-concreto" class="btn primary full">Más información aquí</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVEAL MATH -->
+  <div class="modal-overlay" id="modalReveal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/McGrawHill.png" alt="Reveal Math" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Reveal Math
+      </h2>
+      <p class="modal-subtitle">Programa matemático basado en investigación y resolución de problemas.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-head">
+            <h3><img src="../Multimedia/Logo_Reveal_Math.png" alt="Reveal Math" width="160" height="46" /></h3>
+            <span class="tag">Libros</span>
+          </div>
+          <img src="../Multimedia/LIBROS REVEAL MATH.png" alt="Reveal Math Books" width="100%" height="auto" style="border-radius:8px; margin-bottom:12px;" />
+          <ul class="compare-list">
+            <li>Currículo moderno de matemáticas para el aula.</li>
+            <li>Promueve la comprensión y el pensamiento matemático.</li>
+            <li>Materiales diseñados para docentes y estudiantes.</li>
+          </ul>
+
+          <a href="#" class="btn primary full" data-open="modalReveal">Más información aquí</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIME -->
+  <div class="modal-overlay" id="modalPrime" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/Scholastic.png" alt="Prime" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Prime
+      </h2>
+      <p class="modal-subtitle">Contenido y recursos para fortalecer el aprendizaje con metodología estructurada.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-head">
+            <h3><img src="../Multimedia/Logo_Prime.png" alt="Prime Logo" width="160" height="46" /></h3>
+            <span class="tag">Libros</span>
+          </div>
+          <img src="../Multimedia/LIBROS PRIME.png" alt="Prime Books" width="100%" height="auto" style="border-radius:8px; margin-bottom:12px;" />
+          <ul class="compare-list">
+            <li>Recursos pedagógicos que fortalecen la enseñanza.</li>
+            <li>Apoyo práctico para docentes en el aula.</li>
+            <li>Contenidos alineados con los estándares curriculares.</li>
+          </ul>
+
+          <a class="btn primary full" href="https://tusitio.com/prime">Más información aquí</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MCGRAW HILL -->
+  <div class="modal-overlay" id="modal-McGrawHill" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/McGrawHill.png" alt="McGraw Hill" width="100" height="84" />
+      <h2 class="modal-text">
+        Nuestros productos McGraw Hill
+      </h2>
+      <p class="modal-subtitle">Soluciones educativas innovadoras para potenciar el aprendizaje.</p>
+      <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-head">
+            <h3><img src="../Multimedia/ALEKS.jpeg" alt="ALEKS Logo" width="195" height="40" /></h3>
+            <span class="tag">Plataforma de Aprendizaje</span>
+          </div>
+
+          <ul class="compare-list">
+            <li>Matemáticas adaptadas a las necesidades de cada estudiante.</li>
+            <li>Evaluación continua y seguimiento en tiempo real.</li>
+            <li>Información clara que apoya la gestión académica.</li>
+          </ul>
+
+          <a href="#" class="btn primary full" data-open="modalAleks">Más información aquí</a>
+        </div>
+
+        <div class="compare-card highlight">
+          <div class="compare-head">
+            <h3><img src="../Multimedia/Logo_Reveal_Math.png" alt="RevealMath" width="160" height="46" /></h3>
+            <span class="tag">Libros</span>
+          </div>
+          
+
+          <ul class="compare-list">
+            <li>Aprendizaje personalizado</li>
+            <li>Diagnóstico inteligente</li>
+            <li>Ideal para colegios</li>
+          </ul>
+
+          <a href="#" class="btn secondary full" data-open="modalReveal">Más información aquí</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHOLASTIC -->
+  <div class="modal-overlay" id="modal-Scholastic" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/Scholastic.png" alt="Scholastic" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Nuestros productos Scholastic
+      </h2>
+      
+      <p class="modal-subtitle">Libros y recursos educativos para fomentar el amor por la lectura y el aprendizaje. </p>
+
+       <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-head">
+            <h3><img src="../Multimedia/Logo_Prime.png" alt="Prime Logo" width="195" height="40" /></h3>
+            <span class="tag">Libros & Recursos</span>
+          </div>
+
+          <ul class="compare-list">
+            <li>Libros de lectura y recursos para primaria y secundaria.</li>
+            <li>Materiales que fomentan la comprensión lectora y el pensamiento crítico.</li>
+            <li>Programas de lectura escolar y bibliotecas escolares.</li>
+          </ul>
+
+          <a href="#" class="btn primary full" data-open="modalPrime">Más información aquí</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATH MINDS -->
+  <div class="modal-overlay" id="modal-MathMinds" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100" height="84" />
+
+      <h2 class="modal-text">
+        Nuestros productos Math Minds
+      </h2>
+      <p class="modal-subtitle">Soluciones educativas integrales para el aprendizaje efectivo de las matemáticas.</p>
+
+       <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-head">
+            <h3>
+              <img src="../Multimedia/Didactico.png" alt="Material Concreto"  />
+            </h3>
+           
+            <span class="tag">Soluciones educativas</span>
+          </div>
+
+          <ul class="compare-list">
+            <li>Programas y recursos propios para enseñanza de matemáticas.</li>
+            <li>Formación docente y evaluación formativa.</li>
+            <li>Material adaptado a currículo colombiano.</li>
+          </ul>
+
+          <a href="#" class="btn primary full" data-open="modalMaterial">Más información aquí</a>
+        </div>
+        </div>
+    </div>
+  </div>
 </body>
 </html>

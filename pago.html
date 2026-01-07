@@ -392,11 +392,44 @@
             // Initialize after baseDeDatos ready
             whenBaseReady(() => {
                 populateCollegeOptions();
+                // If user already selected a colegio in productos, lock it here
+                try{
+                    const selected = localStorage.getItem('mm_selected_colegio');
+                    if (selected){
+                        // set select to only show the selected colegio and disable changes
+                        collegeSel.innerHTML = '';
+                        const opt = new Option(selected, selected);
+                        opt.selected = true;
+                        collegeSel.add(opt);
+                        collegeSel.disabled = true;
+                        // populate grades for that colegio
+                        populateGradesForCollege(selected);
+                        // If a grade was previously selected in productos, lock it here as well
+                        try{
+                            const sg = localStorage.getItem('mm_selected_grade');
+                            if (sg){
+                                // wait a tick to ensure options present
+                                setTimeout(() => {
+                                    const optG = Array.from(gradeSel.options).find(o => o.value === sg);
+                                    if (optG){ gradeSel.value = sg; gradeSel.disabled = true; }
+                                }, 50);
+                            }
+                        }catch(e){}
+                    }
+                }catch(e){ /* ignore */ }
             });
 
             collegeSel.addEventListener('change', (e) => {
                 populateGradesForCollege(e.target.value);
             });
+
+            // Persist grade selection so finalizar_pago can read it if datos_entrega lacks curso
+            const gradeSelEl = document.getElementById('grade');
+            if (gradeSelEl){
+                gradeSelEl.addEventListener('change', (ev) => {
+                    try{ localStorage.setItem('mm_selected_grade', ev.target.value); }catch(e){}
+                });
+            }
 
             // Handle form submit
             document.getElementById('payForm').addEventListener('submit', function(e){
