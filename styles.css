@@ -138,7 +138,7 @@ img{ max-width:100%; height:auto; display:block; }
 }
 
 /* Hide tag button on desktop (show only on small screens) */
-.tag-btn{ display:none; }
+.tag-btn{ display:none; 
 
   .header-controls{ gap:8px; }
 }

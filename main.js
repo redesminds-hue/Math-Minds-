@@ -1610,8 +1610,9 @@ document.addEventListener('click', (e) => {
   const grado = btn.dataset.grado || btn.getAttribute('data-grado') || '';
   if (prod) {
     // add to legacy pedido and modern Cart API with metadata
+    // agregarAlCarrito already syncs with the Cart API (it calls window.Cart.addItem).
+    // Do not call window.Cart.addItem again here — that was causing duplicate entries.
     agregarAlCarrito(prod, price, { colegio, grado });
-    try{ if (window.Cart && typeof window.Cart.addItem === 'function') window.Cart.addItem({ id: Date.now().toString(), title: prod, price: Number(price||0), image: '', colegio, grado }); }catch(e){}
   }
 });
 
