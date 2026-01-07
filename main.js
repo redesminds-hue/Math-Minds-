@@ -157,6 +157,23 @@ if (tagBtns && tagBtns.length){
   }));
 }
 
+// Close button inside mobile menu (drawer)
+const menuCloseBtns = document.querySelectorAll('.menu-close');
+if (menuCloseBtns && menuCloseBtns.length){
+  menuCloseBtns.forEach(b => b.addEventListener('click', (ev) => { ev.preventDefault(); closeMenu(); }));
+}
+
+// Make badges optionally interactive (e.g., 'Ofertas' -> productos.html?tag=ofertas)
+const menuBadges = document.querySelectorAll('.menu-top-badges .badge');
+if (menuBadges && menuBadges.length){
+  menuBadges.forEach(b => b.addEventListener('click', (ev) => {
+    const txt = (b.textContent || '').trim().toLowerCase();
+    // simple mapping: send to productos with a query for the badge text
+    const q = encodeURIComponent(txt.replace(/[^a-z0-9]+/g,'-'));
+    window.location.href = `productos.html?tag=${q}`;
+  }));
+}
+
 
 // ===============================
 // CAROUSEL Y CONTROLES
