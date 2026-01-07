@@ -1666,24 +1666,19 @@ img{ max-width:100%; height:auto; display:block; }
       top:0; left:0; bottom:0; right:auto; height:100vh; width:82%; max-width:360px; max-height:none; padding:18px 16px; border-radius:0; box-shadow: 0 20px 50px rgba(0,0,0,0.32);
       transform-origin: left top; transition: transform .2s cubic-bezier(.2,.9,.2,1), opacity .12s ease;
     }
-    .menu-drawer-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:12px; }
-    .menu-drawer-header .menu-logo{ width:120px; height:auto; display:block; object-fit:contain; }
-    .menu-close{ background:transparent; border:none; font-size:28px; line-height:1; padding:6px 8px; cursor:pointer; color:var(--black); }
-    .menu-top-badges{ display:flex; flex-direction:column; gap:8px; margin:8px 0 12px 0; }
-    .menu-top-badges .badge{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:700; border:none; cursor:pointer; box-shadow: 0 6px 10px rgba(0,0,0,0.06); }
-    .badge-pink{ background:#ffeef1; color:#d32f45; }
-    .badge-blue{ background:#e6f2ff; color:#0b63b8; }
-    .badge-red{ background:#fff0f0; color:#b71c1c; }
+
+    /* Hide anything not part of the main menu - badges/footer removed per request */
+    .menu-drawer-header,
+    .menu-top-badges,
+    .menu-drawer-footer{ display:none !important; }
+
+    /* Close button visible and positioned */
+    .menu-close{ display:block; position:absolute; top:14px; right:12px; background:transparent; border:none; font-size:28px; line-height:1; padding:6px 8px; cursor:pointer; color:var(--black); }
 
     /* Larger, airy menu items like the reference */
     .menu.open a{ font-size:18px; padding:14px 8px; width:100%; border-bottom:none; color:var(--black); display:flex; align-items:center; justify-content:space-between; }
     .menu.open a + a{ border-top:1px solid rgba(0,0,0,0.04); }
     .menu.open a::after{ content: '›'; opacity:.35; font-size:20px; }
-
-    /* Footer contact area pinned to bottom */
-    .menu-drawer-footer{ position:absolute; left:0; right:0; bottom:0; padding:18px 16px; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.03) 100%); border-top:1px solid rgba(0,0,0,0.04); }
-    .menu-drawer-footer .menu-contact{ display:flex; flex-direction:column; gap:6px; }
-    .menu-drawer-footer .mc-row{ font-weight:600; color:var(--black); }
 
     /* Make overlay darker on phones */
     .menu-overlay.active{ background: rgba(0,0,0,0.45); }
