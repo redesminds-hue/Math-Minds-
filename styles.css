@@ -1044,7 +1044,7 @@ img{ max-width:100%; height:auto; display:block; }
   display: none;
   align-items: flex-start; /* allow scrolling when modal taller than viewport */
   justify-content: center;
-  z-index: 100020; /* above header */
+  z-index: 3147483647 !important; /* ensure modals sit above all other UI */
   overflow: auto; /* enable internal scrolling */
   padding: 24px 12px; /* give space so top of modal isn't hidden under notch */
 }
@@ -1058,6 +1058,7 @@ img{ max-width:100%; height:auto; display:block; }
   border-radius: 18px;
   padding: 28px;
   position: relative;
+  z-index: 3147483648 !important; /* above overlay and page content */
   animation: modalIn 0.35s ease;
   max-height: calc(100vh - 64px);
   overflow: auto; /* allow scrolling inside the modal */

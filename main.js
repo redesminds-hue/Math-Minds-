@@ -1335,6 +1335,15 @@ document.addEventListener('click', (e) => {
 function renderizarProductos(col, gra, query) {
     const contenedor = document.getElementById('contenedorProductos');
     if (!contenedor) return;
+  // On productos.html: require both colegio and grado before rendering (unless a search query is provided)
+  try{
+    const onProducts = window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('productos.html');
+    const hasQuery = query && String(query).trim();
+    if (onProducts && !hasQuery && !(col && gra)){
+      contenedor.innerHTML = '<div class="mensaje-bienvenida"><img src="../Multimedia/Logotipo_MathMinds.png" alt="Math Minds" width="100"><p>Por favor selecciona tu colegio y grado para ver los productos.</p></div>';
+      return;
+    }
+  }catch(e){}
   console.log('renderizarProductos called with', { col, gra, query, baseLen: (baseDeDatos||[]).length });
   // Si viene una query, filtrar por producto/colegio/grado que contenga la query
   let filtrados;
