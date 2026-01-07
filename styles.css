@@ -426,6 +426,16 @@ img{ max-width:100%; height:auto; display:block; }
   text-align:center;
 }
 
+/* animation for small badge bump */
+@keyframes badgeBump {
+  0%{ transform: scale(1); }
+  30%{ transform: scale(1.25); }
+  100%{ transform: scale(1); }
+}
+
+.badge-bump{
+  animation: badgeBump 350ms cubic-bezier(.2,.8,.3,1);
+}
 @media (max-width:420px){
   .cart-btn{ padding:6px; height:32px; }
   .cart-btn .cart-badge{ padding:2px 5px; font-size:11px; min-width:18px; }

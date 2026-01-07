@@ -986,56 +986,50 @@ function renderizarProductos(col, gra) {
     filtrados.forEach(p => {
         const card = document.createElement('div');
         card.className = 'card-producto';
-        card.innerHTML = `
-            <div class="producto-info">
-                <img src="../Multimedia/Logotipo_MathMinds.png" width="50" style="margin-bottom:10px;">
-                <h3>${p.producto}</h3>
-                <p style="font-size: 12px; color: #777;">${p.colegio} - ${p.grado}</p>
-                <p class="precio">$${p.costo.toLocaleString()}</p>
-              
-                <button class="btn primary full" onclick="agregarAlCarrito('${p.producto}', ${p.costo})">
-                    Añadir al carrito
-                </button>
-            </div>
-        `;
+
+        const info = document.createElement('div');
+        info.className = 'producto-info';
+
+        const img = document.createElement('img');
+        img.src = '../Multimedia/Logotipo_MathMinds.png';
+        img.width = 50;
+        img.style.marginBottom = '10px';
+
+        const title = document.createElement('h3');
+        title.textContent = p.producto;
+
+        const meta = document.createElement('p');
+        meta.style.fontSize = '12px';
+        meta.style.color = '#777';
+        meta.textContent = `${p.colegio} - ${p.grado}`;
+
+        const price = document.createElement('p');
+        price.className = 'precio';
+        price.textContent = `$${p.costo.toLocaleString()}`;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn primary full add-to-cart-btn';
+        btn.type = 'button';
+        btn.textContent = 'Añadir al carrito';
+        // data attributes for delegation/debug
+        btn.dataset.product = p.producto;
+        btn.dataset.price = p.costo;
+        btn.addEventListener('click', () => {
+          agregarAlCarrito(p.producto, p.costo);
+        });
+
+        info.appendChild(img);
+        info.appendChild(title);
+        info.appendChild(meta);
+        info.appendChild(price);
+        info.appendChild(btn);
+        card.appendChild(info);
+
         contenedor.appendChild(card);
     });
 }
 
-// Usamos un nombre diferente para evitar conflictos con otras partes de tu código
-let carritoTienda = JSON.parse(localStorage.getItem('carritoMathMinds')) || [];
-
-function agregarAlCarrito(nombre, precio) {
-    // 1. Creamos el objeto del producto usando los datos de tus listas 
-    const productoNuevo = {
-        nombre: nombre,
-        precio: parseFloat(precio),
-        id: Date.now() 
-    };
-
-    // 2. Lo añadimos a la nueva variable
-    carritoTienda.push(productoNuevo);
-
-    // 3. Guardamos en el navegador con una clave única
-    localStorage.setItem('carritoMathMinds', JSON.stringify(carritoTienda));
-
-    // 4. Actualizamos los contadores visuales
-    actualizarContadoresVisuales();
-
-    // 5. Confirmación al usuario
-    alert(`Añadido: ${nombre}`);
-}
-
-function actualizarContadoresVisuales() {
-    const total = carritoTienda.length;
-    
-    // Contador del menú
-    const badgeMenu = document.getElementById('cartCount');
-    if (badgeMenu) badgeMenu.innerText = total;
-}
-
-// Cargar el estado al iniciar la página
-document.addEventListener('DOMContentLoaded', actualizarContadoresVisuales);
+// (Removed duplicate carritoTienda implementation) -- cart actions are unified below.
 
 // 6. MANEJO DEL FORMULARIO DE PAGO (Si existe en la página)
 document.addEventListener('submit', (e) => {
@@ -1083,98 +1077,156 @@ document.getElementById('mobile-menu-btn').addEventListener('click', function() 
     document.getElementById('menu').classList.toggle('open');
 });
 
-function actualizarContadorCarrito(total) {
-    // Actualiza el del menú normal
-    const cartCount = document.getElementById('cartCount');
-    if(cartCount) cartCount.innerText = total;
-}
+// (Removed duplicate implementations — using unified cart below.)
 
-// 1. Array para almacenar los productos
-let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+// Variable única para tu pedido (var to avoid TDZ when functions run early)
+var pedidoMathMinds = JSON.parse(localStorage.getItem('mm_pedido')) || [];
 
-// 2. Función que activa el botón "Agregar"
-function agregarAlCarrito(nombre, precio) {
-    // Creamos el objeto del producto
-    const nuevoProducto = {
-        id: Date.now(), // ID único para cada clic
-        nombre: nombre,
-        precio: parseFloat(precio)
+// Unified add-to-cart function used by product buttons
+function agregarAlCarrito(nombre, precioRaw) {
+    console.log('agregarAlCarrito called with', nombre, precioRaw);
+    // Normalize price (accept numbers or formatted strings)
+    const precioNum = Number(String(precioRaw).replace(/[^0-9.-]+/g, '')) || 0;
+
+    const producto = {
+        id: Date.now().toString(),
+        nombre: String(nombre),
+        precio: precioNum
     };
 
-    // Lo agregamos al carrito
-    carrito.push(nuevoProducto);
+    // Ensure in-memory array exists and load fresh state
+    pedidoMathMinds = JSON.parse(localStorage.getItem('mm_pedido')) || [];
+    pedidoMathMinds.push(producto);
+    try{
+      localStorage.setItem('mm_pedido', JSON.stringify(pedidoMathMinds));
+      console.log('Saved mm_pedido len:', pedidoMathMinds.length);
+    }catch(e){
+      console.error('Failed to save mm_pedido:', e);
+      showInlineToast('No se pudo guardar el carrito en el navegador. Revisa permisos o espacio.');
+    }
 
-    // Guardamos en la memoria del navegador
-    localStorage.setItem('carrito', JSON.stringify(carrito));
+    // If the Cart API is present, add to it too so the drawer stays in sync
+    try{
+      if (window.Cart && typeof window.Cart.addItem === 'function'){
+        window.Cart.addItem({ id: producto.id, title: producto.nombre, price: producto.precio, image: '' });
+      }
+    }catch(e){ console.error('Cart.addItem error', e); }
 
-    // Actualizamos visualmente el número en el carrito y el botón flotante
+    // Update visual counters
     actualizarContadores();
-    
-    // Animación de confirmación (Opcional)
-    alert("¡Producto añadido con éxito!");
+
+    // Minimal visible feedback: inline toast
+    showInlineToast(`✅ ${producto.nombre} añadido al carrito.`);
 }
 
-// 3. Función para actualizar los números en pantalla
+// Small inline toast helper (lightweight, no dependency)
+function showInlineToast(message, timeout = 1400){
+  try{
+    let el = document.createElement('div');
+    el.className = 'mm-inline-toast';
+    el.textContent = message;
+    Object.assign(el.style, {
+      position: 'fixed',
+      bottom: '86px',
+      right: '18px',
+      background: 'rgba(0,0,0,0.8)',
+      color: '#fff',
+      padding: '10px 14px',
+      borderRadius: '8px',
+      zIndex: 200000,
+      opacity: '0',
+      transform: 'translateY(6px)'
+    });
+    document.body.appendChild(el);
+    // allow CSS transition
+    requestAnimationFrame(()=>{ el.style.transition = 'opacity 240ms ease, transform 240ms ease'; el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+    setTimeout(()=>{ el.style.opacity='0'; el.style.transform = 'translateY(8px)'; setTimeout(()=> el.remove(), 260); }, timeout);
+  }catch(e){ /* ignore */ }
+}
+
+// Centralized counter update
 function actualizarContadores() {
-    // Obtenemos lo que hay guardado en la memoria
     const pedido = JSON.parse(localStorage.getItem('mm_pedido')) || [];
     const cantidad = pedido.length;
 
-    // 1. Actualiza el carrito del menú (el de arriba)
     const cMenu = document.getElementById('cartCount');
-    if (cMenu) cMenu.innerText = cantidad;
-}
-
-// Llama a esta función siempre que la página cargue
-window.onload = actualizarContadores;
-
-// Ejecutar al cargar la página para recuperar datos previos
-document.addEventListener('DOMContentLoaded', actualizarContadores);
-
-// Variable única para tu pedido
-let pedidoMathMinds = JSON.parse(localStorage.getItem('mm_pedido')) || [];
-
-// LA FUNCIÓN DEL BOTÓN
-function agregarAlCarrito(nombre, precioRaw) {
-    console.log("Botón presionado para:", nombre);
-
-    // 1. Limpiar el precio (Quita $, puntos y espacios)
-    let precioLimpio = String(precioRaw).replace(/[^0-9]/g, "");
-    let precioFinal = parseInt(precioLimpio);
-
-    if (isNaN(precioFinal) || precioFinal <= 0) {
-        console.error("Precio inválido para:", nombre);
-        return;
+    if (cMenu) {
+      cMenu.innerText = cantidad;
+      // bump animation
+      try{
+        cMenu.classList.remove('badge-bump');
+        // forced reflow to restart animation
+        void cMenu.offsetWidth;
+        cMenu.classList.add('badge-bump');
+      }catch(e){}
     }
 
-    // 2. Crear el objeto
-    const producto = {
-        id: Date.now(),
-        nombre: nombre,
-        precio: precioFinal
-    };
+    // also update Cart UI if present
+    try{
+      if (window.Cart && typeof window.Cart.render === 'function'){
+        window.Cart.render();
+      }
+    }catch(e){}
 
-    // 3. Guardar
-    pedidoMathMinds.push(producto);
-    localStorage.setItem('mm_pedido', JSON.stringify(pedidoMathMinds));
-
-    // 4. Actualizar la interfaz
-    actualizarContadores();
-
-    // 5. Feedback visual
-    alert(`✅ ${nombre} añadido al carrito.`);
+    console.log('Total en carrito:', cantidad);
 }
 
-// FUNCIÓN PARA ACTUALIZAR LOS NÚMEROS
-function actualizarContadores() {
-    const cantidad = pedidoMathMinds.length;
-    
-    // Contador del menú
-    const cMenu = document.getElementById('cartCount');
-    if (cMenu) cMenu.innerText = cantidad;
-    
-    console.log("Total en carrito:", cantidad);
-}
+// Delegate click handler for add-to-cart buttons (robust for dynamically created content)
+document.addEventListener('click', (e) => {
+  const btn = e.target && e.target.closest && e.target.closest('.add-to-cart-btn');
+  if (!btn) return;
+  const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
+  const price = btn.dataset.price || btn.getAttribute('data-price') || null;
+  if (prod) agregarAlCarrito(prod, price);
+});
 
-// Ejecutar al cargar la página
+// Ensure counters are set on load
 window.addEventListener('load', actualizarContadores);
+
+// Expose quick test to console
+window.testAddToCart = function(){ agregarAlCarrito('Producto prueba', 100); }; 
+
+// Debug panel (cerrable) to inspect mm_pedido and add test items
+function renderDebugPanel(){
+  if (document.getElementById('mm-debug-panel')) return;
+  const panel = document.createElement('div');
+  panel.id = 'mm-debug-panel';
+  Object.assign(panel.style,{ position:'fixed', right:'14px', bottom:'14px', width:'220px', background:'#fff', border:'1px solid rgba(0,0,0,0.08)', padding:'8px', borderRadius:'10px', boxShadow:'0 6px 18px rgba(0,0,0,0.06)', zIndex:200001, fontSize:'13px'});
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <strong style="font-size:13px;">Debug carrito</strong>
+      <button id="mm-debug-close" style="border:none;background:transparent;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <div id="mm-debug-count" style="opacity:.9;margin-bottom:8px;">Cargando...</div>
+    <div style="display:flex;gap:6px;">
+      <button id="mm-debug-add" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--black);background:#f6f6f6;">Añadir test</button>
+      <button id="mm-debug-show" style="padding:6px;border-radius:8px;border:1px solid var(--black);background:#fff;">Mostrar</button>
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  document.getElementById('mm-debug-close').addEventListener('click', ()=> panel.remove());
+  document.getElementById('mm-debug-add').addEventListener('click', ()=> { agregarAlCarrito('Producto test', 149); updateDebugPanel(); });
+  document.getElementById('mm-debug-show').addEventListener('click', ()=> { 
+    const arr = JSON.parse(localStorage.getItem('mm_pedido'))||[];
+    alert('mm_pedido:\n' + JSON.stringify(arr, null, 2));
+  });
+
+  updateDebugPanel();
+}
+
+function updateDebugPanel(){
+  const el = document.getElementById('mm-debug-count');
+  if (!el) return;
+  const arr = JSON.parse(localStorage.getItem('mm_pedido'))||[];
+  el.textContent = `Items: ${arr.length}`;
+}
+
+// Keep panel in sync when counters update
+const origActualizar = actualizarContadores;
+actualizarContadores = function(){ origActualizar(); updateDebugPanel(); };
+
+// Auto-render debug panel (remove or gate this if you don't want visible panel)
+if (typeof document !== 'undefined'){
+  document.addEventListener('DOMContentLoaded', () => { renderDebugPanel(); });
+}
