@@ -190,19 +190,13 @@
                     <div class="form-group">
                         <label>Colegio</label>
                         <select id="college" required>
-                            <option value="" disabled selected>Selecciona colegio</option>
-                            <option value="Colegio 1">Colegio 1</option>
-                            <option value="Colegio 2">Colegio 2</option>
-                            <option value="Otro">Otro Colegio</option>
+                            <option value="" disabled selected>Cargando colegios...</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Curso / Grado</label>
-                        <select id="grade" required>
-                            <option value="" disabled selected>Selecciona grado</option>
-                            <option value="Jardin">Jardín</option>
-                            <option value="Primero">Primero</option>
-                            <option value="Segundo">Segundo</option>
+                        <select id="grade" required disabled>
+                            <option value="" disabled selected>Primero selecciona colegio</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -226,30 +220,204 @@
         </div>
     </main>
 
+    <script src="main.js"></script>
     <script>
-        document.getElementById('payForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Espera hasta que baseDeDatos esté cargada por main.js, luego inicializa selects
+        document.addEventListener('DOMContentLoaded', () => {
+            const collegeSel = document.getElementById('college');
+            const gradeSel = document.getElementById('grade');
             const STORAGE_KEY = 'mm_cart_v1';
-            const carrito = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            
-            if (carrito.length === 0) {
-                alert("⚠️ El carrito está vacío.");
-                return;
+
+            function getCartTitles(){
+                const cart = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                return cart.map(i => (i.title || '').toString().trim()).filter(Boolean);
             }
 
-            const datosEntrega = {
-                acudiente: document.getElementById('parentName').value,
-                documento: document.getElementById('documentId').value,
-                email: document.getElementById('parentEmail').value,
-                colegio: document.getElementById('college').value,
-                curso: document.getElementById('grade').value,
-                ciudad: document.getElementById('city').value,
-                direccion: document.getElementById('address').value,
-                telefono: document.getElementById('phone').value
-            };
-            
-            localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
-            window.location.href = 'finalizar_pago.html'; 
+            function normalizeText(s){
+                return (s||'').toString().trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/["'`]/g,'').replace(/[^a-z0-9\s]/g,'');
+            }
+
+            function productMatches(prodName, cartTitle){
+                const a = normalizeText(prodName);
+                const b = normalizeText(cartTitle);
+                if (!a || !b) return false;
+                if (a === b) return true;
+                if (a.includes(b) || b.includes(a)) return true;
+                // word overlap
+                const aw = new Set(a.split(/\s+/));
+                const bw = new Set(b.split(/\s+/));
+                for (const w of bw){ if (aw.has(w) && w.length > 2) return true; }
+                return false;
+            }
+
+            function whenBaseReady(cb){
+                // If already loaded, call immediately
+                if (window.baseDeDatos && window.baseDeDatos.length > 0) return cb();
+
+                // Otherwise listen for the event dispatched by main.js
+                const handler = () => { window.removeEventListener('baseDeDatosReady', handler); clearTimeout(timeoutId); cb(); };
+                window.addEventListener('baseDeDatosReady', handler);
+
+                // Safety fallback: if event doesn't arrive within 20s, call cb anyway
+                const timeoutId = setTimeout(() => {
+                    window.removeEventListener('baseDeDatosReady', handler);
+                    console.warn('whenBaseReady: timeout waiting for baseDeDatos (fallback)');
+                    cb();
+                }, 20000);
+            }
+
+            function createWarningEl(){
+                let el = document.getElementById('collegeWarning');
+                if (!el){
+                    el = document.createElement('div');
+                    el.id = 'collegeWarning';
+                    el.style.marginTop = '8px';
+                    el.style.color = '#b35f00';
+                    el.style.pointerEvents = 'none';
+                    el.style.display = 'none';
+                    el.style.fontSize = '13px';
+                    collegeSel.parentNode.appendChild(el);
+                }
+                return el;
+            }
+
+            function populateCollegeOptions(){
+                const cartTitles = getCartTitles();
+                const warningEl = createWarningEl();
+                console.log('populateCollegeOptions -> cartTitles:', cartTitles);
+                // Try window.baseDeDatos first, fallback to localStorage
+                let bdb = (window.baseDeDatos || []);
+                if ((!bdb || bdb.length === 0) && localStorage.getItem('mm_baseDeDatos')){
+                    try{ bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]'); }catch(e){ bdb = []; }
+                }
+                console.log('populateCollegeOptions -> baseDeDatos length:', (bdb||[]).length);
+                console.log('populateCollegeOptions -> sample baseDeDatos:', (bdb||[]).slice(0,6));
+
+                // If cart empty, populate all colegios from baseDeDatos
+                if (!cartTitles.length){
+                    const colegios = [...new Set((window.baseDeDatos || []).map(p => p.colegio))].sort();
+                    collegeSel.innerHTML = '<option value="" disabled selected>Selecciona colegio</option>';
+                    colegios.forEach(c => collegeSel.add(new Option(c, c)));
+                    warningEl.textContent = '';
+                    return;
+                }
+
+                // Map colegios that contain matches for cart products
+                const colegiosMap = new Map();
+                // For each cart title, find matching rows in baseDeDatos
+                for (const t of cartTitles){
+                    const matched = (bdb || []).filter(p => productMatches(p.producto || '', t));
+                    matched.forEach(p => {
+                        if (!p.colegio) return;
+                        if (!colegiosMap.has(p.colegio)) colegiosMap.set(p.colegio, new Set());
+                        colegiosMap.get(p.colegio).add(t);
+                    });
+                }
+
+                collegeSel.innerHTML = '<option value="" disabled selected>Selecciona colegio</option>';
+                if (colegiosMap.size === 0){
+                    // Ningún colegio tiene los productos exactos; añadir todos los colegios como opción alternativa
+                    const colegios = [...new Set((bdb || []).map(p => p.colegio))].sort();
+                    colegios.forEach(c => collegeSel.add(new Option(c, c)));
+                    collegeSel.disabled = false;
+                    warningEl.textContent = '⚠️ Algunos productos en el carrito no están vinculados a colegios en la base de datos.';
+                    console.warn('populateCollegeOptions -> colegiosMap empty, fallback colegios:', colegios);
+                    return;
+                }
+
+                for (const col of Array.from(colegiosMap.keys()).sort()){
+                    collegeSel.add(new Option(col, col));
+                }
+                // Preserve an 'Otro' option
+                collegeSel.add(new Option('Otro', 'Otro'));
+                collegeSel.disabled = false;
+                // If only one colegio available (aside from placeholder), auto-select it
+                const optCount = Array.from(collegeSel.options).filter(o => o.value).length; // excludes placeholder
+                if (optCount === 1){
+                    const only = collegeSel.options[1];
+                    if (only) { collegeSel.selectedIndex = 1; collegeSel.dispatchEvent(new Event('change')); }
+                }
+                warningEl.textContent = '';
+            }
+
+            function populateGradesForCollege(col){
+                const cartTitles = getCartTitles();
+                const warningEl = createWarningEl();
+                gradeSel.innerHTML = '<option value="" disabled selected>Selecciona grado</option>';
+                warningEl.textContent = '';
+                warningEl.style.display = 'none';
+
+                if (!col) return;
+
+                // Use same DB fallback as populateCollegeOptions
+                let bdb = (window.baseDeDatos || []);
+                if ((!bdb || bdb.length === 0) && localStorage.getItem('mm_baseDeDatos')){
+                    try{ bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]'); }catch(e){ bdb = []; }
+                }
+
+                // For selected colegio, gather grades for cart products
+                const gradosSet = new Set();
+                for (const t of cartTitles){
+                    (bdb || []).forEach(p => {
+                        if (p.colegio !== col) return;
+                        if (productMatches(p.producto || '', t)) gradosSet.add(p.grado);
+                    });
+                }
+
+                // If no grades found from cart-products, fallback to all grades in the colegio
+                if (gradosSet.size === 0){
+                    for (const p of (bdb || [])){
+                        if (p.colegio === col) gradosSet.add(p.grado);
+                    }
+                }
+
+                const grados = Array.from(gradosSet).filter(Boolean).sort();
+                grados.forEach(g => gradeSel.add(new Option(g, g)));
+                gradeSel.disabled = !(grados.length > 0);
+
+                // Compute unavailable products for this colegio
+                const unavailable = getCartTitles().filter(t => {
+                    return !(bdb || []).some(p => p.colegio === col && productMatches((p.producto||''), t));
+                });
+
+                if (unavailable.length > 0){
+                    warningEl.textContent = '⚠️ Algunos productos del carrito no están disponibles para el colegio seleccionado: ' + unavailable.join(', ');
+                    warningEl.style.display = 'block';
+                } else {
+                    warningEl.textContent = '';
+                    warningEl.style.display = 'none';
+                }
+            }
+
+            // Initialize after baseDeDatos ready
+            whenBaseReady(() => {
+                populateCollegeOptions();
+            });
+
+            collegeSel.addEventListener('change', (e) => {
+                populateGradesForCollege(e.target.value);
+            });
+
+            // Handle form submit
+            document.getElementById('payForm').addEventListener('submit', function(e){
+                e.preventDefault();
+                const carrito = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                if (carrito.length === 0){ alert('⚠️ El carrito está vacío.'); return; }
+
+                const datosEntrega = {
+                    acudiente: document.getElementById('parentName').value,
+                    documento: document.getElementById('documentId').value,
+                    email: document.getElementById('parentEmail').value,
+                    colegio: document.getElementById('college').value,
+                    curso: document.getElementById('grade').value,
+                    ciudad: document.getElementById('city').value,
+                    direccion: document.getElementById('address').value,
+                    telefono: document.getElementById('phone').value
+                };
+
+                localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega));
+                window.location.href = 'finalizar_pago.html';
+            });
         });
     </script>
 </body>

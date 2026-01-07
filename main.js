@@ -415,38 +415,146 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function filterProducts(query){
     if (!query) return [];
-    const q = query.toLowerCase();
-    return PRODUCTS.filter(p => (
-      p.title.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q) ||
-      (p.tags || []).some(t => t.toLowerCase().includes(q))
-    ));
+    const q = String(query).toLowerCase().trim();
+    const qTokens = q.split(/\s+/).filter(Boolean);
+
+    // scoring: higher score = more relevant
+    const scored = PRODUCTS.map(p => {
+      const title = (p.title || '').toString().toLowerCase();
+      const desc = (p.description || '').toString().toLowerCase();
+      const tags = ((p.tags||[]).join(' ') || '').toLowerCase();
+      let score = 0;
+
+      // exact contains full query in title -> strong match
+      if (title.includes(q)) score += 30;
+      if (title.startsWith(q)) score += 10;
+      if (desc.includes(q)) score += 6;
+      if (tags.includes(q)) score += 5;
+
+      // token overlap: each token found in title adds weight, in desc smaller weight
+      for (const tk of qTokens){
+        if (!tk) continue;
+        if (title.includes(tk)) score += 6;
+        else if (desc.includes(tk)) score += 2;
+        else if (tags.includes(tk)) score += 1;
+        // partial token match (3+ chars)
+        if (tk.length >= 4){
+          if (title.indexOf(tk) >= 0) score += 2;
+        }
+      }
+
+      return { p, score };
+    }).filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .map(x => x.p);
+
+    return scored;
   }
 
-  function renderResults(items){
+  function renderResults(items, menuMatches){
     const wrap = document.getElementById('searchResults');
     const noEl = document.getElementById('noResults');
     wrap.innerHTML = '';
-    if (!items || items.length === 0){
+    menuMatches = menuMatches || [];
+    const q = (searchInput && searchInput.value) ? (searchInput.value||'').trim() : '';
+
+    if (((!items || items.length === 0) && menuMatches.length === 0)){
       noEl.style.display = 'block';
       return;
     }
     noEl.style.display = 'none';
 
-    items.slice(0,8).forEach(p => {
-      const li = document.createElement('li');
-      li.tabIndex = 0;
-      li.innerHTML = `
-        <img src="${p.image}" alt="${p.title}" />
-        <div class="meta">
-          <b>${p.title}</b>
-          <small style="opacity:.8">${p.description}</small>
-        </div>
-      `;
-      li.addEventListener('click', () => { window.location.href = p.link; });
-      li.addEventListener('keydown', e => { if (e.key === 'Enter') window.location.href = p.link; });
-      wrap.appendChild(li);
-    });
+    // Render menu/footer suggestions first (autocomplete-like)
+    if (menuMatches.length > 0){
+      const header = document.createElement('li');
+      header.className = 'search-section-header';
+      header.textContent = 'Sugerencias';
+      wrap.appendChild(header);
+
+      menuMatches.slice(0,8).forEach(m => {
+        const li = document.createElement('li');
+        li.className = 'search-suggestion';
+        li.tabIndex = 0;
+        const logo = chooseLogoForText(m.text);
+        li.innerHTML = `<div style="display:flex;gap:8px;align-items:center;"><img src="${logo}" alt="" style="width:36px;height:36px;object-fit:contain;border-radius:6px;"/><div class="meta"><b>${escapeHtml(m.text)}</b><small style="opacity:.75;display:block">${m.href || (m.modal? 'Modal' : '')}</small></div></div>`;
+        li.addEventListener('click', () => {
+          // user clicked suggestion -> open modal or navigate
+          if (m.modal){ try{ openModal(m.modal); }catch(e){ m.el && m.el.click(); } }
+          else if (m.open){ try{ openModal(m.open); }catch(e){ m.el && m.el.click(); } }
+          else if (m.href){
+            if (m.href.includes('productos.html')){
+              const q = encodeURIComponent(searchInput.value || '');
+              window.location.href = `productos.html?q=${q}`;
+            } else {
+              window.location.href = m.href;
+            }
+          } else {
+            try{ m.el && m.el.click(); }catch(e){}
+          }
+        });
+        li.addEventListener('keydown', e => { if (e.key === 'Enter') li.click(); });
+        wrap.appendChild(li);
+      });
+    }
+
+    // Render product results
+    if (items && items.length > 0){
+      const header = document.createElement('li');
+      header.className = 'search-section-header';
+      header.textContent = 'Productos';
+      wrap.appendChild(header);
+
+      items.slice(0,8).forEach(p => {
+        const li = document.createElement('li');
+        li.tabIndex = 0;
+        const highlightedTitle = q ? highlightMatch(p.title || '', q) : escapeHtml(p.title || '');
+        const highlightedDesc = q ? highlightMatch(p.description || '', q) : escapeHtml(p.description || '');
+        li.innerHTML = `
+          <img src="${p.image || ''}" alt="${p.title || ''}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;" />
+          <div class="meta">
+            <b>${highlightedTitle}</b>
+            <small style="opacity:.8">${highlightedDesc}</small>
+          </div>
+        `;
+        // Click should take user to productos.html with the product query so the store filters and shows it
+        li.addEventListener('click', () => { const q = encodeURIComponent(p.title || ''); window.location.href = `productos.html?q=${q}`; });
+        li.addEventListener('keydown', e => { if (e.key === 'Enter' && p.link) window.location.href = p.link; });
+        wrap.appendChild(li);
+      });
+    }
+  }
+
+  // small helper to avoid HTML injection in inserted strings
+  function escapeHtml(str){ return String(str).replace(/[&"'<>]/g, c => ({'&':'&amp;','"':'&quot;',"'":'&#39;','<':'&lt;','>':'&gt;'}[c])); }
+
+  // Choose a small logo/img for menu suggestions based on text keywords
+  function chooseLogoForText(text){
+    const t = (text || '').toString().toLowerCase();
+    if (t.includes('prime')) return '../Multimedia/Logo_Prime.png';
+    if (t.includes('reveal')) return '../Multimedia/Logo_Reveal_Math.png';
+    if (t.includes('aleks')) return '../Multimedia/ALEKS.jpeg';
+    if (t.includes('material') || t.includes('didact')) return '../Multimedia/MaterialDidactico.png';
+    // default brand
+    return '../Multimedia/Logotipo_MathMinds.png';
+  }
+
+  // Highlight query tokens inside text (returns HTML-safe string with <b> around matches)
+  function escapeRegex(str){ return String(str).replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'); }
+  function highlightMatch(text, query){
+    if (!text) return '';
+    const safe = escapeHtml(text);
+    const q = String(query || '').toLowerCase().trim();
+    if (!q) return safe;
+    const tokens = q.split(/\s+/).filter(Boolean).sort((a,b)=> b.length - a.length);
+    let out = safe;
+    for (const tk of tokens){
+      if (!tk) continue;
+      try{
+        const re = new RegExp('(' + escapeRegex(tk) + ')', 'ig');
+        out = out.replace(re, '<b>$1</b>');
+      }catch(e){}
+    }
+    return out;
   }
 
   function addToHistory(q){
@@ -486,15 +594,42 @@ document.addEventListener("DOMContentLoaded", () => {
   function performSearch(q){
     const query = (q || searchInput?.value||'').trim();
     if (!query) return;
+
     addToHistory(query);
 
     // Filtrar productos y mostrar resultados en el drawer
     const results = filterProducts(query);
-    renderResults(results);
+    // Also find menu/footer matches to show as suggestions
+    const menuMatches = findMenuMatches(query);
+    renderResults(results, menuMatches);
+
+    // If we're already on productos page, apply the search there too (do not auto-open anything)
+    try{
+      if (window.location && window.location.pathname && window.location.pathname.toLowerCase().includes('productos.html')){
+        renderizarProductos(null, null, query);
+      }
+    }catch(e){}
 
     // Mantener botón "Ver tienda" con la query
     const viewAllBtn = document.getElementById('viewAllBtn');
     if (viewAllBtn) viewAllBtn.href = `productos.html?q=${encodeURIComponent(query)}`;
+  }
+
+  // Busca elementos del menú/footer que coincidan con la query (no abre nada, solo devuelve sugerencias)
+  function findMenuMatches(q){
+    if (!q) return [];
+    const txt = String(q).toLowerCase().trim();
+    const selector = '[data-modal],[data-open], .menu a, .footer a, nav a, .header a';
+    const elems = Array.from(document.querySelectorAll(selector)).filter(Boolean);
+    const out = [];
+    for (const el of elems){
+      const text = ((el.textContent || '') + ' ' + (el.getAttribute('aria-label') || '')).toLowerCase();
+      if (!text) continue;
+      if (text.includes(txt)){
+        out.push({ el, text: (el.textContent||'').trim(), href: el.getAttribute && el.getAttribute('href'), modal: el.dataset && el.dataset.modal, open: el.dataset && el.dataset.open });
+      }
+    }
+    return out;
   }
 
   if (searchToggle && searchDrawer && searchOverlay){
@@ -529,9 +664,10 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput?.addEventListener('input', () => {
       // mostrar resultados en tiempo real mientras escribe
       const q = (searchInput.value || '').trim();
-      if (q.length === 0){ renderResults([]); return; }
+      if (q.length === 0){ renderResults([], []); return; }
       const results = filterProducts(q);
-      renderResults(results);
+      const menuMatches = findMenuMatches(q);
+      renderResults(results, menuMatches);
     });
 
     searchInput?.addEventListener('keydown', (ev) => {
@@ -688,7 +824,26 @@ document.addEventListener("DOMContentLoaded", () => {
       API.render();
     },
 
-    save(){ saveCart(API.items); API.render(); },
+    save(){ API.saveAndSync(); },
+    // Ensure legacy `mm_pedido` (used elsewhere) stays in sync with API.items
+    // This keeps counts consistent when items are removed/changed from the cart UI.
+    saveAndSync(){
+      try{
+        // Save canonical cart storage
+        saveCart(API.items);
+
+        // Build mm_pedido as a flat list (one entry per qty) to preserve existing contador logic
+        const pedidoArr = [];
+        API.items.forEach(it => {
+          const qty = Number(it.qty || 1);
+          for (let i = 0; i < qty; i++){
+            pedidoArr.push({ id: it.id, nombre: it.title, precio: Number(it.price||0) });
+          }
+        });
+        localStorage.setItem('mm_pedido', JSON.stringify(pedidoArr));
+      }catch(e){ console.error('Error sincronizando mm_pedido', e); }
+      API.render();
+    },
 
     addItem(product){
       if (!product || !product.id) return;
@@ -955,6 +1110,16 @@ async function inicializarTienda() {
 
         console.log("Carga completa. Registros:", baseDeDatos.length);
         poblarColegios();
+        // Notify other pages/scripts that the database is ready
+        try{ window.dispatchEvent(new Event('baseDeDatosReady')); }catch(e){}
+        try{ localStorage.setItem('mm_baseDeDatos', JSON.stringify(baseDeDatos)); }catch(e){ /* ignore storage errors */ }
+        // Mostrar todos los productos inicialmente (sin importar colegio) o aplicar query `q` si viene en URL
+        try{
+          const params = new URLSearchParams(window.location.search || '');
+          const q = params.get('q');
+          if (q) renderizarProductos(null, null, q);
+          else renderizarProductos();
+        }catch(e){ /* renderizarProductos puede definirse después; ignorar si aún no existe */ }
     } catch (e) {
         console.error("Error cargando base de datos:", e);
     }
@@ -1015,63 +1180,104 @@ document.addEventListener('change', (e) => {
 });
 
 // 5. MOSTRAR PRODUCTOS EN PANTALLA
-function renderizarProductos(col, gra) {
+function renderizarProductos(col, gra, query) {
     const contenedor = document.getElementById('contenedorProductos');
     if (!contenedor) return;
-
-    const filtrados = baseDeDatos.filter(p => p.colegio === col && p.grado === gra);
-    contenedor.innerHTML = ""; 
-
-    if (filtrados.length === 0) {
-        contenedor.innerHTML = "<p>No hay productos disponibles para esta selección.</p>";
-        return;
-    }
-
-    filtrados.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'card-producto';
-
-        const info = document.createElement('div');
-        info.className = 'producto-info';
-
-        const img = document.createElement('img');
-        img.src = '../Multimedia/Logotipo_MathMinds.png';
-        img.width = 50;
-        img.style.marginBottom = '10px';
-
-        const title = document.createElement('h3');
-        title.textContent = p.producto;
-
-        const meta = document.createElement('p');
-        meta.style.fontSize = '12px';
-        meta.style.color = '#777';
-        meta.textContent = `${p.colegio} - ${p.grado}`;
-
-        const price = document.createElement('p');
-        price.className = 'precio';
-        price.textContent = `$${p.costo.toLocaleString()}`;
-
-        const btn = document.createElement('button');
-        btn.className = 'btn primary full add-to-cart-btn';
-        btn.type = 'button';
-        btn.textContent = 'Añadir al carrito';
-        // data attributes for delegation/debug
-        btn.dataset.product = p.producto;
-        btn.dataset.price = p.costo;
-        btn.addEventListener('click', () => {
-          agregarAlCarrito(p.producto, p.costo);
-        });
-
-        info.appendChild(img);
-        info.appendChild(title);
-        info.appendChild(meta);
-        info.appendChild(price);
-        info.appendChild(btn);
-        card.appendChild(info);
-
-        contenedor.appendChild(card);
+  // Si viene una query, filtrar por producto/colegio/grado que contenga la query
+  let filtrados;
+  if (query && String(query).trim()){
+    const q = String(query).toLowerCase().trim();
+    filtrados = baseDeDatos.filter(p => {
+      return ((p.producto||'').toLowerCase().includes(q)) || ((p.colegio||'').toLowerCase().includes(q)) || ((p.grado||'').toLowerCase().includes(q));
     });
+  } else if (col && gra) {
+    filtrados = baseDeDatos.filter(p => p.colegio === col && p.grado === gra);
+  } else {
+    filtrados = baseDeDatos.slice();
+  }
+
+  contenedor.innerHTML = "";
+
+  if (filtrados.length === 0) {
+    contenedor.innerHTML = "<p>No hay productos disponibles.</p>";
+    return;
+  }
+
+  // Eliminar duplicados por nombre de producto (mantener la primera aparición)
+  const vistos = new Set();
+  const únicos = [];
+  for (const p of filtrados) {
+    const clave = (p.producto || '').toString().trim().toLowerCase();
+    if (!clave) continue;
+    if (vistos.has(clave)) continue;
+    vistos.add(clave);
+    únicos.push(p);
+  }
+
+  únicos.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card-producto';
+
+    const info = document.createElement('div');
+    info.className = 'producto-info';
+
+    const img = document.createElement('img');
+    // Seleccionar logo según el nombre del producto (Prime, Reveal, ALEKS, etc.)
+    const nombreLower = (p.producto || '').toString().toLowerCase();
+    let imgSrc = '../Multimedia/Logotipo_MathMinds.png';
+    if (nombreLower.includes('prime')) {
+      imgSrc = '../Multimedia/Logo_Prime.png';
+    } else if (nombreLower.includes('reveal')) {
+      imgSrc = '../Multimedia/Logo_Reveal_Math.png';
+    } else if (nombreLower.includes('aleks')) {
+      imgSrc = '../Multimedia/ALEKS.jpeg';
+    } else if (nombreLower.includes('didactico') || nombreLower.includes('material')) {
+      imgSrc = '../Multimedia/MaterialDidactico.png';
+    }
+    img.src = imgSrc;
+    img.width = 50;
+    img.style.marginBottom = '10px';
+
+    const title = document.createElement('h3');
+    title.textContent = p.producto;
+
+    // Solo mostrar nombre y botón "Añadir al carrito" (no mostrar precio ni colegio/grado)
+    const btn = document.createElement('button');
+    btn.className = 'btn primary full add-to-cart-btn';
+    btn.type = 'button';
+    btn.textContent = 'Añadir al carrito';
+    btn.dataset.product = p.producto;
+    // No exponer el precio en la UI; pasar 0 al carrito para evitar mostrar precio
+    btn.dataset.price = 0;
+    // Note: delegated click handler on document handles `.add-to-cart-btn` clicks.
+    // Avoid adding a direct listener here to prevent duplicate additions.
+
+    info.appendChild(img);
+    info.appendChild(title);
+    info.appendChild(btn);
+    card.appendChild(info);
+
+    // If a query was provided, highlight matches
+    try{
+      if (query && String(query).trim()){
+        const q = String(query).toLowerCase().trim();
+        if ((p.producto||'').toLowerCase().includes(q)){
+          card.style.border = '2px solid #13d6eba2';
+          card.style.background = 'linear-gradient(180deg, rgba(19,214,235,0.04), rgba(19,214,235,0.02))';
+          // scroll the first highlighted into view
+          if (!document.querySelector('.card-producto[data-mm-highlighted]')){
+            card.setAttribute('data-mm-highlighted','1');
+            setTimeout(()=>{ card.scrollIntoView({behavior:'smooth', block:'center'}); }, 120);
+          }
+        }
+      }
+    }catch(e){}
+
+    contenedor.appendChild(card);
+  });
 }
+
+// Allow searching products by query: call as renderizarProductos(null,null, 'buscar texto')
 
 // (Removed duplicate carritoTienda implementation) -- cart actions are unified below.
 
@@ -1117,9 +1323,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-    document.getElementById('menu').classList.toggle('open');
-});
+const mmBtn = document.getElementById('mobile-menu-btn');
+if (mmBtn) {
+  mmBtn.addEventListener('click', function() {
+    const menuEl = document.getElementById('menu');
+    if (menuEl) menuEl.classList.toggle('open');
+  });
+}
 
 // (Removed duplicate implementations — using unified cart below.)
 
@@ -1230,47 +1440,5 @@ window.addEventListener('load', actualizarContadores);
 // Expose quick test to console
 window.testAddToCart = function(){ agregarAlCarrito('Producto prueba', 100); }; 
 
-// Debug panel (cerrable) to inspect mm_pedido and add test items
-function renderDebugPanel(){
-  if (document.getElementById('mm-debug-panel')) return;
-  const panel = document.createElement('div');
-  panel.id = 'mm-debug-panel';
-  Object.assign(panel.style,{ position:'fixed', right:'14px', bottom:'14px', width:'220px', background:'#fff', border:'1px solid rgba(0,0,0,0.08)', padding:'8px', borderRadius:'10px', boxShadow:'0 6px 18px rgba(0,0,0,0.06)', zIndex:200001, fontSize:'13px'});
-  panel.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <strong style="font-size:13px;">Debug carrito</strong>
-      <button id="mm-debug-close" style="border:none;background:transparent;cursor:pointer;font-size:16px;">×</button>
-    </div>
-    <div id="mm-debug-count" style="opacity:.9;margin-bottom:8px;">Cargando...</div>
-    <div style="display:flex;gap:6px;">
-      <button id="mm-debug-add" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--black);background:#f6f6f6;">Añadir test</button>
-      <button id="mm-debug-show" style="padding:6px;border-radius:8px;border:1px solid var(--black);background:#fff;">Mostrar</button>
-    </div>
-  `;
-  document.body.appendChild(panel);
-
-  document.getElementById('mm-debug-close').addEventListener('click', ()=> panel.remove());
-  document.getElementById('mm-debug-add').addEventListener('click', ()=> { agregarAlCarrito('Producto test', 149); updateDebugPanel(); });
-  document.getElementById('mm-debug-show').addEventListener('click', ()=> { 
-    const arr = JSON.parse(localStorage.getItem('mm_pedido'))||[];
-    alert('mm_pedido:\n' + JSON.stringify(arr, null, 2));
-  });
-
-  updateDebugPanel();
-}
-
-function updateDebugPanel(){
-  const el = document.getElementById('mm-debug-count');
-  if (!el) return;
-  const arr = JSON.parse(localStorage.getItem('mm_pedido'))||[];
-  el.textContent = `Items: ${arr.length}`;
-}
-
-// Keep panel in sync when counters update
-const origActualizar = actualizarContadores;
-actualizarContadores = function(){ origActualizar(); updateDebugPanel(); };
-
-// Auto-render debug panel (remove or gate this if you don't want visible panel)
-if (typeof document !== 'undefined'){
-  document.addEventListener('DOMContentLoaded', () => { renderDebugPanel(); });
-}
+// Debug panel removed: helper functions and auto-render removed to avoid
+// showing a floating debug box in the UI. No-op kept for compatibility.
