@@ -135,14 +135,14 @@ img{ max-width:100%; height:auto; display:block; }
   display: flex;
   align-items: center; /* center vertically to avoid uneven stacking */
   gap: 22px;
-  padding-top: 6px;
+  padding-top: 16px;
   margin-right: 0;
   font-weight: 600;
   letter-spacing: .3px;
   word-spacing: 6px;
   flex: 1;
   justify-content: center;
-  transform: translateY(26px); /* slight adjustment */
+  transform: translateY(30px); /* slight adjustment */
 
   /* Keep one horizontal row but allow items to shrink instead of creating a scrollbar */
   flex-wrap: nowrap; /* keep everything in one horizontal row */
@@ -1386,19 +1386,19 @@ img{ max-width:100%; height:auto; display:block; }
 
 /* Align menu and header controls vertically with the logo on large screens */
 @media (min-width: 1025px) {
-  /* Keep logo untouched; push menu and controls down so their vertical center aligns with the logo */
+  /* Keep logo untouched; lift menu and controls a bit to match the example */
   .header-inner{
-    padding-top:40px; /* space above menu/controls to align with logo center */
-    min-height:140px;
+    padding-top:18px; /* reduced so menu sits higher, aligned with logo */
+    min-height:120px;
   }
 
   .menu{
-    transform:none; /* reset any previous translateY rules */
+    transform: translateY(12px); /* move menu slightly up */
     justify-content:center;
   }
 
   .header-controls{
-    transform:none; /* keep controls at same vertical offset as the menu */
+    transform: translateY(14px); /* align controls with menu */
   }
 
   .search-btn{ transform:none; }
@@ -1465,7 +1465,12 @@ img{ max-width:100%; height:auto; display:block; }
   .menu .menu-item img{ max-width:120px; height:auto; }
 
   .header-top{ margin-left:0; min-height:auto; }
-  .header-line{ margin-top:8px; }
+  .header-line{
+    margin-top:6px;
+    height:2px;
+    width:100%;
+    background: linear-gradient(to right, transparent, rgba(0,0,0,0.16) 30%, rgba(0,0,0,0.34) 50%, rgba(0,0,0,0.16) 70%, transparent);
+  }
 
   /* Make search / burger more compact and visible */
   .search-btn{ margin-right:12px; transform:translateY(0); }
