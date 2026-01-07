@@ -1355,7 +1355,16 @@ img{ max-width:100%; height:auto; display:block; }
     background:#fff;
   }
 
-  .brand img{ width:94%; height:auto; }
+  .brand{
+    position:relative; /* center inside the header on mobile */
+    left:auto;
+    top:auto;
+    width:140px;
+    height:auto;
+    margin:0 auto;
+    padding:6px 0;
+  }
+  .brand img{ width:100%; height:auto; }
 
   .header-inner{
     min-height:auto;
@@ -1366,6 +1375,7 @@ img{ max-width:100%; height:auto; display:block; }
     align-items:center;
     gap:6px;
     width: calc(100% - 28px);
+    padding-left:0; /* remove left offset used for desktop logo */
   }
 
   /* Hide main menu by default on mobile; burger toggles it open */
@@ -1424,10 +1434,13 @@ img{ max-width:100%; height:auto; display:block; }
   .menu.open{
     display:flex;
     position:fixed;
-    top:72px; /* below header */
+    top:86px; /* a bit lower to ensure it's fully below header on small devices */
+    left:16px;
     right:16px;
-    width: min(300px, calc(100% - 32px)); /* a bit smaller */
-    max-height: 75vh; /* not too tall */
+    width:auto;
+    max-width:420px; /* keep a comfortable max width */
+    margin:0 auto;
+    max-height: calc(100vh - 110px); /* fit within viewport leaving room for header */
     overflow-y:auto; /* vertical scrolling */
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
     touch-action: pan-y; /* allow vertical gestures */
@@ -1438,6 +1451,7 @@ img{ max-width:100%; height:auto; display:block; }
     flex-direction:column;
     gap:6px;
     padding:8px;
+    padding-bottom:12px;
     border:2px solid rgba(0,0,0,0.06);
     border-radius:12px;
     box-shadow: 0 12px 36px rgba(0,0,0,0.12);
@@ -1474,9 +1488,6 @@ img{ max-width:100%; height:auto; display:block; }
 
   /* extra spacing so menu is clearly distinct from carousel */
   .carousel-section{ transform: translateY(30px); }
-  .menu a:last-child {
-    margin-bottom: 500px; /* Esto forzará que el contenido sea largo y el scroll aparezca */
-}
 }  
 
 /* Ensure header sits above carousel */
