@@ -312,6 +312,153 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.setAttribute("aria-hidden", "true");
     unlockBodyScroll();
   }
+  window.closeModal = closeModal;
+
+  // Función para abrir modal de producto
+  function openProductModal(productName, colegio, grado) {
+    const modal = document.getElementById('productModal');
+    const content = document.getElementById('productModalContent');
+    if (!modal || !content) return;
+
+    // Buscar información del producto en baseDeDatos
+    const productData = baseDeDatos ? baseDeDatos.find(p => p.producto.toLowerCase().includes(productName.toLowerCase())) : null;
+    const actualProductName = productData ? productData.producto : productName;
+
+    // Obtener colegios donde se ofrece el producto
+    let schools = baseDeDatos ? [...new Set(baseDeDatos.filter(p => p.producto === actualProductName).map(p => p.colegio))].filter(Boolean) : [];
+    
+    // Fallback para productos conocidos si baseDeDatos está vacío
+    if (schools.length === 0) {
+      if (actualProductName.toLowerCase().includes('aleks')) {
+        schools = ['AMERICANO', 'LA ENSEÑANZA', 'SANTO THOMAS DE AQUINO', 'COLOMBO BRITANICO', 'SAN JORGE DE INGLATERRA'];
+      } else if (actualProductName.toLowerCase().includes('prime')) {
+        schools = ['AMERICANO', 'LA ENSEÑANZA', 'SANTO THOMAS DE AQUINO'];
+      } else if (actualProductName.toLowerCase().includes('reveal')) {
+        schools = ['AMERICANO', 'LA ENSEÑANZA', 'COLOMBO BRITANICO'];
+      } else if (actualProductName.toLowerCase().includes('material') || actualProductName.toLowerCase().includes('didactico')) {
+        schools = ['AMERICANO', 'LA ENSEÑANZA', 'SANTO THOMAS DE AQUINO', 'COLOMBO BRITANICO'];
+      }
+    }
+
+    // Seleccionar imagen según el producto
+    const nombreLower = actualProductName.toLowerCase();
+    let imgSrc = '../Multimedia/Logotipo_MathMinds.png';
+    if (nombreLower.includes('prime')) {
+      imgSrc = '../Multimedia/Logo_Prime.png';
+    } else if (nombreLower.includes('reveal')) {
+      imgSrc = '../Multimedia/Logo_Reveal_Math.png';
+    } else if (nombreLower.includes('aleks')) {
+      imgSrc = '../Multimedia/ALEKS.jpeg';
+    } else if (nombreLower.includes('didactico') || nombreLower.includes('material')) {
+      imgSrc = '../Multimedia/MaterialDidactico.png';
+    }
+
+    // Obtener descripción del producto
+    const description = getProductDescription(actualProductName);
+
+    // Crear contenido del modal
+    let contentHTML = `
+      <img src="${imgSrc}" alt="${actualProductName}" width="100" style="margin-bottom: 20px;">
+      <h2>${actualProductName}</h2>
+      <p class="modal-subtitle">Información del producto</p>
+      <p style="margin-bottom: 20px; line-height: 1.6;">${description}</p>`;
+
+    if (colegio === '') {
+      // Mostrar selectores para colegio y grado
+      contentHTML += `
+      <div style="margin-bottom: 20px;">
+        <label for="modalColegio">Selecciona Colegio:</label>
+        <select id="modalColegio" style="width: 100%; padding: 8px; margin-top: 5px;">
+          <option value="">Selecciona un colegio</option>
+          ${schools.map(school => `<option value="${school}">${school}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-bottom: 20px;">
+        <label for="modalGrado">Selecciona Grado:</label>
+        <select id="modalGrado" style="width: 100%; padding: 8px; margin-top: 5px;" disabled>
+          <option value="">Primero selecciona colegio</option>
+        </select>
+      </div>`;
+    } else {
+      // Mostrar lista de colegios
+      contentHTML += `
+      <div style="margin-bottom: 20px;">
+        <h3>Colegios donde se ofrece:</h3>
+        <ul>
+          ${schools.map(school => `<li>${school}</li>`).join('')}
+        </ul>
+      </div>`;
+    }
+
+    contentHTML += `
+      <div style="margin-bottom: 20px;">
+        <label for="quantity">Cantidad:</label>
+        <input type="number" id="quantity" min="1" value="1" style="width: 60px; margin-left: 10px; padding: 5px;">
+      </div>
+      <button class="btn primary full add-to-cart-modal" data-product="${actualProductName}" data-price="0" data-colegio="${colegio}" data-grado="${grado}">Añadir al carrito</button>
+    `;
+
+    content.innerHTML = contentHTML;
+
+    openModal('productModal');
+
+    // Si hay selectores, agregar listeners
+    if (colegio === '') {
+      const modalColegio = document.getElementById('modalColegio');
+      const modalGrado = document.getElementById('modalGrado');
+      if (modalColegio && modalGrado) {
+        modalColegio.addEventListener('change', () => {
+          const selectedColegio = modalColegio.value;
+          if (selectedColegio) {
+            // Poblar grados donde se vende el producto en este colegio
+            let gradosDisponibles = [];
+            if (baseDeDatos) {
+              gradosDisponibles = [...new Set(baseDeDatos.filter(p => p.producto.toLowerCase().includes(actualProductName.toLowerCase()) && p.colegio === selectedColegio).map(p => p.grado))].filter(Boolean);
+            }
+            if (gradosDisponibles.length === 0) {
+              // Fallback
+              gradosDisponibles = ['6to', '7mo', '8vo', '9no', '10mo', '11ro'];
+            }
+            modalGrado.innerHTML = '<option value="">Selecciona un grado</option>' + gradosDisponibles.map(g => `<option value="${g}">${g}</option>`).join('');
+            modalGrado.disabled = false;
+          } else {
+            modalGrado.innerHTML = '<option value="">Primero selecciona colegio</option>';
+            modalGrado.disabled = true;
+          }
+        });
+      }
+    }
+  }
+  window.openProductModal = openProductModal;
+
+  // Función para obtener descripción del producto
+  function getProductDescription(productName) {
+    const name = productName.toLowerCase();
+    if (name.includes('prime')) {
+      return 'Prime es una serie de libros de matemáticas diseñada para estudiantes de secundaria. Ofrece un enfoque integral y riguroso en conceptos matemáticos avanzados, con ejercicios prácticos y aplicaciones reales para desarrollar habilidades críticas en álgebra, geometría y cálculo.';
+    } else if (name.includes('reveal math')) {
+      return 'Reveal Math es un programa interactivo de matemáticas que combina enseñanza basada en investigación con tecnología digital. Incluye lecciones en video, actividades interactivas y evaluaciones continuas para apoyar el aprendizaje personalizado en matemáticas desde kindergarten hasta secundaria.';
+    } else if (name.includes('aleks')) {
+      return 'ALEKS es una plataforma de aprendizaje adaptativo de matemáticas que utiliza inteligencia artificial para personalizar el currículo según las necesidades individuales del estudiante. Proporciona instrucción paso a paso, práctica ilimitada y evaluaciones precisas para dominar conceptos matemáticos.';
+    } else if (name.includes('material didactico') || name.includes('didactico')) {
+      return 'Material Didáctico incluye recursos físicos y manipulativos diseñados para facilitar el aprendizaje práctico de las matemáticas. Incluye bloques, figuras geométricas, juegos y herramientas interactivas que ayudan a los estudiantes a comprender conceptos abstractos a través de la experiencia hands-on.';
+    } else {
+      return 'Este producto educativo está diseñado para enriquecer el aprendizaje de matemáticas con recursos de alta calidad y metodologías probadas. Consulta con tu colegio para más detalles específicos sobre su implementación y beneficios.';
+    }
+  }
+
+  // Función para obtener grados disponibles para un colegio
+  function getGradosForColegio(colegio) {
+    // Fallback grados comunes
+    const gradosPorColegio = {
+      'AMERICANO': ['6to', '7mo', '8vo', '9no', '10mo', '11ro'],
+      'LA ENSEÑANZA': ['6to', '7mo', '8vo', '9no', '10mo', '11ro'],
+      'SANTO THOMAS DE AQUINO': ['6to', '7mo', '8vo', '9no', '10mo', '11ro'],
+      'COLOMBO BRITANICO': ['6to', '7mo', '8vo', '9no', '10mo', '11ro'],
+      'SAN JORGE DE INGLATERRA': ['6to', '7mo', '8vo', '9no', '10mo', '11ro']
+    };
+    return gradosPorColegio[colegio] || ['6to', '7mo', '8vo', '9no', '10mo', '11ro'];
+  }
 
   // ABRIR
   triggers.forEach(trigger => {
@@ -1411,9 +1558,18 @@ function renderizarProductos(col, gra, query) {
     const title = document.createElement('h3');
     title.textContent = p.producto;
 
+    // Botón para ver detalles (abre modal)
+    const detailsBtn = document.createElement('button');
+    detailsBtn.className = 'btn secondary view-details-btn';
+    detailsBtn.type = 'button';
+    detailsBtn.textContent = 'Ver detalles';
+    detailsBtn.dataset.product = p.producto;
+    if (p.colegio) detailsBtn.dataset.colegio = p.colegio;
+    if (p.grado) detailsBtn.dataset.grado = p.grado;
+
     // Solo mostrar nombre y botón "Añadir al carrito" (no mostrar precio ni colegio/grado)
     const btn = document.createElement('button');
-    btn.className = 'btn primary full add-to-cart-btn';
+    btn.className = 'btn primary add-to-cart-btn';
     btn.type = 'button';
     btn.textContent = 'Añadir al carrito';
     btn.dataset.product = p.producto;
@@ -1425,9 +1581,15 @@ function renderizarProductos(col, gra, query) {
     // Note: delegated click handler on document handles `.add-to-cart-btn` clicks.
     // Avoid adding a direct listener here to prevent duplicate additions.
 
+    // Contenedor para los botones
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'buttons-container';
+    buttonsContainer.appendChild(detailsBtn);
+    buttonsContainer.appendChild(btn);
+
     info.appendChild(img);
     info.appendChild(title);
-    info.appendChild(btn);
+    info.appendChild(buttonsContainer);
     card.appendChild(info);
 
     // If a query was provided, highlight matches
@@ -1613,6 +1775,58 @@ document.addEventListener('click', (e) => {
     // agregarAlCarrito already syncs with the Cart API (it calls window.Cart.addItem).
     // Do not call window.Cart.addItem again here — that was causing duplicate entries.
     agregarAlCarrito(prod, price, { colegio, grado });
+  }
+});
+
+// Delegate click handler for view-details buttons
+document.addEventListener('click', (e) => {
+  const btn = e.target && e.target.closest && e.target.closest('.view-details-btn');
+  if (!btn) return;
+  const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
+  const colegio = btn.dataset.colegio || btn.getAttribute('data-colegio') || '';
+  const grado = btn.dataset.grado || btn.getAttribute('data-grado') || '';
+  if (prod) {
+    openProductModal(prod, colegio, grado);
+  }
+});
+
+// Delegate click handler for open-product-modal buttons
+document.addEventListener('click', (e) => {
+  const btn = e.target && e.target.closest && e.target.closest('.open-product-modal-btn');
+  if (!btn) return;
+  const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
+  if (prod) {
+    openProductModal(prod, '', ''); // Sin colegio/grado específico
+  }
+});
+
+// Delegate click handler for add-to-cart-modal buttons
+document.addEventListener('click', (e) => {
+  const btn = e.target && e.target.closest && e.target.closest('.add-to-cart-modal');
+  if (!btn) return;
+  const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
+  const price = btn.dataset.price || btn.getAttribute('data-price') || null;
+  let colegio = btn.dataset.colegio || btn.getAttribute('data-colegio') || '';
+  let grado = btn.dataset.grado || btn.getAttribute('data-grado') || '';
+  const quantity = parseInt(document.getElementById('quantity')?.value) || 1;
+
+  // Si hay selectores en el modal, usar esos valores
+  const modalColegio = document.getElementById('modalColegio');
+  const modalGrado = document.getElementById('modalGrado');
+  if (modalColegio && modalColegio.value) {
+    colegio = modalColegio.value;
+  }
+  if (modalGrado && modalGrado.value) {
+    grado = modalGrado.value;
+  }
+
+  if (prod) {
+    for (let i = 0; i < quantity; i++) {
+      agregarAlCarrito(prod, price, { colegio, grado });
+    }
+    // Close modal after adding
+    const modal = document.getElementById('productModal');
+    if (modal) window.closeModal(modal);
   }
 });
 

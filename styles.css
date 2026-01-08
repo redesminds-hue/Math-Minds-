@@ -108,6 +108,7 @@ img{ max-width:100%; height:auto; display:block; }
   padding-top:6px;
   flex:1;               /* take remaining space so it can be centered */
   justify-content:center; /* center menu items horizontally */
+  margin-right: 50px; /* add space between menu and header controls */
 }
 
 /* Drawer-related elements should be hidden on desktop to avoid disrupting layout */
@@ -128,12 +129,13 @@ img{ max-width:100%; height:auto; display:block; }
   .menu-drawer-header,
   .menu-drawer-footer,
   .menu-top-badges{ display:none !important; }
+  .menu-close { display: none; }
 }
 
 .header-controls{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:15px;
   margin-left:auto; /* ensure controls stay to the right */
 }
 
@@ -316,6 +318,10 @@ img{ max-width:100%; height:auto; display:block; }
 /* Ensure the store button keeps its full label visible */
 .menu-buy{
   flex: 0 0 auto; /* do not allow the buy button to shrink */
+  border: 2px solid var(--black);
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
 }
 .menu-buy .menu-text{
   max-width: none; /* allow full text to show */
@@ -749,7 +755,7 @@ img{ max-width:100%; height:auto; display:block; }
   margin-left: 18px; /* separar del resto del menú */
 }
 
-.menu-buy .menu-label{ font-size:10px; opacity:0.8; color:inherit; }
+.menu-buy .menu-label{ font-size:8px; opacity:0.8; color:inherit; }
 .menu-buy .menu-text{ font-weight:700; color:inherit; }
 
 .menu-buy:hover,
@@ -757,7 +763,7 @@ img{ max-width:100%; height:auto; display:block; }
   background: var(--purple);
   color: #fff;
   border-color: var(--purple);
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   text-decoration: none;
 }
 
@@ -779,8 +785,8 @@ img{ max-width:100%; height:auto; display:block; }
 
   /* Keep Inicio and Comprar readable by slightly reducing their font/padding but not truncating */
   .menu a.active .menu-text{ max-width: none; font-size:15px; }
-  .menu-buy{ padding:8px 10px; }
-  .menu-buy .menu-text{ font-size:15px; max-width:160px; }
+  .menu-buy{ padding:15px 25px; }
+  .menu-buy .menu-text{ font-size:12px; max-width: none; }
 }
 
 @media (max-width: 900px){
@@ -1125,6 +1131,7 @@ img{ max-width:100%; height:auto; display:block; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn.primary{
@@ -1133,10 +1140,23 @@ img{ max-width:100%; height:auto; display:block; }
   border: 2px solid var(--purple);
 }
 
+.btn.primary:hover{
+  background: #0d8b9a; /* tono más oscuro de --purple */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 .btn.secondary{
   background: #fff;
   color: var(--purple);
   border: 2px solid var(--purple);
+}
+
+.btn.secondary:hover{
+  background: var(--purple);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* Comparador ALEKS */
@@ -2020,6 +2040,12 @@ img{ max-width:100%; height:auto; display:block; }
     font-size: 18px;
     margin: 15px 0 10px;
     color: #333;
+}
+
+.buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .card-producto .precio {
