@@ -392,9 +392,25 @@
             // Initialize after baseDeDatos ready
             whenBaseReady(() => {
                 populateCollegeOptions();
-                // If user already selected a colegio in productos, lock it here
+                // Get colegio/grado from the first product in the cart, not from filter selections
                 try{
-                    const selected = localStorage.getItem('mm_selected_colegio');
+                    const carrito = JSON.parse(localStorage.getItem('mm_cart_v1') || '[]');
+                    const pedido = JSON.parse(localStorage.getItem('mm_pedido') || '[]');
+                    const cartItems = carrito.length > 0 ? carrito : pedido;
+                    
+                    let cartColegio = null;
+                    let cartGrado = null;
+                    
+                    if (cartItems.length > 0) {
+                        // Extract colegio/grado from first product in cart
+                        const firstItem = cartItems[0];
+                        cartColegio = firstItem.colegio || null;
+                        cartGrado = firstItem.grado || null;
+                    }
+                    
+                    // Use cart colegio if available, otherwise fall back to filter selection
+                    const selected = cartColegio || localStorage.getItem('mm_selected_colegio');
+                    
                     if (selected){
                         // set select to only show the selected colegio and disable changes
                         collegeSel.innerHTML = '';
@@ -404,17 +420,15 @@
                         collegeSel.disabled = true;
                         // populate grades for that colegio
                         populateGradesForCollege(selected);
-                        // If a grade was previously selected in productos, lock it here as well
-                        try{
-                            const sg = localStorage.getItem('mm_selected_grade');
-                            if (sg){
-                                // wait a tick to ensure options present
-                                setTimeout(() => {
-                                    const optG = Array.from(gradeSel.options).find(o => o.value === sg);
-                                    if (optG){ gradeSel.value = sg; gradeSel.disabled = true; }
-                                }, 50);
-                            }
-                        }catch(e){}
+                        // Use cart grado if available, otherwise fall back to filter selection
+                        const sg = cartGrado || localStorage.getItem('mm_selected_grade');
+                        if (sg){
+                            // wait a tick to ensure options present
+                            setTimeout(() => {
+                                const optG = Array.from(gradeSel.options).find(o => o.value === sg);
+                                if (optG){ gradeSel.value = sg; gradeSel.disabled = true; }
+                            }, 50);
+                        }
                     }
                 }catch(e){ /* ignore */ }
             });
