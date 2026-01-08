@@ -1809,8 +1809,21 @@ document.addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
   const btn = e.target && e.target.closest && e.target.closest('.open-product-modal-btn');
   if (!btn) return;
-  const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
+  let prod = btn.dataset.product || btn.getAttribute('data-product') || null;
   if (prod) {
+    // If the product name is just "ALEKS" or similar generic name without a package suffix,
+    // try to find the actual product from baseDeDatos that matches and includes keywords like "12 meses"
+    const baseDatos = window.baseDeDatos || [];
+    if (baseDatos.length > 0 && prod.toLowerCase() === 'aleks') {
+      // Search for ALEKS product with "12 meses" or other package info
+      const aleksProducts = baseDatos.filter(p => (p.producto || '').toLowerCase().includes('aleks'));
+      if (aleksProducts.length > 0) {
+        // Prefer one with "12 meses" if available
+        const withMonths = aleksProducts.find(p => (p.producto || '').toLowerCase().includes('12'));
+        prod = withMonths ? withMonths.producto : aleksProducts[0].producto;
+        console.log('Resolved ALEKS to:', prod);
+      }
+    }
     openProductModal(prod, '', ''); // Sin colegio/grado específico
   }
 });

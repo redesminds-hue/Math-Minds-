@@ -1248,6 +1248,7 @@ img{ max-width:100%; height:auto; display:block; }
 
 
 /* Alineación y estilo centrado para modales con 1 tarjeta */
+#modalAleks .compare-grid,
 #modal-Scholastic .compare-grid,
 #modal-MathMinds .compare-grid,
 #modalReveal .compare-grid,
@@ -1259,6 +1260,7 @@ img{ max-width:100%; height:auto; display:block; }
   gap: 18px;
 }
 
+#modalAleks .compare-card,
 #modal-Scholastic .compare-card,
 #modal-MathMinds .compare-card,
 #modalReveal .compare-card,
