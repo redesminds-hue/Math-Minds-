@@ -176,6 +176,18 @@
                 <input type="email" id="studentEmail" class="input-estudiante" placeholder="correo@ejemplo.com">
             </div>
 
+            <div class="form-group" style="margin-top:15px;">
+                <label style="font-weight:700; font-size:12px;">MÉTODO DE PAGO</label>
+                <div>
+                    <input type="radio" id="paymentCard" name="paymentMethod" value="CARD" checked>
+                    <label for="paymentCard">Tarjeta de Crédito/Débito</label>
+                </div>
+                <div>
+                    <input type="radio" id="paymentPSE" name="paymentMethod" value="PSE">
+                    <label for="paymentPSE">PSE (Pago Seguro en Línea)</label>
+                </div>
+            </div>
+
             <button id="payButton" onclick="enviarWhatsApp()" class="btn-whatsapp">PAGAR</button>
             <div id="paymentStatus" style="display:none;margin-top:10px;font-weight:700;"></div> 
         </div>
@@ -286,6 +298,8 @@
             const reference = `MM-${Date.now()}-${sDoc}`;
             // amount in cents
             const amount_cents = Math.round(total * 100);
+            // Get payment method
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
             try {
                 const payBtn = document.getElementById('payButton');
@@ -302,6 +316,13 @@
                         customer_email: sEmail,
                         reference: reference,
                         redirect_url: WOMPI_REDIRECT_URL,
+                        payment_method: paymentMethod,
+                        customer_data: {
+                            full_name: `${sFirst} ${sLast}`.trim(),
+                            phone_number: entrega.telefono || '',
+                            legal_id: sDoc,
+                            legal_id_type: 'CC'
+                        },
                         metadata: { document: sDoc, acudiente: entrega.acudiente, student: { last: sLast, first: sFirst } }
                     })
                 });

@@ -304,12 +304,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
+    modal.removeAttribute('inert');
     lockBodyScroll();
   }
 
   function closeModal(modal){
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
+    modal.setAttribute('inert', '');
     unlockBodyScroll();
   }
   window.closeModal = closeModal;
@@ -321,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!modal || !content) return;
 
     // Buscar información del producto en baseDeDatos
-    const productData = baseDeDatos ? baseDeDatos.find(p => p.producto.toLowerCase().includes(productName.toLowerCase())) : null;
+    const productData = baseDeDatos ? baseDeDatos.find(p => p.producto.toLowerCase().includes(productName.toLowerCase()) && p.colegio === colegio && p.grado === grado) : null;
     const actualProductName = productData ? productData.producto : productName;
 
     // Obtener colegios donde se ofrece el producto
@@ -355,13 +357,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Obtener descripción del producto
     const description = getProductDescription(actualProductName);
+    const precio = productData && productData.precio ? `$${productData.precio}` : 'Precio no disponible';
+    const finalDescription = productData && productData.descripcion ? productData.descripcion : description;
 
     // Crear contenido del modal
     let contentHTML = `
       <img src="${imgSrc}" alt="${actualProductName}" width="100" style="margin-bottom: 20px;">
       <h2>${actualProductName}</h2>
       <p class="modal-subtitle">Información del producto</p>
-      <p style="margin-bottom: 20px; line-height: 1.6;">${description}</p>`;
+      <p><strong>Colegio:</strong> ${colegio}</p>
+      <p><strong>Grado:</strong> ${grado}</p>
+      <p><strong>Precio:</strong> ${precio}</p>
+      <p style="margin-bottom: 20px; line-height: 1.6;">${finalDescription}</p>`;
 
     if (colegio === '') {
       // Mostrar selectores para colegio y grado
@@ -395,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label for="quantity">Cantidad:</label>
         <input type="number" id="quantity" min="1" value="1" style="width: 60px; margin-left: 10px; padding: 5px;">
       </div>
-      <button class="btn primary full add-to-cart-modal" data-product="${actualProductName}" data-price="0" data-colegio="${colegio}" data-grado="${grado}">Añadir al carrito</button>
+      <button class="btn primary full add-to-cart-modal" data-product="${actualProductName}" data-price="${productData ? productData.precio : 0}" data-colegio="${colegio}" data-grado="${grado}">Añadir al carrito</button>
     `;
 
     content.innerHTML = contentHTML;
@@ -447,6 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Función para inicializar el modal de selección de curso
   // Función para obtener grados disponibles para un colegio
   function getGradosForColegio(colegio) {
     // Fallback grados comunes
