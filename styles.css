@@ -165,7 +165,7 @@ img{ max-width:100%; height:auto; display:block; }
   }
   .menu{ display:none; }
   .search-btn{ display:flex; } /* show it in mobile as store */
-  .search-btn::before { content: "🏪"; }
+  .search-btn::before { content: "🏪" !important; }
   .header-left{
     position:absolute;
     left:10px;
