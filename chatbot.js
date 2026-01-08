@@ -331,7 +331,16 @@
     
     tienda: {
       pattern: /tienda|compra en línea|comprar online|plataforma|web|sitio|store|ecommerce/i,
-      response: () => "🛒 **NUESTRA TIENDA EN LÍNEA:**\n\nEn la sección **TIENDA** de nuestro sitio web puedes:\n\n✅ Ver catálogo completo de productos\n✅ Filtrar por colegio y grado\n✅ Ver información detallada de cada producto\n✅ Agregar al carrito\n✅ Proceder al pago seguro\n\n**Ventajas:**\n• Proceso rápido y seguro\n• Múltiples formas de pago\n• Confirmación inmediata\n• Seguimiento de tu pedido\n\n¿Necesitas ayuda para encontrar algo específico?"
+      response: () => "🛒 **NUESTRA TIENDA EN LÍNEA:**\n\nEn la sección **TIENDA** de nuestro sitio web puedes:\n\n✅ Ver catálogo completo de productos\n✅ Filtrar por colegio y grado\n✅ Ver información detallada de cada producto\n✅ Agregar al carrito\n✅ Proceder al pago seguro\n\n**Nota:** El catálogo de materiales físicos y recursos está disponible también desde el módulo **Material Didáctico**; al pulsar 'Más información' en ese módulo verás el catálogo detallado y opciones para cada artículo.\n\n**Ventajas:**\n• Proceso rápido y seguro\n• Múltiples formas de pago\n• Confirmación inmediata\n• Seguimiento de tu pedido\n\n¿Necesitas ayuda para encontrar algo específico?"
+        accederTienda: {
+          pattern: /cómo accedo a la tienda|como accedo a la tienda|entrar a la tienda|ir a la tienda|abrir la tienda|ver la tienda|acceder a la tienda/i,
+          response: () => "🛍️ **CÓMO ACCEDER A LA TIENDA:**\n\n1. Desde la página principal, haz clic en el menú y selecciona 'TIENDA'.\n2. También puedes ir al enlace directo de la tienda si lo tienes.\n3. Dentro de la tienda puedes filtrar por colegio y grado para ver productos específicos.\n4. Para materiales físicos, visita el módulo 'Material Didáctico' y pulsa 'Más información' para ver el catálogo detallado.\n\nSi quieres, dime tu colegio y grado y te muestro los productos recomendados."
+        },
+    
+        verCatalogo: {
+          pattern: /catálogo|catalogo|ver catálogo|ver catalogo|mostrar catálogo|ver el catalogo|ver el catálogo|dónde está el catálogo|donde esta el catalogo/i,
+          response: () => "📚 **VER EL CATÁLOGO:**\n\nEl catálogo completo lo encuentras en la sección 'TIENDA' de nuestro sitio web.\n\nAdemás, para material físico y recursos manipulativos:\n• Ve al módulo **Material Didáctico**\n• Haz clic en 'Más información' sobre el recurso de interés\n• Ahí verás la ficha del producto, imágenes y disponibilidad por colegio\n\n¿Quieres que te muestre los productos disponibles para un colegio específico?"
+        },
     },
     
     grados: {
