@@ -78,7 +78,7 @@
   // Respuestas dinámicas del chatbot
   const crearRespuestas = () => ({
     queEsMathMinds: {
-      pattern: /qué es|quiénes somos|sobre ustedes|acerca de|quién eres|presentación|info de la empresa/i,
+      pattern: /qué es|que es|qué son|que son|quiénes somos|quienes somos|quienes son|quiénes son|quién eres|quien eres|sobre ustedes|acerca de|presentación|info de la empresa/i,
       response: () => {
         return "🎓 **Math Minds** es una empresa educativa especializada en soluciones de aprendizaje de matemáticas.\n\nNuestro objetivo:\n• Mejorar la calidad educativa en matemáticas\n• Ofrecer herramientas tecnológicas innovadoras\n• Proporcionar recursos de calidad a colegios\n\nTrabajamos con plataformas como ALEKS, Reveal Math, Prime y Material Didáctico. ¡Estamos comprometidos con la excelencia educativa! 📚";
       }
@@ -398,7 +398,7 @@
     },
     
     comoComprar: {
-      pattern: /cómo compro|cómo comprar|quiero comprar|proceso de compra|pasos para comprar|cómo realizo|forma de compra|modalidad de compra|procedimiento|compra en línea|compra online|realizar una compra|efectuar compra|hacer una compra/i,
+      pattern: /cómo compro|como puedo comprar| como comprar| como compro| cómo comprar|quiero comprar|proceso de compra|pasos para comprar|cómo realizo|forma de compra|modalidad de compra|procedimiento|compra en línea|compra online|realizar una compra|efectuar compra|hacer una compra/i,
       response: () => "🛒 **¿Cómo comprar en Math Minds?**\n\n**Opción 1: En línea (Recomendado)**\n1. Visita nuestra sección **TIENDA**\n2. Explora los productos disponibles\n3. Selecciona el producto y cantidad\n4. Agrégalo al carrito\n5. Completa tu información\n6. Elige método de pago\n7. ¡Listo! Recibirás confirmación\n\n**Opción 2: Contacto directo**\n📱 WhatsApp: +57 301 345 6259\n📧 Email: mathmindscol@gmail.com\n☎️ Teléfono: +57 301 345 6259\n\n¿Necesitas ayuda con algún producto específico?"
     },
 
@@ -413,7 +413,7 @@
     },
 
     menu: {
-      pattern: /mostrar menú|ver menú|opciones|qué puedo preguntar|¿qué preguntas|ejemplos de preguntas/i,
+      pattern: /mostrar menú|menu|Menu|ver menú|opciones|qué puedo preguntar|¿qué preguntas|ejemplos de preguntas/i,
       response: () => "📋 **PREGUNTAS FRECUENTES:**\n\n**SOBRE PRODUCTOS:**\n• Productos disponibles\n• ¿Qué es ALEKS?\n• ¿Cuál es el mejor para primaria?\n• ¿Tienen material para grado 10?\n\n**SOBRE UBICACIÓN:**\n• Colegios con convenio\n• ¿Venden en Colegio X?\n• ¿Dónde consigo ALEKS?\n\n**SOBRE PRECIOS Y COMPRA:**\n• ¿Cuánto cuesta?\n• Cómo compro\n• Métodos de pago\n\n**SOBRE INFORMACIÓN:**\n• ¿Qué es Math Minds?\n• Beneficios de usar nuestros productos\n• ¿Tienen envío a domicilio?\n\n¡Puedes escribir cualquiera de estas preguntas! 🎓"
     },
     
@@ -598,20 +598,44 @@
       return div.innerHTML;
     }
     
-    // Función para obtener respuesta
+    // Función para normalizar texto (quitar tildes)
+    function normalizeText(text) {
+      if (!text || typeof text !== 'string') return text;
+      return text.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    }
+
+    // Comprobar si un patrón (RegExp) coincide con el mensaje, incluyendo versión sin tildes
+    function patternMatches(pattern, mensaje) {
+      if (!pattern) return false;
+      try {
+        if (pattern.test(mensaje)) return true;
+      } catch (e) {
+        // en caso de patrón inválido, ignorar
+      }
+
+      const mensajeNorm = normalizeText(mensaje);
+      const patternSourceNorm = normalizeText(pattern.source);
+      try {
+        const re = new RegExp(patternSourceNorm, pattern.flags);
+        return re.test(mensajeNorm);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Función para obtener respuesta (soporta entradas con y sin tildes)
     function obtenerRespuesta(mensaje) {
       const respuestas = crearRespuestas();
-      
       for (const key in respuestas) {
         const item = respuestas[key];
-        if (item.pattern && item.pattern.test(mensaje)) {
+        if (item.pattern && patternMatches(item.pattern, mensaje)) {
           if (typeof item.response === 'function') {
             return item.response(mensaje);
           }
           return item.response;
         }
       }
-      
+
       if (typeof respuestas.default.response === 'function') {
         return respuestas.default.response(mensaje);
       }
