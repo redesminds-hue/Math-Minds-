@@ -164,7 +164,8 @@ img{ max-width:100%; height:auto; display:block; }
     padding-right: 16px;
   }
   .menu{ display:none; }
-  .search-btn{ display:none; } /* hide small icon */
+  .search-btn{ display:flex; } /* show it in mobile as store */
+  .search-btn::before { content: "🏪"; }
   .header-left{
     position:absolute;
     left:10px;
@@ -337,7 +338,8 @@ img{ max-width:100%; height:auto; display:block; }
 /* =========================
    SEARCH
 ========================= */
-.search-btn{
+.search-btn,
+.store-btn{
   margin:0;
   height: 34px;
   width: 36px;
@@ -352,6 +354,10 @@ img{ max-width:100%; height:auto; display:block; }
   position:relative; /* para controlar z-index */
   z-index:100002; /* arriba del drawer y overlay para que el botón siempre esté visible */
   transition: transform .15s ease;
+}
+
+.search-btn::before {
+  content: "🔎";
 }
 
 @media (max-width: 740px){

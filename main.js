@@ -825,7 +825,14 @@ document.addEventListener("DOMContentLoaded", () => {
       renderHistory();
     });
 
-    searchToggle.addEventListener('click', (ev) => { ev.preventDefault(); openDrawer(); });
+    searchToggle.addEventListener('click', (ev) => { 
+      if (window.innerWidth <= 420) {
+        window.location.href = 'productos.html';
+      } else {
+        ev.preventDefault(); 
+        openDrawer(); 
+      }
+    });
     searchClose?.addEventListener('click', closeDrawer);
     searchOverlay.addEventListener('click', closeDrawer);
 
