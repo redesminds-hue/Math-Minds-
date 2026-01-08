@@ -2,23 +2,36 @@
 (function(){
   // Variable para almacenar la base de datos cuando esté lista
   let bd = [];
+  // Estado simple para seguimiento de la última pregunta del bot
+  let lastQuestion = null;
+
+  // Normalizar texto (quitar tildes) disponible en todo el IIFE
+  function normalizeText(text) {
+    if (!text || typeof text !== 'string') return (text || '');
+    try {
+      return text.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    } catch (e) {
+      // Si el entorno no soporta \p{Diacritic}, usar fallback simplificado
+      return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+  }
   
   // Función para obtener colegios únicos de la base de datos
   function obtenerColegios() {
-    if (!bd || bd.length === 0) return [];
-    return [...new Set(bd.map(p => p.colegio))].filter(Boolean).sort();
+    const src = (bd && bd.length) ? bd : (window.baseDeDatos || []);
+    return [...new Set(src.map(p => p.colegio))].filter(Boolean).sort();
   }
   
   // Función para obtener productos únicos
   function obtenerProductos() {
-    if (!bd || bd.length === 0) return [];
-    return [...new Set(bd.map(p => p.producto))].filter(Boolean).sort();
+    const src = (bd && bd.length) ? bd : (window.baseDeDatos || []);
+    return [...new Set(src.map(p => p.producto))].filter(Boolean).sort();
   }
   
   // Función para obtener colegios que venden un producto específico
   function obtenerColegiosPorProducto(nombreProducto) {
-    if (!bd || bd.length === 0) return [];
-    const productosFiltered = bd.filter(p => 
+    const src = (bd && bd.length) ? bd : (window.baseDeDatos || []);
+    const productosFiltered = src.filter(p => 
       (p.producto || '').toLowerCase().includes(nombreProducto.toLowerCase())
     );
     return [...new Set(productosFiltered.map(p => p.colegio))].filter(Boolean).sort();
@@ -26,7 +39,6 @@
   
   // Función para buscar productos similares
   function buscarProductoSimilar(busqueda) {
-    if (!bd || bd.length === 0) return [];
     const productos = obtenerProductos();
     return productos.filter(p => 
       p.toLowerCase().includes(busqueda.toLowerCase())
@@ -57,21 +69,39 @@
 
   // Función para buscar colegio parcialmente
   function buscarColegioParcial(busqueda) {
+    if (!busqueda) return null;
     const colegios = obtenerColegios();
-    const busquedaLower = busqueda.toLowerCase().trim();
-    
-    // Búsqueda exacta primero
-    let encontrado = colegios.find(c => c.toLowerCase() === busquedaLower);
+
+    // Normalizar para comparar: quitar acentos, artículos comunes y espacios extra
+    function norm(s) {
+      if (!s) return '';
+      let t = normalizeText(s).toLowerCase().trim();
+      // quitar artículos y palabras comunes que suelen usarse en las consultas
+      t = t.replace(/\b(el|la|los|las|colegio|instituto|institución|sede)\b/g, '');
+      t = t.replace(/[^a-z0-9\s]/g, '');
+      return t.replace(/\s+/g, ' ').trim();
+    }
+
+    const busq = norm(busqueda);
+    if (!busq) return null;
+
+    // Búsqueda exacta en forma normalizada
+    let encontrado = colegios.find(c => norm(c) === busq);
     if (encontrado) return encontrado;
-    
-    // Búsqueda parcial (contiene)
-    encontrado = colegios.find(c => c.toLowerCase().includes(busquedaLower));
+
+    // Búsqueda parcial (colegio contiene la búsqueda)
+    encontrado = colegios.find(c => norm(c).includes(busq));
     if (encontrado) return encontrado;
-    
-    // Búsqueda inversa (el colegio contiene la búsqueda)
-    encontrado = colegios.find(c => busquedaLower.includes(c.toLowerCase()));
+
+    // Búsqueda inversa (la búsqueda contiene el colegio normalizado)
+    encontrado = colegios.find(c => busq.includes(norm(c)));
     if (encontrado) return encontrado;
-    
+
+    // Depuración: mostrar primeros colegios normalizados si no se encontró
+    try {
+      const muestras = colegios.slice(0,8).map(c => `${c} -> ${norm(c)}`).join('; ');
+      console.debug('buscarColegioParcial no encontró:', busqueda, 'norm->', busq, 'muestras:', muestras);
+    } catch (e) {}
     return null;
   }
 
@@ -90,13 +120,26 @@
     },
     
     productos: {
-      pattern: /productos|qué venden|qué ofrecen|tienda|comprar|catálogo|¿qué tiene/i,
+      pattern: /productos|qué venden|qué ofrecen|tienda|comprar|¿qué tiene/i,
       response: (mensaje) => {
         const productos = obtenerProductos();
         if (productos.length > 0) {
           return `📚 Nuestros productos disponibles son:\n\n${productos.map(p => `• ${p}`).join('\n')}\n\n¿Quieres saber más sobre alguno de estos productos?`;
         }
         return "Ofrecemos productos educativos de matemáticas como ALEKS, Reveal Math, Prime y Material Didáctico. ¿Cuál te interesa?";
+      }
+    },
+
+    accederTienda: {
+      pattern: /cómo accedo a la tienda|como accedo a la tienda|entrar a la tienda|ir a la tienda|abrir la tienda|ver la tienda|acceder a la tienda/i,
+      response: () => "🛍️ **CÓMO ACCEDER A LA TIENDA:**\n\n1. Desde la página principal, haz clic en el menú y selecciona 'TIENDA'.\n2. También puedes ir al enlace directo de la tienda si lo tienes.\n3. Dentro de la tienda puedes filtrar por colegio y grado para ver productos específicos.\n4. Para materiales físicos, visita el módulo 'Material Didáctico' y pulsa 'Más información' para ver el catálogo detallado.\n\nSi quieres, dime tu colegio y grado y te muestro los productos recomendados."
+    },
+
+    verCatalogo: {
+      pattern: /catálogo|catalogo|ver catálogo|ver catalogo|mostrar catálogo|ver el catalogo|ver el catálogo|dónde está el catálogo|donde esta el catalogo/i,
+      response: (mensaje) => {
+        lastQuestion = 'ask_colegio_catalog';
+        return "📚 **VER EL CATÁLOGO:**\n\nEl catálogo completo lo encuentras en la sección 'TIENDA' de nuestro sitio web.\n\nAdemás, para material físico y recursos manipulativos:\n• Ve al módulo **Material Didáctico**\n• Haz clic en 'Más información' sobre el recurso de interés\n• Ahí verás la ficha del producto, imágenes y disponibilidad por colegio\n\n¿Quieres que te muestre los productos disponibles para un colegio específico?";
       }
     },
 
@@ -326,23 +369,14 @@
     
     horarios: {
       pattern: /horario|atención|cuándo|disponible|abierto/i,
-      response: () => "🕐 Estamos disponibles durante horario laboral.\n\nPara consultas urgentes, contáctanos por:\n📱 WhatsApp: +57 301 345 6259 (disponible las 24/7)\n📧 Email: mathmindscol@gmail.com\n\n¿Necesitas otra información?"
+      response: () => "🕐 Estamos disponibles durante horario laboral.\n\nPara consultas urgentes, contáctanos por:\n📱 WhatsApp: +57 301 345 6259 \n📧 Email: mathmindscol@gmail.com\n\n¿Necesitas otra información?"
     },
     
     tienda: {
       pattern: /tienda|compra en línea|comprar online|plataforma|web|sitio|store|ecommerce/i,
       response: () => "🛒 **NUESTRA TIENDA EN LÍNEA:**\n\nEn la sección **TIENDA** de nuestro sitio web puedes:\n\n✅ Ver catálogo completo de productos\n✅ Filtrar por colegio y grado\n✅ Ver información detallada de cada producto\n✅ Agregar al carrito\n✅ Proceder al pago seguro\n\n**Nota:** El catálogo de materiales físicos y recursos está disponible también desde el módulo **Material Didáctico**; al pulsar 'Más información' en ese módulo verás el catálogo detallado y opciones para cada artículo.\n\n**Ventajas:**\n• Proceso rápido y seguro\n• Múltiples formas de pago\n• Confirmación inmediata\n• Seguimiento de tu pedido\n\n¿Necesitas ayuda para encontrar algo específico?"
     },
-
-    accederTienda: {
-      pattern: /cómo accedo a la tienda|como accedo a la tienda|entrar a la tienda|ir a la tienda|abrir la tienda|ver la tienda|acceder a la tienda/i,
-      response: () => "🛍️ **CÓMO ACCEDER A LA TIENDA:**\n\n1. Desde la página principal, haz clic en el menú y selecciona 'TIENDA'.\n2. También puedes ir al enlace directo de la tienda si lo tienes.\n3. Dentro de la tienda puedes filtrar por colegio y grado para ver productos específicos.\n4. Para materiales físicos, visita el módulo 'Material Didáctico' y pulsa 'Más información' para ver el catálogo detallado.\n\nSi quieres, dime tu colegio y grado y te muestro los productos recomendados."
-    },
-
-    verCatalogo: {
-      pattern: /catálogo|catalogo|ver catálogo|ver catalogo|mostrar catálogo|ver el catalogo|ver el catálogo|dónde está el catálogo|donde esta el catalogo/i,
-      response: () => "📚 **VER EL CATÁLOGO:**\n\nEl catálogo completo lo encuentras en la sección 'TIENDA' de nuestro sitio web.\n\nAdemás, para material físico y recursos manipulativos:\n• Ve al módulo **Material Didáctico**\n• Haz clic en 'Más información' sobre el recurso de interés\n• Ahí verás la ficha del producto, imágenes y disponibilidad por colegio\n\n¿Quieres que te muestre los productos disponibles para un colegio específico?"
-    },
+    
     
     grados: {
       pattern: /grado|curso|nivel|año|6to|7mo|8vo|9no|10mo|11ro|primaria|secundaria|básica|para niños|para estudiantes/i,
@@ -636,6 +670,56 @@
     // Función para obtener respuesta (soporta entradas con y sin tildes)
     function obtenerRespuesta(mensaje) {
       const respuestas = crearRespuestas();
+      const msgNorm = normalizeText((mensaje || '')).toLowerCase().trim();
+
+      // Manejo de seguimientos simples: catálogo -> preguntar colegio
+      if (lastQuestion === 'ask_colegio_catalog' || lastQuestion === 'expect_colegio_name') {
+        // Permitir cancelar o iniciar nuevo tema explícito
+        const cancelRegex = /^(cancelar|olvida(lo)?|olvidalo|otra pregunta|otra|nuevo|reiniciar|reset|salir)$/;
+        if (cancelRegex.test(msgNorm)) {
+          lastQuestion = null;
+          return "Entendido, dejamos ese tema. ¿En qué más puedo ayudarte?";
+        }
+
+        // Si el mensaje parece una nueva pregunta (comienza con palabras interrogativas),
+        // cancelamos el seguimiento y dejamos que el flujo normal lo procese.
+        const questionStartRegex = /^(como|cómo|que|qué|donde|dónde|cuando|cuándo|por qué|porque|quien|quién|cuanto|cuánto|precio|cuál|cual|tengo|necesito|quiero)\b/;
+        if (questionStartRegex.test(msgNorm)) {
+          lastQuestion = null;
+          // Continue to normal intent matching below
+        } else {
+          // Respuesta afirmativa corta
+          if (/^(si|siii|sii|s|sí|sip|claro|ok|vale)$/.test(msgNorm)) {
+            lastQuestion = 'expect_colegio_name';
+            return "Perfecto. ¿Cuál es tu colegio? Escríbelo (puedes escribir parte del nombre).";
+          }
+
+          // Respuesta negativa corta
+          if (/^(noo|nooo|no|nop|na)$/.test(msgNorm)) {
+            lastQuestion = null;
+            return "Entendido. Si necesitas otra cosa, dime.";
+          }
+
+          // Si el usuario escribió directamente el nombre del colegio, intentar resolverlo
+          const colegio = buscarColegioParcial(mensaje || msgNorm);
+          if (colegio) {
+            lastQuestion = null;
+            const src = (bd && bd.length) ? bd : (window.baseDeDatos || []);
+            const productos = [...new Set(src.filter(p => p.colegio === colegio).map(p => p.producto))].filter(Boolean).sort();
+            if (productos.length > 0) {
+              return `📚 En **${colegio}** disponemos de:\n\n${productos.map(p => `• ${p}`).join('\n')}\n\n¿Quieres conocer más sobre alguno?`;
+            }
+            return `No hay información de productos en ${colegio} en este momento.`;
+          }
+
+          // Si no entendimos
+          if (lastQuestion === 'expect_colegio_name') {
+            return "No reconocí el colegio. ¿Puedes escribir el nombre completo o una parte más clara del colegio?";
+          }
+          return "¿Quieres que te muestre los productos disponibles para un colegio específico? Responde 'si' o indica el nombre del colegio.";
+        }
+      }
+
       for (const key in respuestas) {
         const item = respuestas[key];
         if (item.pattern && patternMatches(item.pattern, mensaje)) {
@@ -651,6 +735,8 @@
       }
       return respuestas.default.response;
     }
+    // Exponer helper de prueba en ventana para facilitar debugging en consola
+    try { window.mm_test = obtenerRespuesta; } catch (e) { /* noop en entornos sin window */ }
     
     // Mensaje inicial
     setTimeout(() => {
