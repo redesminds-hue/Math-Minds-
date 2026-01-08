@@ -26,9 +26,28 @@
             border-bottom: 2px solid var(--black);
             display: flex;
             align-items: center;
+            gap: 20px;
         }
 
         .logo-mini { width: 80px; }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--black);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            padding: 8px 14px;
+            border: 1.5px solid var(--black);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .btn-back:hover {
+            background: var(--black);
+            color: #fff;
+        }
 
         /* Layout en dos columnas */
         .container-final {
@@ -142,7 +161,7 @@
 </head>
 <body>
 
-    <header class="header-mini"><img src="../Multimedia/Logo.png" alt="Logo" class="logo-mini"></header>
+    <header class="header-mini"><img src="../Multimedia/Logo.png" alt="Logo" class="logo-mini"><a href="pago.html" class="btn-back">← Regresar</a></header>
 
     <div class="container-final">
         <div class="card">
