@@ -269,6 +269,8 @@ if (menuBadges && menuBadges.length){
   start();
 })();
 
+// Products dataset will be loaded from products.json (GLOBAL)
+let PRODUCTS = [];
 
 // ===============================
 // MODALES (MENÚ + BOTONES CARRUSEL)
@@ -540,9 +542,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const HISTORY_KEY = 'mm_search_history_v1';
   const HISTORY_MAX = 8;
-
-  // Products dataset will be loaded from products.json
-  let PRODUCTS = [];
 
   function loadHistory(){
     try{
@@ -1370,7 +1369,9 @@ async function inicializarTienda() {
           const params = new URLSearchParams(window.location.search || '');
           const q = params.get('q');
           if (q) {
-            renderizarProductos(null, null, q);
+            // Decodificar la búsqueda si viene codificada
+            const decodedQ = decodeURIComponent(q);
+            renderizarProductos(null, null, decodedQ);
           } else {
             // If we're on productos page, do not auto-render all products —
             // require the user to select colegio/grado first.
@@ -1431,12 +1432,43 @@ function buildProductsFromDB(){
   try{
     const db = window.baseDeDatos || [];
     if (!db || db.length === 0) return;
-    PRODUCTS = db.map(r => ({
-      title: r.producto || '',
-      description: `${r.colegio || ''} • ${r.grado || ''}`,
-      tags: [],
-      image: chooseLogoForText(r.producto || '')
+    
+    // Primero, obtener productos únicos (sin duplicados)
+    const productosUnicos = new Map();
+    db.forEach(r => {
+      const productoNorm = (r.producto || '').toString().trim().toLowerCase();
+      if (!productoNorm) return;
+      
+      if (!productosUnicos.has(productoNorm)) {
+        productosUnicos.set(productoNorm, {
+          title: r.producto || '',
+          description: (r.producto || '').toString().trim(),
+          tags: ['producto'],
+          image: chooseLogoForText(r.producto || ''),
+          colegios: [],
+          grados: []
+        });
+      }
+      
+      // Agregar colegios y grados únicos
+      const item = productosUnicos.get(productoNorm);
+      const colegio = (r.colegio || '').toString().trim();
+      const grado = (r.grado || '').toString().trim();
+      
+      if (colegio && !item.colegios.includes(colegio)) {
+        item.colegios.push(colegio);
+      }
+      if (grado && !item.grados.includes(grado)) {
+        item.grados.push(grado);
+      }
+    });
+    
+    // Convertir map a array y mejorar la descripción
+    PRODUCTS = Array.from(productosUnicos.values()).map(p => ({
+      ...p,
+      description: p.description + (p.colegios.length > 0 ? ` • Disponible en ${p.colegios.length} colegio(s)` : '')
     }));
+    
     console.log('PRODUCTS built from baseDeDatos, items:', PRODUCTS.length);
   }catch(e){ console.error('buildProductsFromDB error', e); }
 }
