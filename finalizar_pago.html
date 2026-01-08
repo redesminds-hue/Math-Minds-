@@ -156,15 +156,28 @@
             <div id="datos-envio" class="datos-bloqueados"></div>
             
             <div class="form-group">
-                <label style="font-weight:700; font-size:12px;">NOMBRE DEL ESTUDIANTE</label>
-                <input type="text" id="studentName" class="input-estudiante" placeholder="Nombre completo">
+                <label style="font-weight:700; font-size:12px;">APELLIDO</label>
+                <input type="text" id="studentLastName" class="input-estudiante" placeholder="Apellido del estudiante">
+            </div>
+            <div class="form-group" style="margin-top:15px;">
+                <label style="font-weight:700; font-size:12px;">NOMBRE</label>
+                <input type="text" id="studentFirstName" class="input-estudiante" placeholder="Nombre del estudiante">
+            </div>
+            <div class="form-group" style="margin-top:15px;">
+                <label style="font-weight:700; font-size:12px;">GRADO</label>
+                <input type="text" id="studentGrade" class="input-estudiante" placeholder="Grado (ej. 4°)">
             </div>
             <div class="form-group" style="margin-top:15px;">
                 <label style="font-weight:700; font-size:12px;">DOCUMENTO DEL ESTUDIANTE (T.I.)</label>
                 <input type="text" id="studentDoc" class="input-estudiante" placeholder="Número de documento">
             </div>
+            <div class="form-group" style="margin-top:15px;">
+                <label style="font-weight:700; font-size:12px;">CORREO ELECTRÓNICO DEL ESTUDIANTE</label>
+                <input type="email" id="studentEmail" class="input-estudiante" placeholder="correo@ejemplo.com">
+            </div>
 
-            <button onclick="enviarWhatsApp()" class="btn-whatsapp">PAGAR</button>
+            <button id="payButton" onclick="enviarWhatsApp()" class="btn-whatsapp">PAGAR</button>
+            <div id="paymentStatus" style="display:none;margin-top:10px;font-weight:700;"></div> 
         </div>
     </div>
 
@@ -220,28 +233,108 @@
                 document.getElementById('lista-productos').innerHTML = rowsHtml;
                 document.getElementById('total-precio').innerText = `Total: $${total.toLocaleString()}`;
                 try{ localStorage.setItem('total_calc', total); }catch(e){}
+                // Prefill student data if available
+                try {
+                    if (entrega.curso) document.getElementById('studentGrade').value = entrega.curso;
+                    if (entrega.email) document.getElementById('studentEmail').value = entrega.email;
+                } catch(e){}
         }
 
-        function enviarWhatsApp() {
-            const entrega = JSON.parse(localStorage.getItem('datos_entrega'));
-            const sName = document.getElementById('studentName').value;
-            const sDoc = document.getElementById('studentDoc').value;
-            const total = localStorage.getItem('total_calc') || "Pendiente";
+        async function enviarWhatsApp() {
+            const entrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
+            const sLast = (document.getElementById('studentLastName').value || '').trim();
+            const sFirst = (document.getElementById('studentFirstName').value || '').trim();
+            const sGrade = (document.getElementById('studentGrade').value || '').trim();
+            const sDoc = (document.getElementById('studentDoc').value || '').trim();
+            const sEmail = (document.getElementById('studentEmail').value || '').trim();
+            const total = Number(localStorage.getItem('total_calc') || 0);
 
-            if(!sName || !sDoc) { alert("Completa los datos del estudiante"); return; }
+            if (!sLast || !sFirst || !sGrade || !sDoc || !sEmail) { alert("Completa todos los datos del estudiante (Apellido, Nombre, Grado, Documento y correo)."); return; }
+            if (!/\S+@\S+\.\S+/.test(sEmail)) { alert("Ingresa un correo electrónico válido para el estudiante."); return; }
 
-            const txt = `*NUEVO PEDIDO MATH MINDS*%0A%0A` +
-                        `*ACUDIENTE:* ${entrega.acudiente}%0A` +
-                        `*EMAIL:* ${entrega.email}%0A` +
-                        `*COLEGIO:* ${entrega.colegio}%0A` +
-                        `*CURSO:* ${entrega.curso}%0A%0A` +
-                        `*ESTUDIANTE:*%0A` +
-                        `- Nombre: ${sName}%0A` +
-                        `- Documento: ${sDoc}%0A%0A` +
-                        `*DIRECCIÓN:* ${entrega.direccion}%0A` +
-                        `*TOTAL:* $${total}`;
+            // Save student into datos_entrega for later reference
+            try{
+                entrega.student = { last: sLast, first: sFirst, grade: sGrade, doc: sDoc, email: sEmail };
+                localStorage.setItem('datos_entrega', JSON.stringify(entrega));
+            }catch(e){}
 
-            window.open(`https://wa.me/573132644265?text=${txt}`, '_blank');
+            // Wompi server endpoint (Apps Script). Set this to your deployed Apps Script URL.
+            const WOMPI_SERVER_URL = 'REPLACE_WITH_YOUR_APPS_SCRIPT_URL'; // e.g. https://script.google.com/macros/s/XXX/exec
+            const WOMPI_REDIRECT_URL = 'REPLACE_WITH_YOUR_REDIRECT_URL'; // e.g. https://tu-sitio.com/pago_exitoso.html
+
+            // If not configured, fallback to WhatsApp flow
+            if (!WOMPI_SERVER_URL || WOMPI_SERVER_URL.indexOf('REPLACE') === 0) {
+                const txt = `*NUEVO PEDIDO MATH MINDS*%0A%0A` +
+                            `*ACUDIENTE:* ${entrega.acudiente}%0A` +
+                            `*EMAIL:* ${entrega.email}%0A` +
+                            `*COLEGIO:* ${entrega.colegio}%0A` +
+                            `*CURSO:* ${entrega.curso}%0A%0A` +
+                            `*ESTUDIANTE:*%0A` +
+                            `- Apellido: ${sLast}%0A` +
+                            `- Nombre: ${sFirst}%0A` +
+                            `- Grado: ${sGrade}%0A` +
+                            `- Documento (T.I.): ${sDoc}%0A` +
+                            `- Correo: ${sEmail}%0A%0A` +
+                            `*DIRECCIÓN:* ${entrega.direccion}%0A` +
+                            `*TOTAL:* $${total}`;
+
+                window.open(`https://wa.me/573132644265?text=${txt}`, '_blank');
+                return;
+            }
+
+            // Create unique reference
+            const reference = `MM-${Date.now()}-${sDoc}`;
+            // amount in cents
+            const amount_cents = Math.round(total * 100);
+
+            try {
+                const payBtn = document.getElementById('payButton');
+                const statusEl = document.getElementById('paymentStatus');
+                if (payBtn) { payBtn.disabled = true; }
+                if (statusEl) { statusEl.style.display = 'block'; statusEl.innerText = 'Creando transacción, redirigiendo a la pasarela...'; }
+
+                const resp = await fetch(`${WOMPI_SERVER_URL}?action=create_wompi_txn`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: amount_cents,
+                        currency: 'COP',
+                        customer_email: sEmail,
+                        reference: reference,
+                        redirect_url: WOMPI_REDIRECT_URL,
+                        metadata: { document: sDoc, acudiente: entrega.acudiente, student: { last: sLast, first: sFirst } }
+                    })
+                });
+                const data = await resp.json().catch(()=>({}));
+                if (!data || data.status !== 'ok') {
+                    alert('Error creando la transacción: ' + (data && data.data && JSON.stringify(data.data) || JSON.stringify(data)));
+                    if (payBtn) payBtn.disabled = false;
+                    if (statusEl) { statusEl.innerText = 'Error creando transacción'; }
+                    return;
+                }
+
+                // Try to find checkout URL in response
+                var checkout = null;
+                if (data.data && data.data.data && data.data.data.attributes && data.data.data.attributes.checkout_url) checkout = data.data.data.attributes.checkout_url;
+                else if (data.data && data.data.data && data.data.data.checkout_url) checkout = data.data.data.checkout_url;
+                else if (data.data && data.data.attributes && data.data.attributes.checkout_url) checkout = data.data.attributes.checkout_url;
+
+                if (checkout) {
+                    // Save the reference in datos_entrega so webhook can match it
+                    try{ entrega.reference = reference; localStorage.setItem('datos_entrega', JSON.stringify(entrega)); }catch(e){}
+                    if (statusEl) { statusEl.innerText = 'Redirigiendo a la pasarela...'; }
+                    window.location.href = checkout;
+                } else {
+                    alert('No se pudo obtener la URL de pago. Respuesta: ' + JSON.stringify(data));
+                    if (payBtn) payBtn.disabled = false;
+                    if (statusEl) { statusEl.innerText = 'Error: no se obtuvo la URL de pago'; }
+                }
+
+            } catch (err) {
+                alert('Error al comunicarse con el servidor de pagos: ' + String(err));
+                if (payBtn) payBtn.disabled = false;
+                const statusEl = document.getElementById('paymentStatus'); if (statusEl) statusEl.innerText = 'Error de comunicación';
+            }
         }
         init();
     </script>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pago - Math Minds</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>body{font-family:Poppins, sans-serif;padding:30px;background:#f6f8f7} .card{background:#fff;padding:30px;border-radius:12px;border:2px solid #111;max-width:800px;margin:40px auto}</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Gracias por tu pago</h2>
+    <p id="info">Verificando estado de la transacción...</p>
+    <pre id="raw" style="white-space:pre-wrap;background:#f0f0f0;padding:12px;border-radius:8px;display:none"></pre>
+    <a href="index.html">Volver al inicio</a>
+  </div>
+
+  <script>
+    // Put your Apps Script URL (same one used in finalizar_pago.html)
+    const APPS_SCRIPT_URL = 'REPLACE_WITH_YOUR_APPS_SCRIPT_URL';
+
+    function getQueryParams(){
+      var qs = location.search.replace('?','').split('&').filter(Boolean); var out = {};
+      qs.forEach(function(p){ var p2 = p.split('='); out[decodeURIComponent(p2[0])] = decodeURIComponent((p2[1]||'').replace(/\+/g,' ')); });
+      return out;
+    }
+
+    async function check(){
+      const q = getQueryParams();
+      const infoEl = document.getElementById('info');
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('REPLACE')===0){ infoEl.innerText = 'La verificación automática no está configurada. Contacta al administrador.'; return; }
+      // Prefer reference param if present
+      const reference = q.reference || q.tx_reference || q.transaction_reference || '';
+      const transaction_id = q.transaction || q.tx || '';
+      if (!reference && !transaction_id){ infoEl.innerText = 'No se recibió referencia de transacción. Si tu pago fue exitoso, recibirás confirmación por correo.'; return; }
+
+      infoEl.innerText = 'Consultando estado en el servidor...';
+      try{
+        let attempts = 0; const maxAttempts = 12; // ~1 minute polling
+        while(attempts < maxAttempts){
+          const resp = await fetch(APPS_SCRIPT_URL + '?action=get_payment_status',{
+            method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ reference: reference, transaction_id: transaction_id })
+          });
+          const data = await resp.json().catch(()=>null);
+          if (data && data.status === 'ok'){
+            const last = data.results[data.results.length-1];
+            const status = last.values[6] || 'desconocido';
+            const receipt = last.values[9] || '';
+            infoEl.innerHTML = `Estado: <strong>${status}</strong>`;
+            if (receipt){ infoEl.innerHTML += `<br>Recibo enviado: ${receipt}`; document.getElementById('raw').style.display = 'block'; document.getElementById('raw').innerText = JSON.stringify(last.values, null, 2); return; }
+            if (['APPROVED','PAID','AUTHORIZED'].indexOf(String(status).toUpperCase()) !== -1){ infoEl.innerHTML += '<br>Pago aprobado — esperando envío de recibo...'; }
+          } else {
+            infoEl.innerText = 'Estado no encontrado aún. Esperando...';
+          }
+          attempts++; await new Promise(r=>setTimeout(r,5000));
+        }
+        infoEl.innerText += '\nNo se confirmó el pago aún. Si pagaste, espera unos segundos y recarga la página.';
+      }catch(e){ infoEl.innerText = 'Error verificando transacción: '+String(e); }
+    }
+
+    check();
+  </script>
+</body>
+</html>
