@@ -40,6 +40,41 @@
     return items.slice(0, -1).join(', ') + ' y ' + items[items.length - 1];
   }
 
+  // Función para obtener grados únicos
+  function obtenerGrados() {
+    if (!bd || bd.length === 0) return [];
+    return [...new Set(bd.map(p => p.grado))].filter(Boolean).sort();
+  }
+
+  // Función para obtener grados por producto
+  function obtenerGradosPorProducto(nombreProducto) {
+    if (!bd || bd.length === 0) return [];
+    const productosFiltered = bd.filter(p => 
+      (p.producto || '').toLowerCase().includes(nombreProducto.toLowerCase())
+    );
+    return [...new Set(productosFiltered.map(p => p.grado))].filter(Boolean).sort();
+  }
+
+  // Función para buscar colegio parcialmente
+  function buscarColegioParcial(busqueda) {
+    const colegios = obtenerColegios();
+    const busquedaLower = busqueda.toLowerCase().trim();
+    
+    // Búsqueda exacta primero
+    let encontrado = colegios.find(c => c.toLowerCase() === busquedaLower);
+    if (encontrado) return encontrado;
+    
+    // Búsqueda parcial (contiene)
+    encontrado = colegios.find(c => c.toLowerCase().includes(busquedaLower));
+    if (encontrado) return encontrado;
+    
+    // Búsqueda inversa (el colegio contiene la búsqueda)
+    encontrado = colegios.find(c => busquedaLower.includes(c.toLowerCase()));
+    if (encontrado) return encontrado;
+    
+    return null;
+  }
+
   // Respuestas dinámicas del chatbot
   const crearRespuestas = () => ({
     queEsMathMinds: {
@@ -51,12 +86,12 @@
     
     saludo: {
       pattern: /hola|hi|buenos días|buenas tardes|buenos días|buenas noches|hoe|hey|qué tal|¿qué hay/i,
-      response: () => "¡Hola! 👋 Bienvenido a Math Minds.\n\n¿En qué puedo ayudarte? Algunos temas que puedo atender:\n\n• 🛒 Cómo comprar productos\n• 📚 Información sobre ALEKS, Reveal, Prime\n• 🏫 Colegios con convenio\n• 💰 Precios y métodos de pago\n• 📞 Contacto y horarios\n• 🎓 Beneficios educativos\n\n¡Escribe tu pregunta o di 'menú' para ver más opciones! 😊"
+      response: () => "¡Hola! 👋 Bienvenido a Math Minds.\n\n¿En qué puedo ayudarte? Algunos temas que puedo atender:\n\n• 🛒 Cómo comprar productos\n• 📚 Información sobre ALEKS, Reveal, Prime\n• 🏫 Colegios con convenio\n• � Métodos de pago\n• 📞 Contacto y horarios\n• 🎓 Beneficios educativos\n\n¡Escribe tu pregunta o di 'menú' para ver más opciones! 😊"
     },
     
     productos: {
       pattern: /productos|qué venden|qué ofrecen|tienda|comprar|catálogo|¿qué tiene/i,
-      response: () => {
+      response: (mensaje) => {
         const productos = obtenerProductos();
         if (productos.length > 0) {
           return `📚 Nuestros productos disponibles son:\n\n${productos.map(p => `• ${p}`).join('\n')}\n\n¿Quieres saber más sobre alguno de estos productos?`;
@@ -64,15 +99,67 @@
         return "Ofrecemos productos educativos de matemáticas como ALEKS, Reveal Math, Prime y Material Didáctico. ¿Cuál te interesa?";
       }
     },
+
+    consultaProducto: {
+      pattern: /qué (tienen|tiene|hay|ofrecen|venden) (de|sobre|en) (aleks|reveal|prime|material)/i,
+      response: (mensaje) => {
+        const productos = obtenerProductos();
+        let productoEncontrado = null;
+        
+        // Buscar qué producto se menciona
+        for (let producto of productos) {
+          if (mensaje.toLowerCase().includes(producto.toLowerCase())) {
+            productoEncontrado = producto;
+            break;
+          }
+        }
+        
+        if (!productoEncontrado) {
+          // Búsqueda parcial
+          const palabras = mensaje.toLowerCase().split(/\s+/);
+          for (let palabra of palabras) {
+            if (palabra.length > 3) {
+              productoEncontrado = productos.find(p => p.toLowerCase().includes(palabra));
+              if (productoEncontrado) break;
+            }
+          }
+        }
+        
+        if (productoEncontrado) {
+          const colegios = obtenerColegiosPorProducto(productoEncontrado);
+          const grados = obtenerGradosPorProducto(productoEncontrado);
+          
+          let respuesta = `📚 **${productoEncontrado}**\n\n`;
+          
+          if (colegios.length > 0) {
+            respuesta += `📍 **Disponible en colegios:**\n${colegios.map(c => `• ${c}`).join('\n')}\n\n`;
+          }
+          
+          if (grados.length > 0) {
+            respuesta += `📖 **Grados:** ${grados.join(', ')}\n\n`;
+          }
+          
+          respuesta += `¿Quieres más información o deseas comprarlo?`;
+          return respuesta;
+        }
+        
+        const productosStr = productos.slice(0, 4).join(', ');
+        return `¿Qué producto te interesa? Tenemos: ${productosStr}`;
+      }
+    },
     
     aleks: {
       pattern: /\baleks\b/i,
       response: (mensaje) => {
         const colegios = obtenerColegiosPorProducto('ALEKS');
+        const grados = obtenerGradosPorProducto('ALEKS');
         let respuesta = "🤖 **ALEKS** es una plataforma de aprendizaje adaptativo que utiliza inteligencia artificial para personalizar el currículo.\n\nCaracterísticas:\n• Instrucción paso a paso\n• Práctica ilimitada\n• Evaluaciones precisas\n• IA personalizada para cada estudiante";
         
         if (colegios.length > 0) {
           respuesta += `\n\n📍 Disponible en: ${formatearLista(colegios)}`;
+        }
+        if (grados.length > 0) {
+          respuesta += `\n📖 Para grados: ${grados.join(', ')}`;
         }
         
         return respuesta;
@@ -83,10 +170,14 @@
       pattern: /reveal|reveal math/i,
       response: (mensaje) => {
         const colegios = obtenerColegiosPorProducto('Reveal');
+        const grados = obtenerGradosPorProducto('Reveal');
         let respuesta = "📖 **Reveal Math** es un programa interactivo que combina enseñanza basada en investigación con tecnología digital.\n\nIncluye:\n• Lecciones en video interactivas\n• Actividades prácticas\n• Evaluaciones continuas\n• Desde kindergarten hasta secundaria";
         
         if (colegios.length > 0) {
           respuesta += `\n\n📍 Disponible en: ${formatearLista(colegios)}`;
+        }
+        if (grados.length > 0) {
+          respuesta += `\n📖 Para grados: ${grados.join(', ')}`;
         }
         
         return respuesta;
@@ -97,10 +188,14 @@
       pattern: /\bprime\b/i,
       response: (mensaje) => {
         const colegios = obtenerColegiosPorProducto('Prime');
+        const grados = obtenerGradosPorProducto('Prime');
         let respuesta = "📕 **Prime** es una serie de libros de matemáticas para secundaria diseñada con rigor académico.\n\nOfrece:\n• Enfoque integral y riguroso\n• Ejercicios prácticos y variados\n• Aplicaciones reales de conceptos\n• Desarrollo de pensamiento crítico";
         
         if (colegios.length > 0) {
           respuesta += `\n\n📍 Disponible en: ${formatearLista(colegios)}`;
+        }
+        if (grados.length > 0) {
+          respuesta += `\n📖 Para grados: ${grados.join(', ')}`;
         }
         
         return respuesta;
@@ -111,10 +206,14 @@
       pattern: /material didáctico|material concreto|didáctico/i,
       response: (mensaje) => {
         const colegios = obtenerColegiosPorProducto('Material');
+        const grados = obtenerGradosPorProducto('Material');
         let respuesta = "🧮 **Material Didáctico** incluye recursos físicos y manipulativos para facilitar el aprendizaje práctico.\n\nIncluye:\n• Bloques y figuras geométricas\n• Juegos matemáticos interactivos\n• Herramientas manipulativas\n• Experiencia hands-on para conceptos abstractos";
         
         if (colegios.length > 0) {
           respuesta += `\n\n📍 Disponible en: ${formatearLista(colegios)}`;
+        }
+        if (grados.length > 0) {
+          respuesta += `\n📖 Para grados: ${grados.join(', ')}`;
         }
         
         return respuesta;
@@ -133,23 +232,44 @@
     },
     
     productoPorColegio: {
-      pattern: /qué productos.*hay|qué venden en|en .+ hay|tiene .+ en/i,
+      pattern: /qué productos.*hay|qué venden en|en .+ hay|tiene .+ en|del colegio|de .+ colegio|en mi colegio/i,
       response: (mensaje) => {
         // Intentar extraer el nombre del colegio del mensaje
         const colegios = obtenerColegios();
+        
+        // Extraer posibles nombres de colegios del mensaje
+        let colegioEncontrado = null;
         for (let colegio of colegios) {
           if (mensaje.toLowerCase().includes(colegio.toLowerCase())) {
-            const productos = [...new Set(bd
-              .filter(p => p.colegio === colegio)
-              .map(p => p.producto)
-            )].filter(Boolean).sort();
-            
-            if (productos.length > 0) {
-              return `📚 En **${colegio}** disponemos de:\n\n${productos.map(p => `• ${p}`).join('\n')}\n\n¿Quieres conocer más sobre alguno?`;
-            }
-            return `No hay información de productos en ${colegio} en este momento.`;
+            colegioEncontrado = colegio;
+            break;
           }
         }
+        
+        // Si no encuentra exacto, intentar búsqueda más flexible
+        if (!colegioEncontrado) {
+          // Extraer palabras clave del mensaje
+          const palabras = mensaje.toLowerCase().split(/\s+/);
+          for (let palabra of palabras) {
+            if (palabra.length > 3) {
+              colegioEncontrado = buscarColegioParcial(palabra);
+              if (colegioEncontrado) break;
+            }
+          }
+        }
+        
+        if (colegioEncontrado) {
+          const productos = [...new Set(bd
+            .filter(p => p.colegio === colegioEncontrado)
+            .map(p => p.producto)
+          )].filter(Boolean).sort();
+          
+          if (productos.length > 0) {
+            return `📚 En **${colegioEncontrado}** disponemos de:\n\n${productos.map(p => `• ${p}`).join('\n')}\n\n¿Quieres conocer más sobre alguno?`;
+          }
+          return `No hay información de productos en ${colegioEncontrado} en este momento.`;
+        }
+        
         return `Para saber qué productos tenemos en tu colegio, menciona su nombre. Nuestros colegios son: ${formatearLista(colegios)}`;
       }
     },
@@ -159,14 +279,33 @@
       response: (mensaje) => {
         // Intentar extraer el producto del mensaje
         const productos = obtenerProductos();
+        let productoEncontrado = null;
+        
+        // Búsqueda exacta
         for (let producto of productos) {
           if (mensaje.toLowerCase().includes(producto.toLowerCase())) {
-            const colegios = obtenerColegiosPorProducto(producto);
-            if (colegios.length > 0) {
-              return `📍 **${producto}** está disponible en:\n\n${colegios.map(c => `• ${c}`).join('\n')}\n\n¿Necesitas más información sobre este producto?`;
-            }
-            return `No tenemos información sobre ${producto} en nuestros colegios en este momento.`;
+            productoEncontrado = producto;
+            break;
           }
+        }
+        
+        // Si no encuentra, intentar búsqueda parcial
+        if (!productoEncontrado) {
+          const palabras = mensaje.toLowerCase().split(/\s+/);
+          for (let palabra of palabras) {
+            if (palabra.length > 3) {
+              productoEncontrado = productos.find(p => p.toLowerCase().includes(palabra));
+              if (productoEncontrado) break;
+            }
+          }
+        }
+        
+        if (productoEncontrado) {
+          const colegios = obtenerColegiosPorProducto(productoEncontrado);
+          if (colegios.length > 0) {
+            return `📍 **${productoEncontrado}** está disponible en:\n\n${colegios.map(c => `• ${c}`).join('\n')}\n\n¿Necesitas más información sobre este producto?`;
+          }
+          return `No tenemos información sobre ${productoEncontrado} en nuestros colegios en este momento.`;
         }
         
         // Si no encontró producto específico, pedir que mencione cuál
@@ -175,9 +314,9 @@
       }
     },
     
-    precio: {
-      pattern: /precio|costo|cuánto|cuánto cuesta|valor|caro|económico|presupuesto|cotización|cuota|arancel|paquete|promoción/i,
-      response: () => "💰 **INFORMACIÓN DE PRECIOS:**\n\nLos precios varían según:\n• Producto seleccionado\n• Cantidad de usuarios/licencias\n• Duración (mensual, trimestral, anual)\n• Tu colegio o institución\n\n**¿Quieres una cotización?**\n📱 WhatsApp: +57 301 345 6259 (Rápido)\n📧 Email: mathmindscol@gmail.com\n☎️ Teléfono: +57 301 345 6259\n\n¿Sobre qué producto necesitas información?"
+    pago: {
+      pattern: /pago|pagar|formas de pago|tarjeta|cómo pagar|método|transferencia|efectivo|bancario|nequi|daviplata|precio|costo|cuánto|cuánto cuesta/i,
+      response: () => "💳 **MÉTODOS DE PAGO DISPONIBLES:**\n\n✅ Tarjeta de crédito/débito\n✅ Transferencia bancaria\n✅ Nequi/Daviplata\n✅ Efectivo (coordinando directamente)\n\n**Para información y cotizaciones:**\n📱 WhatsApp: +57 301 345 6259\n📧 Email: mathmindscol@gmail.com\n☎️ Teléfono: +57 301 345 6259\n\nNuestro equipo te dará los mejores precios según tu necesidad. 😊"
     },
     
     contacto: {
@@ -197,7 +336,20 @@
     
     grados: {
       pattern: /grado|curso|nivel|año|6to|7mo|8vo|9no|10mo|11ro|primaria|secundaria|básica|para niños|para estudiantes/i,
-      response: () => "📚 **GRADOS QUE ATENDEMOS:**\n\n✅ Primaria (grados 1-5)\n✅ Secundaria (grados 6-11)\n\n**Disponibilidad por grado:**\nCada producto está disponible en diferentes grados según tu colegio. Algunos como ALEKS y Reveal cubren desde primaria, mientras que Prime es más para secundaria.\n\n**¿Cuál es tu grado?**\nCuéntame el grado y el colegio para recomendarte el mejor producto. 📖"
+      response: () => {
+        const grados = obtenerGrados();
+        let respuesta = "📚 **GRADOS QUE ATENDEMOS:**\n\n";
+        
+        if (grados.length > 0) {
+          respuesta += `${grados.map(g => `✅ ${g}`).join('\n')}\n\n`;
+        } else {
+          respuesta += `✅ Primaria (grados 1-5)\n✅ Secundaria (grados 6-11)\n\n`;
+        }
+        
+        respuesta += `**Disponibilidad por grado:**\nCada producto está disponible en diferentes grados según tu colegio. Algunos como ALEKS y Reveal cubren desde primaria, mientras que Prime es más para secundaria.\n\n**¿Cuál es tu grado?**\nCuéntame el grado y el colegio para recomendarte el mejor producto. 📖`;
+        
+        return respuesta;
+      }
     },
     
     beneficios: {
@@ -474,25 +626,20 @@
   
   // Esperar a que la base de datos esté disponible
   function esperarBaseDatos() {
-    if (window.baseDeDatos && window.baseDeDatos.length > 0) {
-      bd = window.baseDeDatos;
-      crearChatbot();
-    } else {
-      // Escuchar el evento cuando la base de datos esté lista
-      window.addEventListener('baseDeDatosReady', () => {
-        bd = window.baseDeDatos || [];
-        if (document.getElementById('mm-chatbot-container')) return; // Ya creado
-        crearChatbot();
-      }, { once: true });
-      
-      // Fallback: crear chatbot después de un tiempo aunque no haya BD
-      setTimeout(() => {
-        if (!document.getElementById('mm-chatbot-container')) {
-          bd = window.baseDeDatos || [];
-          crearChatbot();
-        }
-      }, 3000);
-    }
+    // Crear chatbot inmediatamente
+    crearChatbot();
+    
+    // Escuchar el evento cuando la base de datos esté lista
+    window.addEventListener('baseDeDatosReady', () => {
+      bd = window.baseDeDatos || [];
+    });
+    
+    // También revisar si ya está disponible
+    setTimeout(() => {
+      if (window.baseDeDatos && window.baseDeDatos.length > 0) {
+        bd = window.baseDeDatos;
+      }
+    }, 500);
   }
   
   // Inicializar cuando el DOM esté listo
