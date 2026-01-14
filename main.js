@@ -322,6 +322,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   window.closeModal = closeModal;
 
+
+  
   // Función para abrir modal de producto
   function openProductModal(productName, colegio, grado) {
     const modal = document.getElementById('productModal');
@@ -389,6 +391,10 @@ document.addEventListener("DOMContentLoaded", () => {
       imgSrc = '../Multimedia/FRACTION TILES.png';
     } else if (nombreNorm.includes('counters')) {
       imgSrc = '../Multimedia/COUNTERS.png';
+     } else if (nombreNorm.includes('prime mathematics kb') && nombreNorm.includes('editorial scholastic')) {
+      imgSrc = '../Multimedia/PRIME KB.png';
+    } else if (nombreNorm.includes('geoplano') && nombreNorm.includes('plastico')) {
+      imgSrc = '../Multimedia/GEOBOARD.png';
     } else if (nombreNorm.includes('prime mathematics 1 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) { 
       imgSrc = '../Multimedia/PRIME 1.png';
     } else if (nombreNorm.includes('prime mathematics 2 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
@@ -399,13 +405,10 @@ document.addEventListener("DOMContentLoaded", () => {
       imgSrc = '../Multimedia/PRIME 4.png'; 
     } else if (nombreNorm.includes('prime mathematics 5 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
       imgSrc = '../Multimedia/PRIME 5.png';
-    } else if (nombreNorm.includes('prime mathematics kb') && nombreNorm.includes('editorial scholastic')) {
-      imgSrc = '../Multimedia/PRIME KB.png';
-    } else if (nombreNorm.includes('geoplano') && nombreNorm.includes('plastico')) {
-      imgSrc = '../Multimedia/GEOBOARD.png';
     }
+   
   
-    // Seleccionar logo pequeño según el producto
+    // LOGOS 
     let logoSrc = '../Multimedia/Logotipo_MathMinds.png';
     if (nombreLower.includes('prime')) {
       logoSrc = '../Multimedia/Logo_Prime.png';
