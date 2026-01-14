@@ -312,6 +312,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function closeModal(modal){
     modal.classList.remove("active");
+    // Blur any focused element inside the modal to avoid aria-hidden warning
+    if (document.activeElement && modal.contains(document.activeElement)) {
+        document.activeElement.blur();
+    }
     modal.setAttribute("aria-hidden", "true");
     modal.setAttribute('inert', '');
     unlockBodyScroll();
@@ -344,17 +348,73 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Seleccionar imagen según el producto
-    const nombreLower = actualProductName.toLowerCase();
+    // Seleccionar imagen representativa según el producto
+    const nombreLower = actualProductName.toLowerCase().trim();
     let imgSrc = '../Multimedia/Logotipo_MathMinds.png';
-    if (nombreLower.includes('prime')) {
-      imgSrc = '../Multimedia/Logo_Prime.png';
-    } else if (nombreLower.includes('reveal')) {
-      imgSrc = '../Multimedia/Logo_Reveal_Math.png';
-    } else if (nombreLower.includes('aleks')) {
-      imgSrc = '../Multimedia/ALEKS.jpeg';
-    } else if (nombreLower.includes('didactico') || nombreLower.includes('material')) {
+    
+    // Limpiar espacios extra y normalizar búsqueda
+    const nombreNorm = nombreLower.replace(/\s+/g, ' ');
+    
+    if (nombreNorm.includes('reveal math student edition grade k volumen 1')) {
+      imgSrc = '../Multimedia/REVEAL MATH GRADE K VOLUME 1.png';
+    } else if (nombreNorm.includes('reveal math student edition grade k volumen 2')) {
+      imgSrc = '../Multimedia/REVEAL MATH GRADE K VOLUME 2.png';
+    } else if (nombreNorm.includes('reveal math student edition grado 1 volumen 2')) {
+      imgSrc = '../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png';
+    } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('1º'))  {
+      imgSrc = '../Multimedia/PRIME 1.png';
+    } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('2º')) {
+      imgSrc = '../Multimedia/PRIME 2.png'; 
+    } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('3º')) {
+      imgSrc = '../Multimedia/PRIME 3.png'; 
+    } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('4º')) {
+      imgSrc = '../Multimedia/PRIME 4.png'; 
+    } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('5º')) {
+      imgSrc = '../Multimedia/PRIME 5.png';
+    } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('ka y kb')) {
+      imgSrc = '../Multimedia/PRIME KA KB.png';
+    } else if (nombreNorm.includes('reveal')) {
+      imgSrc = '../Multimedia/LIBROS REVEAL MATH.png';
+    } else if (nombreNorm.includes('aleks')) {
+      imgSrc = '../Multimedia/ALEKS IMAGEN.png';
+    } else if (nombreNorm.includes('didactico') || nombreNorm.includes('material')) {
       imgSrc = '../Multimedia/MaterialDidactico.png';
+    } else if (nombreNorm.includes('snap') || nombreNorm.includes('anap')) {
+      imgSrc = '../Multimedia/Snap Cubes.png';
+    } else if (nombreNorm.includes('connecting cubes') || nombreNorm.includes('anap')) {
+      imgSrc = '../Multimedia/CONNECTING CUBES.png';
+    } else if (nombreNorm.includes('base ten blocks') && nombreNorm.includes('set')) {
+      imgSrc = '../Multimedia/BASE TEN BLOCKS SET.png';
+    } else if (nombreNorm.includes('fraction tiles') && nombreNorm.includes('set')) {
+      imgSrc = '../Multimedia/FRACTION TILES.png';
+    } else if (nombreNorm.includes('counters')) {
+      imgSrc = '../Multimedia/COUNTERS.png';
+    } else if (nombreNorm.includes('prime mathematics 1 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) { 
+      imgSrc = '../Multimedia/PRIME 1.png';
+    } else if (nombreNorm.includes('prime mathematics 2 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+      imgSrc = '../Multimedia/PRIME 2.png'; 
+    } else if (nombreNorm.includes('prime mathematics 3 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+      imgSrc = '../Multimedia/PRIME 3.png'; 
+    } else if (nombreNorm.includes('prime mathematics 4 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+      imgSrc = '../Multimedia/PRIME 4.png'; 
+    } else if (nombreNorm.includes('prime mathematics 5 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+      imgSrc = '../Multimedia/PRIME 5.png';
+    } else if (nombreNorm.includes('prime mathematics kb') && nombreNorm.includes('editorial scholastic')) {
+      imgSrc = '../Multimedia/PRIME KB.png';
+    } else if (nombreNorm.includes('geoplano') && nombreNorm.includes('plastico')) {
+      imgSrc = '../Multimedia/GEOBOARD.png';
+    }
+  
+    // Seleccionar logo pequeño según el producto
+    let logoSrc = '../Multimedia/Logotipo_MathMinds.png';
+    if (nombreLower.includes('prime')) {
+      logoSrc = '../Multimedia/Logo_Prime.png';
+    } else if (nombreLower.includes('reveal')) {
+      logoSrc = '../Multimedia/Logo_Reveal_Math.png';
+    } else if (nombreLower.includes('aleks')) {
+      logoSrc = '../Multimedia/ALEKS.jpeg';
+    } else if (nombreLower.includes('didactico') || nombreLower.includes('material')) {
+      logoSrc = '../Multimedia/MaterialDidactico.png';
     }
 
     // Obtener descripción del producto
@@ -364,13 +424,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Crear contenido del modal
     let contentHTML = `
-      <img src="${imgSrc}" alt="${actualProductName}" width="100" style="margin-bottom: 20px;">
-      <h2>${actualProductName}</h2>
-      <p class="modal-subtitle">Información del producto</p>
-      <p><strong>Colegio:</strong> ${colegio}</p>
+      <div style="position: relative; padding-top: 90px;">
+        <img src="${logoSrc}" alt="Logo ${actualProductName}" style="position: absolute; top: 10px; left: 10px; width: 80px; height: auto; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2>${actualProductName}</h2>
+        <img src="${imgSrc}" alt="${actualProductName}" width="350" style="display: block; margin: 20px auto 30px auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <p><strong>Colegio:</strong> ${colegio}</p>
       <p><strong>Grado:</strong> ${grado}</p>
       <p><strong>Precio:</strong> ${precio}</p>
-      <p style="margin-bottom: 20px; line-height: 1.6;">${finalDescription}</p>`;
+      <p style="margin-bottom: 20px; line-height: 1.6;">${finalDescription}</p></div>`;
 
     if (colegio === '') {
       // Mostrar selectores para colegio y grado
