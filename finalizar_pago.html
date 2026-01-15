@@ -291,7 +291,7 @@
             }catch(e){}
 
             // Wompi server endpoint (Apps Script). Set this to your deployed Apps Script URL.
-            const WOMPI_SERVER_URL = 'https://script.google.com/macros/s/AKfycbzE7Fx8oJHQIVy6c95lpHpBQJBc_iM0vW6_dvakGAYgIcKNrElzNvH8VmzLXTZ0qJ4mHg/exec'; // e.g. https://script.google.com/macros/s/XXX/exec
+            const WOMPI_SERVER_URL = 'https://script.google.com/macros/s/AKfycbxQiGqfPfFeGqN8_-kUP7pFqJvyjCNoLHptz1vx5mqGDvxKz8VmA6fmO2wQzQhDVH4GIA/exec'; // e.g. https://script.google.com/macros/s/XXX/exec
             const WOMPI_REDIRECT_URL = 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html'; // e.g. https://tu-sitio.com/pago_exitoso.html
 
             // If not configured, fallback to WhatsApp flow
@@ -310,7 +310,7 @@
                             `*DIRECCIÓN:* ${entrega.direccion}%0A` +
                             `*TOTAL:* $${total}`;
 
-                window.open(`https://wa.me/573132644265?text=${txt}`, '_blank');
+                window.open(``, '_blank');
                 return;
             }
 
