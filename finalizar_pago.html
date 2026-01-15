@@ -327,28 +327,31 @@
                 if (payBtn) { payBtn.disabled = true; }
                 if (statusEl) { statusEl.style.display = 'block'; statusEl.innerText = 'Creando transacción, redirigiendo a la pasarela...'; }
 
-                const resp = await fetch(`${WOMPI_SERVER_URL}?action=create_wompi_txn`, {
+                // Use URLSearchParams to avoid CORS preflight
+                const data = new URLSearchParams();
+                data.append('action', 'create_wompi_txn');
+                data.append('amount', amount_cents);
+                data.append('currency', 'COP');
+                data.append('customer_email', sEmail);
+                data.append('reference', reference);
+                data.append('redirect_url', WOMPI_REDIRECT_URL);
+                data.append('payment_method', paymentMethod);
+                data.append('full_name', `${sFirst} ${sLast}`.trim());
+                data.append('phone_number', entrega.telefono || '');
+                data.append('legal_id', sDoc);
+                data.append('legal_id_type', 'CC');
+
+                const resp = await fetch(WOMPI_SERVER_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: amount_cents,
-                        currency: 'COP',
-                        customer_email: sEmail,
-                        reference: reference,
-                        redirect_url: WOMPI_REDIRECT_URL,
-                        payment_method: paymentMethod,
-                        customer_data: {
-                            full_name: `${sFirst} ${sLast}`.trim(),
-                            phone_number: entrega.telefono || '',
-                            legal_id: sDoc,
-                            legal_id_type: 'CC'
-                        },
-                        metadata: { document: sDoc, acudiente: entrega.acudiente, student: { last: sLast, first: sFirst } }
-                    })
+                    body: data
                 });
-                const data = await resp.json().catch(()=>({}));
-                if (!data || data.status !== 'ok') {
-                    alert('Error creando la transacción: ' + (data && data.data && JSON.stringify(data.data) || JSON.stringify(data)));
+                
+                const respText = await resp.text();
+                let dataRes = {};
+                try { dataRes = JSON.parse(respText); } catch(e) { dataRes = { raw: respText }; }
+                
+                if (!dataRes || dataRes.status !== 'ok') {
+                    alert('Error creando la transacción: ' + (dataRes && dataRes.data && JSON.stringify(dataRes.data) || JSON.stringify(dataRes)));
                     const payBtn = document.getElementById('payButton');
                     if (payBtn) payBtn.disabled = false;
                     if (statusEl) { statusEl.innerText = 'Error creando transacción'; }
@@ -357,9 +360,10 @@
 
                 // Try to find checkout URL in response
                 var checkout = null;
-                if (data.data && data.data.data && data.data.data.attributes && data.data.data.attributes.checkout_url) checkout = data.data.data.attributes.checkout_url;
-                else if (data.data && data.data.data && data.data.data.checkout_url) checkout = data.data.data.checkout_url;
-                else if (data.data && data.data.attributes && data.data.attributes.checkout_url) checkout = data.data.attributes.checkout_url;
+                if (dataRes.data && dataRes.data.data && dataRes.data.data.attributes && dataRes.data.data.attributes.checkout_url) checkout = dataRes.data.data.attributes.checkout_url;
+                else if (dataRes.data && dataRes.data.data && dataRes.data.data.checkout_url) checkout = dataRes.data.data.checkout_url;
+                else if (dataRes.data && dataRes.data.attributes && dataRes.data.attributes.checkout_url) checkout = dataRes.data.attributes.checkout_url;
+                else if (dataRes.data && dataRes.data.checkout_url) checkout = dataRes.data.checkout_url;
 
                 if (checkout) {
                     // Save the reference in datos_entrega so webhook can match it
@@ -367,7 +371,7 @@
                     if (statusEl) { statusEl.innerText = 'Redirigiendo a la pasarela...'; }
                     window.location.href = checkout;
                 } else {
-                    alert('No se pudo obtener la URL de pago. Respuesta: ' + JSON.stringify(data));
+                    alert('No se pudo obtener la URL de pago. Respuesta: ' + JSON.stringify(dataRes));
                     const payBtn = document.getElementById('payButton');
                     if (payBtn) payBtn.disabled = false;
                     if (statusEl) { statusEl.innerText = 'Error: no se obtuvo la URL de pago'; }
