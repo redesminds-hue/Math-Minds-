@@ -30,22 +30,24 @@ function doPost(e) {
     // Detect Wompi webhook payloads (they contain 'event' and/or data.object.transaction)
     if (data && (data.event || (data.data && data.data.object && data.data.object.transaction) || data.type)) {
       handleWompiWebhook(data);
-      return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeader('Access-Control-Allow-Origin', '*')
-        .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-        .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      var output = ContentService.createTextOutput(JSON.stringify({ status: 'ok' }));
+      output.setMimeType(ContentService.MimeType.JSON);
+      output.setHeader('Access-Control-Allow-Origin', '*');
+      output.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+      output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      return output;
     }
 
     // Fallback: treat as form submission and append to 'Registros' (original behaviour)
     return appendSubmissionToSheet(data);
 
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeader('Access-Control-Allow-Origin', '*')
-      .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-      .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    var output = ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.message }));
+    output.setMimeType(ContentService.MimeType.JSON);
+    output.setHeader('Access-Control-Allow-Origin', '*');
+    output.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return output;
   }
 }
 
@@ -86,11 +88,12 @@ function appendSubmissionToSheet(data) {
   ];
   sheet.appendRow(row);
 
-  return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  var output = ContentService.createTextOutput(JSON.stringify({ status: 'ok' }));
+  output.setMimeType(ContentService.MimeType.JSON);
+  output.setHeader('Access-Control-Allow-Origin', '*');
+  output.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return output;
 }
 
 // Create transaction at Wompi
@@ -101,11 +104,12 @@ function createWompiTransaction(body) {
   var url = sandbox ? 'https://sandbox.wompi.co/v1/transactions' : 'https://production.wompi.co/v1/transactions';
 
   if (!privateKey) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'WOMPI_PRIVATE_KEY not set in Script Properties' }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeader('Access-Control-Allow-Origin', '*')
-      .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-      .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    var output = ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'WOMPI_PRIVATE_KEY not set in Script Properties' }));
+    output.setMimeType(ContentService.MimeType.JSON);
+    output.setHeader('Access-Control-Allow-Origin', '*');
+    output.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return output;
   }
 
   var amount = Number(body.amount) || 0; // amount in cents
@@ -135,11 +139,12 @@ function createWompiTransaction(body) {
   try { parsed = JSON.parse(resText); } catch(e) { parsed = { raw: resText }; }
 
   // Return Wompi response to client
-  return ContentService.createTextOutput(JSON.stringify({ status: (code >= 200 && code < 300) ? 'ok' : 'error', code: code, data: parsed }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  var output = ContentService.createTextOutput(JSON.stringify({ status: (code >= 200 && code < 300) ? 'ok' : 'error', code: code, data: parsed }));
+  output.setMimeType(ContentService.MimeType.JSON);
+  output.setHeader('Access-Control-Allow-Origin', '*');
+  output.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return output;
 }
 
 // Handle Wompi webhooks: log to 'Pagos', update 'Registros' and send receipt email when approved
@@ -356,16 +361,20 @@ function getPaymentStatus(data) {
       rows.push({ index: i+1, values: row });
     }
   }
-  if (!rows.length) return ContentService.createTextOutput(JSON.stringify({ status: 'not_found' }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  return ContentService.createTextOutput(JSON.stringify({ status: 'ok', results: rows }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (!rows.length) {
+    var output = ContentService.createTextOutput(JSON.stringify({ status: 'not_found' }));
+    output.setMimeType(ContentService.MimeType.JSON);
+    output.setHeader('Access-Control-Allow-Origin', '*');
+    output.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return output;
+  }
+  var output2 = ContentService.createTextOutput(JSON.stringify({ status: 'ok', results: rows }));
+  output2.setMimeType(ContentService.MimeType.JSON);
+  output2.setHeader('Access-Control-Allow-Origin', '*');
+  output2.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  output2.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return output2;
 }
 
 // Helper: set script properties (run from the Apps Script editor once to store your private key)
