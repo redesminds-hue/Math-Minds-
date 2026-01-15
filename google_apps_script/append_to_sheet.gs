@@ -43,8 +43,16 @@ function doPost(e) {
   }
 }
 
+// Handle CORS preflight requests
+function doOptions(e) {
+  return ContentService.createTextOutput('')
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 // --- Configuration: set your spreadsheet ID here ---
-var SPREADSHEET_ID = 'REPLACE_WITH_YOUR_SPREADSHEET_ID';
+var SPREADSHEET_ID = '1FXfFhhNzeLwNkAd-W1Q2WZ-ZAF4199WC_ES1yR2CJso';
 
 function appendSubmissionToSheet(data) {
   var SHEET_NAME = 'Registros';
@@ -116,7 +124,10 @@ function createWompiTransaction(body) {
 
   // Return Wompi response to client
   return ContentService.createTextOutput(JSON.stringify({ status: (code >= 200 && code < 300) ? 'ok' : 'error', code: code, data: parsed }))
-    .setMimeType(ContentService.MimeType.JSON);
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 // Handle Wompi webhooks: log to 'Pagos', update 'Registros' and send receipt email when approved
@@ -333,8 +344,16 @@ function getPaymentStatus(data) {
       rows.push({ index: i+1, values: row });
     }
   }
-  if (!rows.length) return ContentService.createTextOutput(JSON.stringify({ status: 'not_found' })).setMimeType(ContentService.MimeType.JSON);
-  return ContentService.createTextOutput(JSON.stringify({ status: 'ok', results: rows })).setMimeType(ContentService.MimeType.JSON);
+  if (!rows.length) return ContentService.createTextOutput(JSON.stringify({ status: 'not_found' }))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return ContentService.createTextOutput(JSON.stringify({ status: 'ok', results: rows }))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 // Helper: set script properties (run from the Apps Script editor once to store your private key)

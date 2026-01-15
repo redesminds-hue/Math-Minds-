@@ -291,8 +291,8 @@
             }catch(e){}
 
             // Wompi server endpoint (Apps Script). Set this to your deployed Apps Script URL.
-            const WOMPI_SERVER_URL = 'REPLACE_WITH_YOUR_APPS_SCRIPT_URL'; // e.g. https://script.google.com/macros/s/XXX/exec
-            const WOMPI_REDIRECT_URL = 'REPLACE_WITH_YOUR_REDIRECT_URL'; // e.g. https://tu-sitio.com/pago_exitoso.html
+            const WOMPI_SERVER_URL = 'https://script.google.com/macros/s/AKfycbzk6TLMy6MiWqbV0xhpKzVIXl7hmptVraLb6VnXg1VdLTPuOktQiCsJHUtP5RuMSwUb/exec'; // e.g. https://script.google.com/macros/s/XXX/exec
+            const WOMPI_REDIRECT_URL = 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html'; // e.g. https://tu-sitio.com/pago_exitoso.html
 
             // If not configured, fallback to WhatsApp flow
             if (!WOMPI_SERVER_URL || WOMPI_SERVER_URL.indexOf('REPLACE') === 0) {
@@ -349,6 +349,7 @@
                 const data = await resp.json().catch(()=>({}));
                 if (!data || data.status !== 'ok') {
                     alert('Error creando la transacción: ' + (data && data.data && JSON.stringify(data.data) || JSON.stringify(data)));
+                    const payBtn = document.getElementById('payButton');
                     if (payBtn) payBtn.disabled = false;
                     if (statusEl) { statusEl.innerText = 'Error creando transacción'; }
                     return;
@@ -367,12 +368,14 @@
                     window.location.href = checkout;
                 } else {
                     alert('No se pudo obtener la URL de pago. Respuesta: ' + JSON.stringify(data));
+                    const payBtn = document.getElementById('payButton');
                     if (payBtn) payBtn.disabled = false;
                     if (statusEl) { statusEl.innerText = 'Error: no se obtuvo la URL de pago'; }
                 }
 
             } catch (err) {
                 alert('Error al comunicarse con el servidor de pagos: ' + String(err));
+                const payBtn = document.getElementById('payButton');
                 if (payBtn) payBtn.disabled = false;
                 const statusEl = document.getElementById('paymentStatus'); if (statusEl) statusEl.innerText = 'Error de comunicación';
             }
