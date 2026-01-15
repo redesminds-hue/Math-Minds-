@@ -31,7 +31,10 @@ function doPost(e) {
     if (data && (data.event || (data.data && data.data.object && data.data.object.transaction) || data.type)) {
       handleWompiWebhook(data);
       return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-        .setMimeType(ContentService.MimeType.JSON);
+        .setMimeType(ContentService.MimeType.JSON)
+        .setHeader('Access-Control-Allow-Origin', '*')
+        .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+        .setHeader('Access-Control-Allow-Headers', 'Content-Type');
     }
 
     // Fallback: treat as form submission and append to 'Registros' (original behaviour)
@@ -39,7 +42,10 @@ function doPost(e) {
 
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeader('Access-Control-Allow-Origin', '*')
+      .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+      .setHeader('Access-Control-Allow-Headers', 'Content-Type');
   }
 }
 
@@ -81,7 +87,10 @@ function appendSubmissionToSheet(data) {
   sheet.appendRow(row);
 
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-    .setMimeType(ContentService.MimeType.JSON);
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 // Create transaction at Wompi
@@ -93,7 +102,10 @@ function createWompiTransaction(body) {
 
   if (!privateKey) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'WOMPI_PRIVATE_KEY not set in Script Properties' }))
-      .setMimeType(ContentService.MimeType.JSON);
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeader('Access-Control-Allow-Origin', '*')
+      .setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+      .setHeader('Access-Control-Allow-Headers', 'Content-Type');
   }
 
   var amount = Number(body.amount) || 0; // amount in cents
