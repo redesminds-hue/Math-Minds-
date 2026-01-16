@@ -398,35 +398,89 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
       return;
     }
 
-    console.log('✅ Firma obtenida correctamente');
+    console.log('✅ Firma obtenida correctamente:', signature);
     
-    // Limpiar completamente el contenedor
+    // Crear la transacción en Wompi usando Apps Script
+    const txnResponse = await crearTransaccionWompi(amountInCents, reference, sEmail, sFirst, sLast, signature);
+    
+    if (!txnResponse || !txnResponse.data || !txnResponse.data.transaction || !txnResponse.data.transaction.checkout_url) {
+      console.error('No se pudo crear transacción:', txnResponse);
+      container.innerHTML = '<p style="color:#ff6b6b;font-size:14px;"><b>❌ Error creando transacción. Por favor intenta de nuevo.</b></p>';
+      return;
+    }
+
+    const checkoutUrl = txnResponse.data.transaction.checkout_url;
+    console.log('✅ Transacción creada. Checkout URL:', checkoutUrl);
+    
+    // Limpiar el contenedor
     container.innerHTML = '';
 
-    // Crear el script de Wompi usando createElement para que se ejecute
-    const script = document.createElement('script');
-    script.src = 'https://checkout.wompi.co/widget.js';
-    script.setAttribute('data-render', 'button');
-    script.setAttribute('data-public-key', 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK');
-    script.setAttribute('data-currency', 'COP');
-    script.setAttribute('data-amount-in-cents', String(amountInCents));
-    script.setAttribute('data-reference', String(reference));
-    script.setAttribute('data-signature-integrity', String(signature));
-    script.setAttribute('data-customer-email', String(sEmail));
-    script.setAttribute('data-customer-name', `${sFirst} ${sLast}`);
+    // Crear iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = checkoutUrl;
+    iframe.style.width = '100%';
+    iframe.style.height = '600px';
+    iframe.style.border = 'none';
+    iframe.style.borderRadius = '8px';
+    iframe.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+    iframe.title = 'Wompi Checkout';
+    iframe.allow = 'payment';
 
-    container.appendChild(script);
+    container.appendChild(iframe);
 
-    console.log('✅ Widget de Wompi renderizado para:', {
-      amount: amountInCents,
-      reference: reference,
-      email: sEmail,
-      name: `${sFirst} ${sLast}`
-    });
+    console.log('✅ iFrame de Wompi insertado con transacción válida');
     
   } catch (error) {
     console.error('Error en abrirPasarelaPago:', error);
     container.innerHTML = '<p style="color:#ff6b6b;font-size:14px;"><b>Error procesando pago</b></p>';
+  }
+}
+
+async function crearTransaccionWompi(amountInCents, reference, sEmail, sFirst, sLast, signature) {
+  try {
+    const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbx4e6iuN7ckPULn9OGq3zhRAQ2RQjMO-1lFKVUWgzl-Vvbi0YvQF1lPG52sfobSY2HsEw/exec';
+    
+    const params = new URLSearchParams({
+      action: 'create_wompi_txn',
+      amount: String(amountInCents),
+      currency: 'COP',
+      reference: reference,
+      customer_email: sEmail,
+      customer_name: `${sFirst} ${sLast}`,
+      signature_integrity: signature,
+      redirect_url: `${window.location.origin}/pago_exitoso.html`
+    });
+
+    const fullUrl = `${googleScriptUrl}?${params.toString()}`;
+    console.log('📝 URL de transacción:', fullUrl.substring(0, 80) + '...');
+
+    const response = await fetch(fullUrl, {
+      method: 'GET',
+      mode: 'cors'
+    });
+
+    if (!response.ok) {
+      console.error('Error en respuesta:', response.status, response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('Respuesta de transacción completa:', JSON.stringify(data, null, 2));
+
+    if (data && data.status === 'ok' && data.data) {
+      console.log('✅ Transacción exitosa, data:', data.data);
+      return data.data;
+    }
+
+    console.error('❌ Error en respuesta de transacción:', data);
+    console.error('Status:', data?.status);
+    console.error('Data:', data?.data);
+    console.error('Error:', data?.error);
+    return null;
+
+  } catch (error) {
+    console.error('Error creando transacción:', error);
+    return null;
   }
 }
 
@@ -453,7 +507,7 @@ async function obtenerFirma(amountInCents, reference) {
         });
         
         const fullUrl = `${url}?${params.toString()}`;
-        console.log('Pidiendo firma a:', fullUrl.substring(0, 50) + '...');
+        console.log('Pidiendo firma a:', fullUrl.substring(0, 80) + '...');
 
         const res = await fetch(fullUrl, {
             method: 'GET',
