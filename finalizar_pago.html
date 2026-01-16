@@ -4,357 +4,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resumen Final - Math Minds</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Wompi Checkout -->
+    <script src="https://checkout.wompi.co/widget.js"></script>
+
     <style>
-        :root {
-            --black: #111;
-            --purple: #13d6eba2;
-            --light-gray: #f4f7f6;
-        }
-
         body {
-            background-color: var(--light-gray);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
+            background: #f4f7f6;
             margin: 0;
-            padding: 0;
         }
 
-        /* Header minimalista */
-        .header-mini {
+        .header {
             background: #fff;
+            border-bottom: 2px solid #111;
             padding: 15px 40px;
-            border-bottom: 2px solid var(--black);
             display: flex;
             align-items: center;
-            gap: 20px;
+            justify-content: space-between;
         }
 
-        .logo-mini { width: 80px; }
+        .header img { height: 60px; }
 
-        .btn-back {
-            text-decoration: none;
-            color: var(--black);
-            font-weight: 700;
-            font-size: 13px;
-            text-transform: uppercase;
-            padding: 8px 14px;
-            border: 1.5px solid var(--black);
-            border-radius: 10px;
-            transition: all 0.2s ease;
-            margin-left: auto;
-        }
-
-        .btn-back:hover {
-            background: var(--black);
-            color: #fff;
-        }
-
-        /* Layout en dos columnas */
-        .container-final {
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             gap: 30px;
-            max-width: 1100px;
-            margin: 40px auto;
             padding: 0 20px;
         }
 
         .card {
             background: #fff;
-            border: 2px solid var(--black);
+            border: 2px solid #111;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
         h3 {
             margin-top: 0;
-            text-transform: uppercase;
-            font-size: 18px;
-            border-bottom: 2px solid var(--purple);
+            border-bottom: 2px solid #13d6eba2;
             display: inline-block;
-            margin-bottom: 20px;
+            padding-bottom: 5px;
         }
 
-        /* Estilo de productos */
-        .producto-row {
+        .producto {
             display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 0;
+            justify-content: space-between;
+            padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
 
-        .producto-row img {
-            width: 70px;
-            height: 60px;
-            object-fit: contain;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-
-        .producto-info { flex: 1; }
-        .producto-info strong { display: block; font-size: 15px; }
-        .producto-info span { font-size: 13px; color: #666; }
-
-        /* Datos estáticos (Bloqueados) */
-        .datos-bloqueados {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-left: 4px solid var(--black);
-        }
-
-        .dato-item { margin-bottom: 10px; }
-        .dato-item small { 
-            display: block; 
-            text-transform: uppercase; 
-            font-size: 10px; 
-            color: #888; 
-            font-weight: 700;
-        }
-        .dato-item span { font-weight: 600; color: #333; }
-
-        /* Input Estudiante */
-        .input-estudiante {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--black);
-            border-radius: 12px;
-            font-size: 16px;
-            margin-top: 10px;
-            box-sizing: border-box;
-        }
-
-        .total-box {
+        .total {
+            font-size: 22px;
+            font-weight: 900;
             text-align: right;
             margin-top: 20px;
-            font-size: 24px;
-            font-weight: 900;
         }
 
-        .btn-whatsapp {
+        .input {
             width: 100%;
-            background: var(--purple); /* Color oficial WhatsApp */
-            color: white;
+            padding: 14px;
+            border: 2px solid #111;
+            border-radius: 12px;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        button {
+            width: 100%;
+            background: #13d6eba2;
+            color: #fff;
             border: none;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 18px;
             font-size: 16px;
             font-weight: 800;
+            border-radius: 15px;
             cursor: pointer;
             margin-top: 20px;
-            transition: transform 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
-        .btn-whatsapp:hover { transform: scale(1.02); background: #1eb954; }
+        button:hover { background: #1eb954; }
 
-        @media (max-width: 850px) {
-            .container-final { grid-template-columns: 1fr; }
+        @media (max-width: 800px) {
+            .container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
+
 <body>
 
-    <header class="header-mini"><img src="../Multimedia/Logo.png" alt="Logo" class="logo-mini"><a href="pago.html" class="btn-back">← Regresar</a></header>
+<header class="header">
+    <img src="../Multimedia/Logo.png" alt="Math Minds">
+    <a href="pago.html">← Regresar</a>
+</header>
 
-    <div class="container-final">
-        <div class="card">
-            <h3>Resumen de Libros/Kits</h3>
-            <div id="lista-productos"></div>
-            <div id="total-precio" class="total-box">Cargando total...</div>
-        </div>
+<div class="container">
 
-        <div class="card">
-            <h3>Confirmación Final</h3>
-            <div id="datos-envio" class="datos-bloqueados"></div>
-            
-            <div class="form-group">
-                <label style="font-weight:700; font-size:12px;">APELLIDO</label>
-                <input type="text" id="studentLastName" class="input-estudiante" placeholder="Apellido del estudiante">
-            </div>
-            <div class="form-group" style="margin-top:15px;">
-                <label style="font-weight:700; font-size:12px;">NOMBRE</label>
-                <input type="text" id="studentFirstName" class="input-estudiante" placeholder="Nombre del estudiante">
-            </div>
-            <div class="form-group" style="margin-top:15px;">
-                <label style="font-weight:700; font-size:12px;">GRADO</label>
-                <input type="text" id="studentGrade" class="input-estudiante" placeholder="Grado (ej. 4°)">
-            </div>
-            <div class="form-group" style="margin-top:15px;">
-                <label style="font-weight:700; font-size:12px;">DOCUMENTO DEL ESTUDIANTE (T.I.)</label>
-                <input type="text" id="studentDoc" class="input-estudiante" placeholder="Número de documento">
-            </div>
-            <div class="form-group" style="margin-top:15px;">
-                <label style="font-weight:700; font-size:12px;">CORREO ELECTRÓNICO DEL ESTUDIANTE</label>
-                <input type="email" id="studentEmail" class="input-estudiante" placeholder="correo@ejemplo.com">
-            </div>
-
-            <div class="form-group" style="margin-top:15px;">
-                <label style="font-weight:700; font-size:12px;">MÉTODO DE PAGO</label>
-                <div>
-                   
-                </div>
-                <div>
-                    <input type="radio" id="paymentPSE" name="paymentMethod" value="PSE">
-                    <label for="paymentPSE">PSE (Pago Seguro en Línea)</label>
-                </div>
-            </div>
-
-            <button id="payButton" onclick="enviarWhatsApp()" class="btn-whatsapp">PAGAR</button>
-            <div id="paymentStatus" style="display:none;margin-top:10px;font-weight:700;"></div> 
-        </div>
+    <!-- RESUMEN -->
+    <div class="card">
+        <h3>Resumen del Pedido</h3>
+        <div id="productos"></div>
+        <div id="total" class="total"></div>
     </div>
 
-    <script>
-        const EXCEL_URL = 'TU_URL_CSV_DE_GOOGLE_SHEETS';
+    <!-- DATOS -->
+    <div class="card">
+        <h3>Datos del Estudiante</h3>
 
-        function init() {
-            const entrega = JSON.parse(localStorage.getItem('datos_entrega'));
-            if (!entrega) { window.location.href = 'finalizar_pago.html'; return; }
+        <label>APELLIDO</label>
+        <input class="input" id="lastName">
 
-            document.getElementById('datos-envio').innerHTML = `
-                <div class="dato-item"><small>Acudiente</small><span>${entrega.acudiente} (${entrega.email})</span></div>
-                <div class="dato-item"><small>Colegio / Curso</small><span>${entrega.colegio} - ${entrega.curso}</span></div>
-                <div class="dato-item"><small>Ubicación</small><span>${entrega.direccion}, ${entrega.ciudad}</span></div>
-            `;
+        <label>NOMBRE</label>
+        <input class="input" id="firstName">
 
-            const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
-                // Load DB snapshot (saved by main.js) to get product prices
-                let bdb = [];
-                try{ bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]'); }catch(e){ bdb = []; }
+        <label>GRADO</label>
+        <input class="input" id="grade">
 
-                function norm(s){ try{ return String(s||'').normalize('NFC').trim().toLowerCase(); }catch(e){ return String(s||'').trim().toLowerCase(); } }
+        <label>DOCUMENTO</label>
+        <input class="input" id="doc">
 
-                // Build product rows with resolved price (from baseDeDatos) or fallback to item.price
-                let total = 0;
-                const rowsHtml = carrito.map(i => {
-                    const title = i.title || i.nombre || '';
-                    const qty = Number(i.qty || 1);
-                    // Prefer matching DB row by item-level colegio/grado if present
-                    const itemColegio = (i.colegio) ? norm(i.colegio) : (entrega && entrega.colegio ? norm(entrega.colegio) : null);
-                    const itemGrado = (i.grado) ? norm(i.grado) : (entrega && entrega.curso ? norm(entrega.curso) : null);
-                    let match = null;
-                    if (itemColegio && itemGrado){
-                        match = bdb.find(r => norm(r.colegio) === itemColegio && norm(r.grado) === itemGrado && (norm(r.producto) === norm(title) || norm(title).includes(norm(r.producto))));
-                    }
-                    if (!match && itemColegio){
-                        match = bdb.find(r => norm(r.colegio) === itemColegio && (norm(r.producto) === norm(title) || norm(title).includes(norm(r.producto))));
-                    }
-                    // global fallback
-                    if (!match){ match = bdb.find(r => norm(r.producto) === norm(title)) || bdb.find(r => norm(title).includes(norm(r.producto))) || null; }
-                    const unit = match ? Number(match.costo || 0) : (Number(i.price || i.precio || 0) || 0);
-                    const subtotal = unit * qty;
-                    total += subtotal;
-                    return `
-                        <div class="producto-row">
-                            <img src="${i.image || ''}" alt="">
-                            <div style="flex:1"><strong>${title}</strong><br><span>Cantidad: ${qty} • Precio unitario: $${unit.toLocaleString()}</span></div>
-                            <div style="font-weight:800">$${subtotal.toLocaleString()}</div>
-                        </div>
-                    `;
-                }).join('') || '<p>No hay productos en el carrito.</p>';
+        <label>CORREO ELECTRÓNICO</label>
+        <input class="input" id="email" type="email">
 
-                document.getElementById('lista-productos').innerHTML = rowsHtml;
-                document.getElementById('total-precio').innerText = `Total: $${total.toLocaleString()}`;
-                try{ localStorage.setItem('total_calc', total); }catch(e){}
-                // Prefill student data if available
-                try {
-                    if (entrega.curso) document.getElementById('studentGrade').value = entrega.curso;
-                    if (entrega.email) document.getElementById('studentEmail').value = entrega.email;
-                } catch(e){}
+        <button onclick="pagar()">PAGAR</button>
+    </div>
+
+</div>
+
+<script>
+function init() {
+    const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
+    let total = 0;
+
+    const html = carrito.map(p => {
+        const subtotal = p.price * (p.qty || 1);
+        total += subtotal;
+        return `<div class="producto">
+            <span>${p.title} x${p.qty || 1}</span>
+            <strong>$${subtotal.toLocaleString()}</strong>
+        </div>`;
+    }).join('');
+
+    document.getElementById('productos').innerHTML = html || 'Sin productos';
+    document.getElementById('total').innerText = `Total: $${total.toLocaleString()}`;
+
+    localStorage.setItem('total_calc', total);
+}
+
+function pagar() {
+    const last = lastName.value.trim();
+    const first = firstName.value.trim();
+    const grade = grade.value.trim();
+    const doc = doc.value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if (!last || !first || !grade || !doc || !email) {
+        alert('Completa todos los datos.');
+        return;
+    }
+
+    const total = Number(localStorage.getItem('total_calc'));
+    const reference = `MM-${Date.now()}-${doc}`;
+
+    const checkout = new WidgetCheckout({
+        currency: 'COP',
+        amountInCents: total * 100,
+        reference: reference,
+
+        // 🔴 CAMBIA ESTA LLAVE
+        publicKey: 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK',
+
+        redirectUrl: 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html',
+
+        customerData: {
+            email: email,
+            fullName: `${first} ${last}`
         }
+    });
 
-        async function enviarWhatsApp() {
-            const entrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
-            const sLast = (document.getElementById('studentLastName').value || '').trim();
-            const sFirst = (document.getElementById('studentFirstName').value || '').trim();
-            const sGrade = (document.getElementById('studentGrade').value || '').trim();
-            const sDoc = (document.getElementById('studentDoc').value || '').trim();
-            const sEmail = (document.getElementById('studentEmail').value || '').trim();
-            const total = Number(localStorage.getItem('total_calc') || 0);
+    checkout.open();
+}
 
-            if (!sLast || !sFirst || !sGrade || !sDoc || !sEmail) { alert("Completa todos los datos del estudiante (Apellido, Nombre, Grado, Documento y correo)."); return; }
-            if (!/\S+@\S+\.\S+/.test(sEmail)) { alert("Ingresa un correo electrónico válido para el estudiante."); return; }
+init();
+</script>
 
-            // Save student into datos_entrega for later reference
-            try{
-                entrega.student = { last: sLast, first: sFirst, grade: sGrade, doc: sDoc, email: sEmail };
-                localStorage.setItem('datos_entrega', JSON.stringify(entrega));
-            }catch(e){}
-
-            // Wompi server endpoint (Apps Script). Set this to your deployed Apps Script URL.
-            const WOMPI_SERVER_URL = 'https://script.google.com/macros/s/AKfycbxxlc29E36JuK7QeWETH8irr6hgS3g04_hX3L2Fh9AEqlsLGPwUIF0SS5zhDJ40isXwxA/exec'; // e.g. https://script.google.com/macros/s/XXX/exec
-            const WOMPI_REDIRECT_URL = 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html'; // e.g. https://tu-sitio.com/pago_exitoso.html
-
-            // If not configured, fallback to WhatsApp flow
-            if (!WOMPI_SERVER_URL || WOMPI_SERVER_URL.indexOf('REPLACE') === 0) {
-                const txt = `*NUEVO PEDIDO MATH MINDS*%0A%0A` +
-                            `*ACUDIENTE:* ${entrega.acudiente}%0A` +
-                            `*EMAIL:* ${entrega.email}%0A` +
-                            `*COLEGIO:* ${entrega.colegio}%0A` +
-                            `*CURSO:* ${entrega.curso}%0A%0A` +
-                            `*ESTUDIANTE:*%0A` +
-                            `- Apellido: ${sLast}%0A` +
-                            `- Nombre: ${sFirst}%0A` +
-                            `- Grado: ${sGrade}%0A` +
-                            `- Documento (T.I.): ${sDoc}%0A` +
-                            `- Correo: ${sEmail}%0A%0A` +
-                            `*DIRECCIÓN:* ${entrega.direccion}%0A` +
-                            `*TOTAL:* $${total}`;
-
-                window.open(``, '_blank');
-                return;
-            }
-
-            // Create unique reference
-            const reference = `MM-${Date.now()}-${sDoc}`;
-            // amount in cents
-            const amount_cents = Math.round(total * 100);
-            // Get payment method
-            
-
-            
-                const payBtn = document.getElementById('payButton');
-                const statusEl = document.getElementById('paymentStatus');
-                if (payBtn) { payBtn.disabled = true; }
-                if (statusEl) { statusEl.style.display = 'block'; statusEl.innerText = 'Creando transacción, redirigiendo a la pasarela...'; }
-
-                // Use URLSearchParams to avoid CORS preflight
-                const data = new URLSearchParams();
-                data.append('action', 'create_wompi_txn');
-                data.append('amount', amount_cents);
-                data.append('currency', 'COP');
-                data.append('customer_email', sEmail);
-                data.append('reference', reference);
-                data.append('redirect_url', WOMPI_REDIRECT_URL);
-
-
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = WOMPI_SERVER_URL;
-
-                for (const [key, value] of data.entries()) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    form.appendChild(input);
-                }
-
-                document.body.appendChild(form);
-                form.submit();
-
-            
-            
-        }
-        init();
-    </script>
 </body>
 </html>
