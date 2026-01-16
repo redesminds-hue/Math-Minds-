@@ -282,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeButtons = document.querySelectorAll(".modal-close");
 
   let _mm_scrollY = 0;
+
   function lockBodyScroll(){
     _mm_scrollY = window.scrollY || document.documentElement.scrollTop || 0;
     document.body.style.position = 'fixed';
@@ -1783,6 +1784,64 @@ if (mmBtn) {
 var pedidoMathMinds = JSON.parse(localStorage.getItem('mm_pedido')) || [];
 
 // Unified add-to-cart function used by product buttons
+function getProductImage(productName) {
+  const nombreLower = String(productName || '').toLowerCase().trim();
+  const nombreNorm = nombreLower.replace(/\s+/g, ' ');
+  let imgSrc = '../Multimedia/Logotipo_MathMinds.png';
+
+  if (nombreNorm.includes('reveal math student edition grade k volumen 1')) {
+    imgSrc = '../Multimedia/REVEAL MATH GRADE K VOLUME 1.png';
+  } else if (nombreNorm.includes('reveal math student edition grade k volumen 2')) {
+    imgSrc = '../Multimedia/REVEAL MATH GRADE K VOLUME 2.png';
+  } else if (nombreNorm.includes('reveal math student edition grado 1 volumen 2')) {
+    imgSrc = '../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png';
+  } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('1º')) {
+    imgSrc = '../Multimedia/PRIME 1.png';
+  } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('2º')) {
+    imgSrc = '../Multimedia/PRIME 2.png';
+  } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('3º')) {
+    imgSrc = '../Multimedia/PRIME 3.png';
+  } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('4º')) {
+    imgSrc = '../Multimedia/PRIME 4.png';
+  } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('5º')) {
+    imgSrc = '../Multimedia/PRIME 5.png';
+  } else if (nombreNorm.includes('prime mathematics') && nombreNorm.includes('ka y kb')) {
+    imgSrc = '../Multimedia/PRIME KA KB.png';
+  } else if (nombreNorm.includes('reveal')) {
+    imgSrc = '../Multimedia/LIBROS REVEAL MATH.png';
+  } else if (nombreNorm.includes('aleks')) {
+    imgSrc = '../Multimedia/ALEKS IMAGEN.png';
+  } else if (nombreNorm.includes('didactico') || nombreNorm.includes('material')) {
+    imgSrc = '../Multimedia/MaterialDidactico.png';
+  } else if (nombreNorm.includes('snap') || nombreNorm.includes('anap')) {
+    imgSrc = '../Multimedia/Snap Cubes.png';
+  } else if (nombreNorm.includes('connecting cubes')) {
+    imgSrc = '../Multimedia/CONNECTING CUBES.png';
+  } else if (nombreNorm.includes('base ten blocks') && nombreNorm.includes('set')) {
+    imgSrc = '../Multimedia/BASE TEN BLOCKS SET.png';
+  } else if (nombreNorm.includes('fraction tiles') && nombreNorm.includes('set')) {
+    imgSrc = '../Multimedia/FRACTION TILES.png';
+  } else if (nombreNorm.includes('counters')) {
+    imgSrc = '../Multimedia/COUNTERS.png';
+  } else if (nombreNorm.includes('prime mathematics kb') && nombreNorm.includes('editorial scholastic')) {
+    imgSrc = '../Multimedia/PRIME KB.png';
+  } else if (nombreNorm.includes('geoplano') && nombreNorm.includes('plastico')) {
+    imgSrc = '../Multimedia/GEOBOARD.png';
+  } else if (nombreNorm.includes('prime mathematics 1 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+    imgSrc = '../Multimedia/PRIME 1.png';
+  } else if (nombreNorm.includes('prime mathematics 2 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+    imgSrc = '../Multimedia/PRIME 2.png';
+  } else if (nombreNorm.includes('prime mathematics 3 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+    imgSrc = '../Multimedia/PRIME 3.png';
+  } else if (nombreNorm.includes('prime mathematics 4 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+    imgSrc = '../Multimedia/PRIME 4.png';
+  } else if (nombreNorm.includes('prime mathematics 5 nueva ediciín') && nombreNorm.includes('(sin plataforma)')) {
+    imgSrc = '../Multimedia/PRIME 5.png';
+  }
+
+  return imgSrc;
+}
+
 function agregarAlCarrito(nombre, precioRaw, meta) {
   console.log('agregarAlCarrito called with', nombre, precioRaw, meta);
     // Normalize price (accept numbers or formatted strings)
@@ -1810,7 +1869,8 @@ function agregarAlCarrito(nombre, precioRaw, meta) {
     // If the Cart API is present, add to it too so the drawer stays in sync
     try{
       if (window.Cart && typeof window.Cart.addItem === 'function'){
-        window.Cart.addItem({ id: producto.id, title: producto.nombre, price: producto.precio, image: '', colegio: producto.colegio, grado: producto.grado });
+        const productImage = getProductImage(nombre);
+        window.Cart.addItem({ id: producto.id, title: producto.nombre, price: producto.precio, image: productImage, colegio: producto.colegio, grado: producto.grado });
       }
     }catch(e){ console.error('Cart.addItem error', e); }
 

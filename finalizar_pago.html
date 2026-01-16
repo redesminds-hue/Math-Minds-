@@ -7,8 +7,6 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
 
-    <!-- Wompi Checkout OFICIAL -->
-
     <style>
         :root {
             --black: #111;
@@ -57,9 +55,10 @@
 
         .card {
             background: #fff;
-            border: 2px solid var(--black);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 8px 20px rgba(17,17,17,0.06);
+            border: 1px solid rgba(0,0,0,0.06);
         }
 
         h3 {
@@ -68,7 +67,7 @@
             font-size: 18px;
             border-bottom: 2px solid var(--purple);
             display: inline-block;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
         }
 
         .producto-row {
@@ -87,33 +86,58 @@
             border-radius: 10px;
         }
 
+        .form-group {
+            margin-bottom: 22px;
+        }
+
         .input-estudiante {
             width: 100%;
-            padding: 15px;
-            border: 2px solid var(--black);
-            border-radius: 12px;
-            font-size: 16px;
-            margin-top: 10px;
+            padding: 14px 16px;
+            border: 1.5px solid rgba(0,0,0,0.12);
+            border-radius: 10px;
+            font-size: 15px;
+            margin-top: 8px;
+            margin-bottom: 0;
+            box-sizing: border-box;
+            line-height: 1.5;
         }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #222;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.6px;
+        }
+
+        .student-note {
+            color: #b30000;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 28px;
+            margin-top: 0;
+            line-height: 1.6;
+        }
+
+        .acudiente-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 24px;
+            align-items: start;
+        }
+
+        .acudiente-row { background:#f9f9f9; padding:14px; border-radius:8px; }
+
+        .acudiente-label { display:block; font-size:11px; color:#555; font-weight:700; margin-bottom:8px; }
+
+        .acudiente-value { font-size:14px; color:#111; line-height:1.5; }
 
         .total-box {
             text-align: right;
             margin-top: 20px;
             font-size: 24px;
             font-weight: 900;
-        }
-
-        .btn-whatsapp {
-            width: 100%;
-            background: var(--purple);
-            color: white;
-            border: none;
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-top: 20px;
         }
 
         @media (max-width: 850px) {
@@ -138,7 +162,22 @@
     </div>
 
     <div class="card">
-        <h3>Confirmación Final</h3>
+        <h3>Datos del Acudiente</h3>
+        <div id="datos-acudiente" style="margin-bottom:20px;">
+            <div class="acudiente-grid" id="acudiente-grid">
+                <div class="acudiente-row"><span class="acudiente-label">Nombre</span><span class="acudiente-value" id="acudiente-nombre">-</span></div>
+                <div class="acudiente-row"><span class="acudiente-label">Documento</span><span class="acudiente-value" id="acudiente-doc">-</span></div>
+                <div class="acudiente-row"><span class="acudiente-label">Teléfono</span><span class="acudiente-value" id="acudiente-tel">-</span></div>
+                <div class="acudiente-row"><span class="acudiente-label">Dirección</span><span class="acudiente-value" id="acudiente-direccion">-</span></div>
+                <div class="acudiente-row"><span class="acudiente-label">Barrio / Ciudad</span><span class="acudiente-value" id="acudiente-barrio">-</span></div>
+                <div class="acudiente-row"><span class="acudiente-label">Correo</span><span class="acudiente-value" id="acudiente-email">-</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Datos del Estudiante</h3>
+        <p class="student-note">Por favor completa los datos del ESTUDIANTE que recibirá los productos:</p>
 
         <div class="form-group">
             <label>APELLIDO</label>
@@ -165,7 +204,28 @@
             <input id="studentEmail" type="email" class="input-estudiante">
         </div>
 
-        <button onclick="enviarWhatsApp()" class="btn-whatsapp">PAGAR</button>
+        <div id="domicilio-section" style="display:none; background:#f0f8ff; padding:24px; border-radius:10px; margin-top:28px; margin-bottom:28px; border:1px solid #ccc;">
+            <h4 style="margin-top:0; margin-bottom:18px; font-size:16px;">Envío a Domicilio</h4>
+            <div style="display:flex; align-items:flex-start; gap:12px;">
+                <input type="checkbox" id="solicitar-domicilio" style="width:20px; height:20px; cursor:pointer; margin-top:2px; flex-shrink:0;">
+                <label for="solicitar-domicilio" style="cursor:pointer; margin:0; line-height:1.5;">¿Deseas que enviemos a domicilio? Se añadirán $13.000 al total por envío a domicilio.</label>
+            </div>
+            <p id="domicilio-info" style="color:#666; font-size:13px; margin-top:12px; margin-bottom:0; display:none;">Se añadirán $13.000 al total por envío a domicilio.</p>
+        </div>
+
+        <div id="campos-domicilio-confirmacion" style="display:none;">
+            <div class="form-group">
+                <label>CONFIRMAR DIRECCIÓN DE ENVÍO</label>
+                <input id="studentAddress" type="address" class="input-estudiante">
+            </div>
+
+            <div class="form-group">
+                <label>CONFIRMAR TELÉFONO</label>
+                <input id="studentPhone" type="tel" class="input-estudiante">
+            </div>
+        </div>
+
+        <div id="wompi-widget-container" style="margin-top:20px;"></div>
         <div id="paymentStatus" style="display:none;margin-top:10px;font-weight:700;"></div>
     </div>
 
@@ -175,6 +235,47 @@
 function init() {
     const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
     const bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]');
+    const datosEntrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
+
+    // Cargar datos del acudiente (mostrar solo campos específicos)
+    const grid = document.getElementById('acudiente-grid');
+    if (grid) {
+        grid.innerHTML = '';
+        const ordered = [
+            ['Nombre', ['acudiente','nombre','nombreAcudiente','parentName']],
+            ['Documento', ['documento','docAcudiente','documentoAcudiente']],
+            ['Teléfono', ['telefono','telefonoAcudiente','celular','phone','movil']],
+            ['Dirección', ['direccion','domicilio','address','direccionEnvio']],
+            ['Ciudad', ['ciudad','city']],
+            ['Correo', ['email','parentEmail','correo','mail','emailAcudiente']],
+            ['Colegio', ['colegio','school','schoolName','nombreColegio']],
+            ['Curso', ['curso','grado','grade','gradeLevel','nivel','grade']]
+        ];
+        ordered.forEach(item => {
+            const label = item[0];
+            const keys = item[1];
+            let val = '-';
+            for (let k of keys) {
+                if (datosEntrega[k] && String(datosEntrega[k]).trim() !== '') { 
+                    val = datosEntrega[k]; 
+                    break; 
+                }
+            }
+            const div = document.createElement('div');
+            div.className = 'acudiente-row';
+            div.innerHTML = '<span class="acudiente-label">'+label+'</span><span class="acudiente-value">'+val+'</span>';
+            grid.appendChild(div);
+        });
+    }
+
+    // Detectar Aleks: si TODOS los productos son Aleks => no mostrar domicilio
+    const allAreAleks = carrito.length > 0 && carrito.every(i => String(i.title || '').toLowerCase().includes('aleks'));
+    const domicilioSection = document.getElementById('domicilio-section');
+    if (!allAreAleks) {
+        domicilioSection.style.display = 'block';
+    } else {
+        domicilioSection.style.display = 'none';
+    }
 
     function norm(s){ return String(s||'').trim().toLowerCase(); }
 
@@ -197,85 +298,192 @@ function init() {
     }).join('');
 
     document.getElementById('lista-productos').innerHTML = html;
-    document.getElementById('total-precio').innerText = `Total: $${total.toLocaleString()}`;
+    
+    // Guardar total base sin domicilio
+    window.totalBase = total;
+    actualizarTotalConDomicilio(total);
     localStorage.setItem('total_calc', total);
+    
+    // Agregar listener al checkbox de domicilio
+    const checkboxDomicilio = document.getElementById('solicitar-domicilio');
+    const camposDomicilio = document.getElementById('campos-domicilio-confirmacion');
+    
+    checkboxDomicilio.addEventListener('change', () => {
+        actualizarTotalConDomicilio(window.totalBase);
+        // Mostrar/ocultar campos de confirmación según checkbox
+        if (checkboxDomicilio.checked) {
+            camposDomicilio.style.display = 'block';
+        } else {
+            camposDomicilio.style.display = 'none';
+        }
+        validarYCargarWidget();
+    });
 }
 
-function enviarWhatsApp() {
-  const entrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
+function actualizarTotalConDomicilio(baseTotal) {
+    const checkboxDomicilio = document.getElementById('solicitar-domicilio');
+    const domicilioInfo = document.getElementById('domicilio-info');
+    const costoDomicilio = 13000;
+    
+    let totalFinal = baseTotal;
+    if (checkboxDomicilio && checkboxDomicilio.checked) {
+        totalFinal = baseTotal + costoDomicilio;
+        domicilioInfo.style.display = 'block';
+    } else if (domicilioInfo) {
+        domicilioInfo.style.display = 'none';
+    }
+    
+    document.getElementById('total-precio').innerText = `Total: $${totalFinal.toLocaleString()}`;
+    localStorage.setItem('total_calc', totalFinal);
+}
 
+function validarYCargarWidget() {
   const sLast  = document.getElementById('studentLastName').value.trim();
   const sFirst = document.getElementById('studentFirstName').value.trim();
   const sGrade = document.getElementById('studentGrade').value.trim();
   const sDoc   = document.getElementById('studentDoc').value.trim();
   const sEmail = document.getElementById('studentEmail').value.trim();
 
-  const total = Number(localStorage.getItem('total_calc') || 0);
-
   if (!sLast || !sFirst || !sGrade || !sDoc || !sEmail) {
-    alert("Completa todos los datos del estudiante.");
+    document.getElementById('wompi-widget-container').innerHTML = '<p style="color:#ccc;font-size:14px;">Completa todos los datos para ver la pasarela de pago</p>';
     return;
   }
 
   if (!/\S+@\S+\.\S+/.test(sEmail)) {
-    alert("Correo electrónico inválido.");
+    document.getElementById('wompi-widget-container').innerHTML = '<p style="color:#ff6b6b;font-size:14px;">Correo electrónico inválido</p>';
     return;
   }
 
+  // Validar domicilio si está seleccionado
+  const checkboxDomicilio = document.getElementById('solicitar-domicilio');
+  if (checkboxDomicilio && checkboxDomicilio.checked) {
+    const sAddress = document.getElementById('studentAddress').value.trim();
+    const sPhone = document.getElementById('studentPhone').value.trim();
+    
+    if (!sAddress || !sPhone) {
+      document.getElementById('wompi-widget-container').innerHTML = '<p style="color:#ff6b6b;font-size:14px;">Por favor completa la dirección y teléfono para proceder con el envío a domicilio</p>';
+      return;
+    }
+  }
+
+  const entrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
   entrega.student = { last: sLast, first: sFirst, grade: sGrade, doc: sDoc, email: sEmail };
   localStorage.setItem('datos_entrega', JSON.stringify(entrega));
 
-  const reference = `MM-${Date.now()}-${sDoc}`;
+  const total = Number(localStorage.getItem('total_calc') || 0);
+  // Generar NUEVA referencia cada vez para permitir reintentos
+  const reference = `MM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   const amountInCents = Math.round(total * 100);
 
-  const statusEl = document.getElementById('paymentStatus');
-  statusEl.style.display = 'block';
-  statusEl.innerText = 'Abriendo pasarela de pago…';
+  cargarWidgetWompi(amountInCents, reference, sEmail, sFirst, sLast);
+}
 
-  // Cargar widget.js si no está cargado
-  if (!window.WidgetCheckout) {
+function cargarWidgetWompi(amountInCents, reference, sEmail, sFirst, sLast) {
+    // Load the widget by inserting the script with data attributes inside abrirPasarelaPago.
+    // Avoid pre-loading widget.js here to prevent double-initialization issues.
+    abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast);
+}
+
+async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast) {
+  const container = document.getElementById('wompi-widget-container');
+  container.innerHTML = '<p style="color:#999;font-size:14px;">Preparando pasarela de pago...</p>';
+
+  try {
+    const signature = await obtenerFirma(amountInCents, reference);
+
+    if (!signature || signature.length < 10) {
+      console.error('Firma inválida:', signature);
+      container.innerHTML = '<p style="color:#ff6b6b;font-size:14px;"><b>❌ Error obteniendo firma de pago. Por favor recarga la página.</b></p>';
+      return;
+    }
+
+    console.log('✅ Firma obtenida correctamente');
+    
+    // Limpiar completamente el contenedor
+    container.innerHTML = '';
+
+    // Crear el script de Wompi usando createElement para que se ejecute
     const script = document.createElement('script');
     script.src = 'https://checkout.wompi.co/widget.js';
-    script.onload = () => {
-      abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast, statusEl);
-    };
-    document.head.appendChild(script);
-  } else {
-    abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast, statusEl);
+    script.setAttribute('data-render', 'button');
+    script.setAttribute('data-public-key', 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK');
+    script.setAttribute('data-currency', 'COP');
+    script.setAttribute('data-amount-in-cents', String(amountInCents));
+    script.setAttribute('data-reference', String(reference));
+    script.setAttribute('data-signature-integrity', String(signature));
+    script.setAttribute('data-customer-email', String(sEmail));
+    script.setAttribute('data-customer-name', `${sFirst} ${sLast}`);
+
+    container.appendChild(script);
+
+    console.log('✅ Widget de Wompi renderizado para:', {
+      amount: amountInCents,
+      reference: reference,
+      email: sEmail,
+      name: `${sFirst} ${sLast}`
+    });
+    
+  } catch (error) {
+    console.error('Error en abrirPasarelaPago:', error);
+    container.innerHTML = '<p style="color:#ff6b6b;font-size:14px;"><b>Error procesando pago</b></p>';
   }
 }
 
-function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast, statusEl) {
-  const checkout = new WidgetCheckout({
-    currency: 'COP',
-    amountInCents: amountInCents,
-    reference: reference,
-    publicKey: 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK',
-    customerData: {
-      email: sEmail,
-      fullName: `${sFirst} ${sLast}`
-    },
-    onResponse: function(data) {
-      console.log('Respuesta Wompi:', data);
-      localStorage.setItem('wompi_last_response', JSON.stringify(data));
-      
-      if (data.transaction && data.transaction.status === 'APPROVED') {
-        statusEl.innerText = '✓ Pago aprobado. Redirigiendo...';
-        statusEl.style.color = 'green';
-        setTimeout(() => {
-          window.location.href = 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html';
-        }, 1500);
-      } else {
-        statusEl.innerText = 'Pago procesado. Verifica tu correo.';
-        statusEl.style.color = '#333';
-      }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const campos = ['studentLastName', 'studentFirstName', 'studentGrade', 'studentDoc', 'studentEmail', 'studentAddress', 'studentPhone'];
+  campos.forEach(campo => {
+    const elemento = document.getElementById(campo);
+    if (elemento) {
+      elemento.addEventListener('input', validarYCargarWidget);
+      elemento.addEventListener('change', validarYCargarWidget);
     }
   });
+});
 
-  checkout.open();
+async function obtenerFirma(amountInCents, reference) {
+    // GET con parámetros en URL para evitar preflight CORS
+    try {
+        const url = 'https://script.google.com/macros/s/AKfycbydGjEs_deeJTBUcJPiFE5XuF7N0985axPfLh1cxrHU0czw2RXLjjHdGS998I_gfOLq0g/exec';
+        const params = new URLSearchParams({
+            amount: String(amountInCents),
+            reference: String(reference),
+            currency: 'COP'
+        });
+        
+        const fullUrl = `${url}?${params.toString()}`;
+        console.log('Pidiendo firma a:', fullUrl.substring(0, 50) + '...');
+
+        const res = await fetch(fullUrl, {
+            method: 'GET',
+            mode: 'cors'
+        });
+
+        if (!res.ok) {
+            console.error('obtenerFirma: respuesta no OK', res.status, res.statusText);
+            return '';
+        }
+
+        const data = await res.json();
+        console.log('Respuesta recibida:', data);
+        
+        if (data && data.signature) {
+            const sig = String(data.signature).trim();
+            console.log('✅ Firma obtenida:', sig.substring(0, 20) + '...');
+            return sig;
+        }
+        
+        if (data && data.error) {
+            console.error('Error del servidor:', data.error);
+        }
+        
+        return '';
+    } catch (e) {
+        console.error('❌ Error obteniendo firma:', e.message);
+        return '';
+    }
 }
-
-
 
 init();
 </script>
