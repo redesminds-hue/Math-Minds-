@@ -199,8 +199,7 @@
             <div class="form-group" style="margin-top:15px;">
                 <label style="font-weight:700; font-size:12px;">MÉTODO DE PAGO</label>
                 <div>
-                    <input type="radio" id="paymentCard" name="paymentMethod" value="CARD" checked>
-                    <label for="paymentCard">Tarjeta de Crédito/Débito</label>
+                   
                 </div>
                 <div>
                     <input type="radio" id="paymentPSE" name="paymentMethod" value="PSE">
@@ -319,9 +318,9 @@
             // amount in cents
             const amount_cents = Math.round(total * 100);
             // Get payment method
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
 
-            try {
+            
                 const payBtn = document.getElementById('payButton');
                 const statusEl = document.getElementById('paymentStatus');
                 if (payBtn) { payBtn.disabled = true; }
@@ -335,11 +334,7 @@
                 data.append('customer_email', sEmail);
                 data.append('reference', reference);
                 data.append('redirect_url', WOMPI_REDIRECT_URL);
-                data.append('payment_method', paymentMethod);
-                data.append('full_name', `${sFirst} ${sLast}`.trim());
-                data.append('phone_number', entrega.telefono || '');
-                data.append('legal_id', sDoc);
-                data.append('legal_id_type', 'CC');
+
 
                 const form = document.createElement('form');
                 form.method = 'POST';
@@ -356,40 +351,8 @@
                 document.body.appendChild(form);
                 form.submit();
 
-                
-                if (!dataRes || dataRes.status !== 'ok') {
-                    alert('Error creando la transacción: ' + (dataRes && dataRes.data && JSON.stringify(dataRes.data) || JSON.stringify(dataRes)));
-                    const payBtn = document.getElementById('payButton');
-                    if (payBtn) payBtn.disabled = false;
-                    if (statusEl) { statusEl.innerText = 'Error creando transacción'; }
-                    return;
-                }
-
-                // Try to find checkout URL in response
-                var checkout = null;
-                if (dataRes.data && dataRes.data.data && dataRes.data.data.attributes && dataRes.data.data.attributes.checkout_url) checkout = dataRes.data.data.attributes.checkout_url;
-                else if (dataRes.data && dataRes.data.data && dataRes.data.data.checkout_url) checkout = dataRes.data.data.checkout_url;
-                else if (dataRes.data && dataRes.data.attributes && dataRes.data.attributes.checkout_url) checkout = dataRes.data.attributes.checkout_url;
-                else if (dataRes.data && dataRes.data.checkout_url) checkout = dataRes.data.checkout_url;
-
-                if (checkout) {
-                    // Save the reference in datos_entrega so webhook can match it
-                    try{ entrega.reference = reference; localStorage.setItem('datos_entrega', JSON.stringify(entrega)); }catch(e){}
-                    if (statusEl) { statusEl.innerText = 'Redirigiendo a la pasarela...'; }
-                    window.location.href = checkout;
-                } else {
-                    alert('No se pudo obtener la URL de pago. Respuesta: ' + JSON.stringify(dataRes));
-                    const payBtn = document.getElementById('payButton');
-                    if (payBtn) payBtn.disabled = false;
-                    if (statusEl) { statusEl.innerText = 'Error: no se obtuvo la URL de pago'; }
-                }
-
-            } catch (err) {
-                alert('Error al comunicarse con el servidor de pagos: ' + String(err));
-                const payBtn = document.getElementById('payButton');
-                if (payBtn) payBtn.disabled = false;
-                const statusEl = document.getElementById('paymentStatus'); if (statusEl) statusEl.innerText = 'Error de comunicación';
-            }
+            
+            
         }
         init();
     </script>
