@@ -341,14 +341,21 @@
                 data.append('legal_id', sDoc);
                 data.append('legal_id_type', 'CC');
 
-                const resp = await fetch(WOMPI_SERVER_URL, {
-                    method: 'POST',
-                    body: data
-                });
-                
-                const respText = await resp.text();
-                let dataRes = {};
-                try { dataRes = JSON.parse(respText); } catch(e) { dataRes = { raw: respText }; }
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = WOMPI_SERVER_URL;
+
+                for (const [key, value] of data.entries()) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+
                 
                 if (!dataRes || dataRes.status !== 'ok') {
                     alert('Error creando la transacción: ' + (dataRes && dataRes.data && JSON.stringify(dataRes.data) || JSON.stringify(dataRes)));
