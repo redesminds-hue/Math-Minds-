@@ -4,136 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resumen Final - Math Minds</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
 
-    <!-- Wompi Checkout -->
-    <script src="https://checkout.wompi.co/widget.js"></script>
+    <!-- Wompi Checkout OFICIAL -->
 
     <style>
-        body {
-            font-family: 'Poppins', Arial, sans-serif;
-            background: #f4f7f6;
-            margin: 0;
+        :root {
+            --black: #111;
+            --purple: #13d6eba2;
+            --light-gray: #f4f7f6;
         }
 
-        .header {
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header-mini {
             background: #fff;
-            border-bottom: 2px solid #111;
             padding: 15px 40px;
+            border-bottom: 2px solid var(--black);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 20px;
         }
 
-        .header img { height: 60px; }
+        .logo-mini { width: 80px; }
 
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
+        .btn-back {
+            text-decoration: none;
+            color: var(--black);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            padding: 8px 14px;
+            border: 1.5px solid var(--black);
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .container-final {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             gap: 30px;
+            max-width: 1100px;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
         .card {
             background: #fff;
-            border: 2px solid #111;
+            border: 2px solid var(--black);
             border-radius: 20px;
             padding: 30px;
         }
 
         h3 {
             margin-top: 0;
-            border-bottom: 2px solid #13d6eba2;
+            text-transform: uppercase;
+            font-size: 18px;
+            border-bottom: 2px solid var(--purple);
             display: inline-block;
-            padding-bottom: 5px;
+            margin-bottom: 20px;
         }
 
-        .producto {
+        .producto-row {
             display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
             border-bottom: 1px solid #eee;
         }
 
-        .total {
-            font-size: 22px;
-            font-weight: 900;
+        .producto-row img {
+            width: 70px;
+            height: 60px;
+            object-fit: contain;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .input-estudiante {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--black);
+            border-radius: 12px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .total-box {
             text-align: right;
             margin-top: 20px;
+            font-size: 24px;
+            font-weight: 900;
         }
 
-        .input {
+        .btn-whatsapp {
             width: 100%;
-            padding: 14px;
-            border: 2px solid #111;
-            border-radius: 12px;
-            margin-top: 8px;
-            font-size: 15px;
-        }
-
-        label {
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        button {
-            width: 100%;
-            background: #13d6eba2;
-            color: #fff;
+            background: var(--purple);
+            color: white;
             border: none;
-            padding: 18px;
+            padding: 20px;
+            border-radius: 15px;
             font-size: 16px;
             font-weight: 800;
-            border-radius: 15px;
             cursor: pointer;
             margin-top: 20px;
         }
 
-        button:hover { background: #1eb954; }
-
-        @media (max-width: 800px) {
-            .container { grid-template-columns: 1fr; }
+        @media (max-width: 850px) {
+            .container-final { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
 <body>
 
-<header class="header">
-    <img src="../Multimedia/Logo.png" alt="Math Minds">
-    <a href="pago.html">← Regresar</a>
+<header class="header-mini">
+    <img src="../Multimedia/Logo.png" alt="Logo" class="logo-mini">
+    <a href="pago.html" class="btn-back">← Regresar</a>
 </header>
 
-<div class="container">
+<div class="container-final">
 
-    <!-- RESUMEN -->
     <div class="card">
-        <h3>Resumen del Pedido</h3>
-        <div id="productos"></div>
-        <div id="total" class="total"></div>
+        <h3>Resumen de Libros/Kits</h3>
+        <div id="lista-productos"></div>
+        <div id="total-precio" class="total-box">Cargando total...</div>
     </div>
 
-    <!-- DATOS -->
     <div class="card">
-        <h3>Datos del Estudiante</h3>
+        <h3>Confirmación Final</h3>
 
-        <label>APELLIDO</label>
-        <input class="input" id="lastName">
+        <div class="form-group">
+            <label>APELLIDO</label>
+            <input id="studentLastName" class="input-estudiante">
+        </div>
 
-        <label>NOMBRE</label>
-        <input class="input" id="firstName">
+        <div class="form-group">
+            <label>NOMBRE</label>
+            <input id="studentFirstName" class="input-estudiante">
+        </div>
 
-        <label>GRADO</label>
-        <input class="input" id="grade">
+        <div class="form-group">
+            <label>GRADO</label>
+            <input id="studentGrade" class="input-estudiante">
+        </div>
 
-        <label>DOCUMENTO</label>
-        <input class="input" id="doc">
+        <div class="form-group">
+            <label>DOCUMENTO</label>
+            <input id="studentDoc" class="input-estudiante">
+        </div>
 
-        <label>CORREO ELECTRÓNICO</label>
-        <input class="input" id="email" type="email">
+        <div class="form-group">
+            <label>CORREO ELECTRÓNICO</label>
+            <input id="studentEmail" type="email" class="input-estudiante">
+        </div>
 
-        <button onclick="pagar()">PAGAR</button>
+        <button onclick="enviarWhatsApp()" class="btn-whatsapp">PAGAR</button>
+        <div id="paymentStatus" style="display:none;margin-top:10px;font-weight:700;"></div>
     </div>
 
 </div>
@@ -141,56 +174,108 @@
 <script>
 function init() {
     const carrito = JSON.parse(localStorage.getItem('mm_cart_v1')) || [];
-    let total = 0;
+    const bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]');
 
-    const html = carrito.map(p => {
-        const subtotal = p.price * (p.qty || 1);
+    function norm(s){ return String(s||'').trim().toLowerCase(); }
+
+    let total = 0;
+    const html = carrito.map(i => {
+        const match = bdb.find(r => norm(r.producto) === norm(i.title));
+        const unit = match ? Number(match.costo) : Number(i.price || 0);
+        const subtotal = unit * (i.qty || 1);
         total += subtotal;
-        return `<div class="producto">
-            <span>${p.title} x${p.qty || 1}</span>
-            <strong>$${subtotal.toLocaleString()}</strong>
-        </div>`;
+
+        return `
+            <div class="producto-row">
+                <img src="${i.image || ''}">
+                <div style="flex:1">
+                    <strong>${i.title}</strong><br>
+                    Cantidad: ${i.qty || 1} • $${unit.toLocaleString()}
+                </div>
+                <strong>$${subtotal.toLocaleString()}</strong>
+            </div>`;
     }).join('');
 
-    document.getElementById('productos').innerHTML = html || 'Sin productos';
-    document.getElementById('total').innerText = `Total: $${total.toLocaleString()}`;
-
+    document.getElementById('lista-productos').innerHTML = html;
+    document.getElementById('total-precio').innerText = `Total: $${total.toLocaleString()}`;
     localStorage.setItem('total_calc', total);
 }
 
-function pagar() {
-    const last = lastName.value.trim();
-    const first = firstName.value.trim();
-    const grade = grade.value.trim();
-    const doc = doc.value.trim();
-    const email = document.getElementById('email').value.trim();
+function enviarWhatsApp() {
+  const entrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
 
-    if (!last || !first || !grade || !doc || !email) {
-        alert('Completa todos los datos.');
-        return;
-    }
+  const sLast  = document.getElementById('studentLastName').value.trim();
+  const sFirst = document.getElementById('studentFirstName').value.trim();
+  const sGrade = document.getElementById('studentGrade').value.trim();
+  const sDoc   = document.getElementById('studentDoc').value.trim();
+  const sEmail = document.getElementById('studentEmail').value.trim();
 
-    const total = Number(localStorage.getItem('total_calc'));
-    const reference = `MM-${Date.now()}-${doc}`;
+  const total = Number(localStorage.getItem('total_calc') || 0);
 
-    const checkout = new WidgetCheckout({
-        currency: 'COP',
-        amountInCents: total * 100,
-        reference: reference,
+  if (!sLast || !sFirst || !sGrade || !sDoc || !sEmail) {
+    alert("Completa todos los datos del estudiante.");
+    return;
+  }
 
-        // 🔴 CAMBIA ESTA LLAVE
-        publicKey: 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK',
+  if (!/\S+@\S+\.\S+/.test(sEmail)) {
+    alert("Correo electrónico inválido.");
+    return;
+  }
 
-        redirectUrl: 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html',
+  entrega.student = { last: sLast, first: sFirst, grade: sGrade, doc: sDoc, email: sEmail };
+  localStorage.setItem('datos_entrega', JSON.stringify(entrega));
 
-        customerData: {
-            email: email,
-            fullName: `${first} ${last}`
-        }
-    });
+  const reference = `MM-${Date.now()}-${sDoc}`;
+  const amountInCents = Math.round(total * 100);
 
-    checkout.open();
+  const statusEl = document.getElementById('paymentStatus');
+  statusEl.style.display = 'block';
+  statusEl.innerText = 'Abriendo pasarela de pago…';
+
+  // Cargar widget.js si no está cargado
+  if (!window.WidgetCheckout) {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.wompi.co/widget.js';
+    script.onload = () => {
+      abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast, statusEl);
+    };
+    document.head.appendChild(script);
+  } else {
+    abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast, statusEl);
+  }
 }
+
+function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast, statusEl) {
+  const checkout = new WidgetCheckout({
+    currency: 'COP',
+    amountInCents: amountInCents,
+    reference: reference,
+    publicKey: 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK',
+    customerData: {
+      email: sEmail,
+      fullName: `${sFirst} ${sLast}`
+    },
+    onResponse: function(data) {
+      console.log('Respuesta Wompi:', data);
+      localStorage.setItem('wompi_last_response', JSON.stringify(data));
+      
+      if (data.transaction && data.transaction.status === 'APPROVED') {
+        statusEl.innerText = '✓ Pago aprobado. Redirigiendo...';
+        statusEl.style.color = 'green';
+        setTimeout(() => {
+          window.location.href = 'https://angelicagarcia.github.io/Math-Minds-/pago_exitoso.html';
+        }, 1500);
+      } else {
+        statusEl.innerText = 'Pago procesado. Verifica tu correo.';
+        statusEl.style.color = '#333';
+      }
+    }
+  });
+
+  checkout.open();
+}
+
+
 
 init();
 </script>
