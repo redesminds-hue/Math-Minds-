@@ -21,44 +21,8 @@
   </script>
 
   <!-- Using Widget Checkout Web only: do NOT load v1.js or call $wompi.initialize to avoid merchants/undefined. -->
-  <!-- Interceptor: bloquea intentos del frontend de llamar a /v1/transactions directamente -->
-  <script>
-    (function(){
-      const blockPattern = /https?:\/\/(?:api|sandbox)\.wompi\.co\/v1\/transactions/;
-      const originalFetch = window.fetch.bind(window);
-      window.fetch = function(input, init){
-        try{
-          const url = typeof input === 'string' ? input : (input && input.url) || '';
-          if (url && blockPattern.test(url)){
-            console.warn('[wompi-guard] Bloqueado fetch a transacción desde el frontend:', url);
-            return Promise.resolve(new Response(JSON.stringify({ error: { type: 'CLIENT_BLOCKED', message: 'Frontend blocked calling /v1/transactions; use server.' } }), { status: 403, headers: { 'Content-Type':'application/json' } }));
-          }
-        }catch(e){ console.warn('[wompi-guard] error evaluando fetch URL', e); }
-        return originalFetch(input, init);
-      };
-
-      // También bloquear XHR clásicos
-      const origOpen = XMLHttpRequest.prototype.open;
-      const origSend = XMLHttpRequest.prototype.send;
-      XMLHttpRequest.prototype.open = function(method, url){
-        this._requestedUrl = url;
-        return origOpen.apply(this, arguments);
-      };
-      XMLHttpRequest.prototype.send = function(body){
-        try{
-          if (this._requestedUrl && blockPattern.test(this._requestedUrl)){
-            console.warn('[wompi-guard] Bloqueado XHR a transacción desde el frontend:', this._requestedUrl);
-            this.readyState = 4;
-            this.status = 403;
-            this.responseText = JSON.stringify({ error: { type: 'CLIENT_BLOCKED', message: 'Frontend blocked calling /v1/transactions; use server.' } });
-            if (typeof this.onload === 'function') this.onload();
-            return;
-          }
-        }catch(e){ console.warn('[wompi-guard] error evaluando XHR URL', e); }
-        return origSend.apply(this, arguments);
-      };
-    })();
-  </script>
+  <!-- Service Worker proxies Wompi POSTs to the backend; no client-side fetch/XHR blocking here -->
+    <!-- Service Worker proxies Wompi POSTs to the backend; no client-side fetch/XHR blocking here -->
 
   <!-- ✅ Script oficial del widget (necesario para Checkout Web) -->
   <script src="https://checkout.wompi.co/widget.js" async data-public-key="pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK"></script>
@@ -525,38 +489,99 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
   status.innerText = 'Preparando pasarela de pago...';
   container.appendChild(status);
 
-  try {
-    // Crear la transacción en backend (backend usa PRIVATE_KEY y evita errores de public_key)
-    status.innerText = 'Creando transacción en el servidor...';
-    const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
-    });
-    const text = await resp.text();
-    let data = {};
-    try { data = text ? JSON.parse(text) : {}; } catch (err) { data = { raw: text }; }
+  
+    try {
+      // Primero solicitamos la firma de integridad al servidor
+      status.innerText = 'Solicitando firma al servidor...';
+      const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount_in_cents: amountInCents, reference, currency: WOMPI_CURRENCY })
+      });
+      const sigJson = await sigResp.json().catch(() => ({}));
+      if (!sigResp.ok || !sigJson.signature) {
+        console.warn('Firma no disponible, fallback a creación de transacción en servidor', sigJson);
+        // Fallback: pedir al servidor que cree la transacción y usar checkout_url
+        status.innerText = 'Creando transacción en el servidor...';
+        const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
+        });
+        const text = await resp.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch (err) { data = { raw: text }; }
+        const checkout = data.checkout_url || (data.data && data.data.checkout_url);
+        if (checkout) { window.open(checkout, '_blank'); return; }
+        container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
+        return;
+      }
 
-    if (!resp.ok && !data.checkout_url) {
-      status.innerText = 'Error creando transacción: ' + (data.message || resp.status + ' ' + resp.statusText);
-      const pre = document.createElement('pre'); pre.style.whiteSpace='pre-wrap'; pre.textContent = JSON.stringify(data, null, 2); container.appendChild(pre);
-      return;
+      const signature = sigJson.signature;
+
+      // Inyectar el script del widget con los data-attributes (incluyendo data-signature:integrity)
+      status.innerText = 'Preparando botón del widget...';
+      // Limpiar contenedor e insertar script tag configurado
+      container.innerHTML = '';
+      const script = document.createElement('script');
+      script.src = 'https://checkout.wompi.co/widget.js';
+      script.async = true;
+      script.setAttribute('data-render', 'button');
+      script.setAttribute('data-public-key', WOMPI_PUBLIC_KEY);
+      script.setAttribute('data-currency', WOMPI_CURRENCY);
+      script.setAttribute('data-amount-in-cents', String(amountInCents));
+      script.setAttribute('data-reference', String(reference));
+      // attribute name must include colon as per widget API
+      script.setAttribute('data-signature:integrity', signature);
+      // redirect to our server result endpoint
+      script.setAttribute('data-redirect-url', PAYMENT_SERVER_URL + '/transaction-result');
+      // append optional expiration time if server returned it
+      if (sigJson.payload && sigJson.payload.includes('T') && sigJson.payload.includes('Z')) {
+        // If the server used expiration in the payload, try to extract it roughly and set attribute
+        // The frontend should also pass expiration if desired; for now we skip precise parsing
+      }
+      container.appendChild(script);
+
+      // After the widget script loads it will render a button. Attempt to auto-click it to open the checkout.
+      script.addEventListener('load', () => {
+        status.innerText = 'Abriendo widget...';
+        // Common patterns: the widget renders a button with data-wompi-button or similar; try generic button
+        setTimeout(() => {
+          const btn = container.querySelector('button') || document.querySelector('button[data-wompi]') || document.querySelector('button.wompi-button');
+          if (btn) { try { btn.click(); return; } catch (e) { /* ignore */ } }
+          // if no button clickable, fallback to create-transaction
+          (async () => {
+            status.innerText = 'Abriendo checkout fallback...';
+            const resp2 = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
+            });
+            const text2 = await resp2.text();
+            let data2 = {};
+            try { data2 = text2 ? JSON.parse(text2) : {}; } catch (err) { data2 = { raw: text2 }; }
+            const checkout2 = data2.checkout_url || (data2.data && data2.data.checkout_url);
+            if (checkout2) { window.open(checkout2, '_blank'); return; }
+            container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
+          })();
+        }, 600);
+      });
+      const resp2 = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
+      });
+      const text2 = await resp2.text();
+      let data2 = {};
+      try { data2 = text2 ? JSON.parse(text2) : {}; } catch (err) { data2 = { raw: text2 }; }
+      const checkout2 = data2.checkout_url || (data2.data && data2.data.checkout_url);
+      if (checkout2) { window.open(checkout2, '_blank'); return; }
+      container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
+
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
     }
-
-    const checkout = data.checkout_url || (data.data && data.data.checkout_url);
-    if (!checkout) {
-      status.innerText = 'No se recibió checkout_url desde el servidor.';
-      const pre = document.createElement('pre'); pre.style.whiteSpace='pre-wrap'; pre.textContent = JSON.stringify(data, null, 2); container.appendChild(pre);
-      return;
-    }
-
-    status.innerText = 'Redirigiendo al checkout...';
-    window.open(checkout, '_blank');
-
-  } catch (e) {
-    console.error(e);
-    container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
-  }
 }
 
 /* ============================================

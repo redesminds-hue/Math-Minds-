@@ -11,16 +11,20 @@ self.addEventListener('fetch', event => {
   // If the page attempts to POST directly to Wompi transactions, proxy to our backend instead
   if (/https?:\/\/(?:api|sandbox)\.wompi\.co\/v1\/transactions/.test(url) && event.request.method === 'POST') {
     event.respondWith((async () => {
-      try {
-        // try to read JSON body
-        let reqBody = null;
         try {
-          const clone = event.request.clone();
-          reqBody = await clone.json();
-        } catch (e) {
-          // not JSON or failed; try text
-          try { reqBody = await event.request.clone().text(); } catch (e2) { reqBody = null; }
-        }
+          // try to read JSON body
+          let reqBody = null;
+          try {
+            const clone = event.request.clone();
+            reqBody = await clone.json();
+          } catch (e) {
+            // not JSON or failed; try text
+            try { reqBody = await event.request.clone().text(); } catch (e2) { reqBody = null; }
+          }
+          // Debug: log intercepted request for easier diagnosis
+          try {
+            console.log('[wompi-sw] Intercepted Wompi POST to:', event.request.url, 'body:', reqBody);
+          } catch (e) { /* ignore logging errors */ }
 
         // Build a request to our local backend endpoint
         const backendUrl = self.registration.scope.replace(/\/$/, '') + '/api/proxy-create-transaction';

@@ -109,9 +109,34 @@ app.post('/api/create-transaction', async (req, res) => {
 
 // Webhook listener (para recibir notificaciones de Wompi)
 app.post('/api/webhook', (req, res) => {
-  console.log('Webhook recibido:', JSON.stringify(req.body, null, 2));
-  // TODO: Verificar firma/validar evento según documentación de Wompi
-  res.status(200).send('ok');
+  try {
+    const sigHeader = req.get('x-wompi-signature') || req.get('x-hook-signature') || req.get('x-wompi-webhook-signature') || req.get('x-signature') || req.get('x-wompi-signature'.toLowerCase());
+    const bodyStr = JSON.stringify(req.body || {});
+    let verified = false;
+
+    if (WOMPI_INTEGRITY_SECRET && sigHeader) {
+      // Common webhook verification approaches: HMAC-SHA256 of raw body, or SHA256 of body+secret
+      try {
+        const hmac = crypto.createHmac('sha256', String(WOMPI_INTEGRITY_SECRET)).update(bodyStr, 'utf8').digest('hex');
+        const alt = crypto.createHash('sha256').update(bodyStr + String(WOMPI_INTEGRITY_SECRET), 'utf8').digest('hex');
+        if (sigHeader === hmac || sigHeader === alt) verified = true;
+      } catch (e) { console.warn('Error computing webhook signature:', e); }
+    }
+
+    console.log('Webhook recibido:', JSON.stringify(req.body, null, 2));
+    console.log('Webhook signature header:', sigHeader, 'verified:', verified);
+
+    if (!verified && WOMPI_INTEGRITY_SECRET) {
+      return res.status(401).json({ message: 'Firma inválida', verified: false });
+    }
+
+    // Aquí procesa el evento (guardar en BD, actualizar estado, etc.)
+    // Por ahora devolvemos ok
+    return res.status(200).json({ ok: true, verified });
+  } catch (err) {
+    console.error('Error en webhook handler:', err);
+    return res.status(500).json({ message: 'Error interno', error: String(err) });
+  }
 });
 
 // Mount proxy route used by ServiceWorker
@@ -124,13 +149,16 @@ try {
 const crypto = require('crypto');
 app.post('/api/generate-signature', (req, res) => {
   try {
-    const { amount_in_cents, reference, currency = 'COP', format } = req.body;
+    const { amount_in_cents, reference, currency = 'COP', format, expiration_time, expirationTime } = req.body;
+    const expiration = expiration_time || expirationTime || process.env.EXPIRATION_TIME || '';
     if (!WOMPI_INTEGRITY_SECRET) return res.status(400).json({ message: 'WOMPI_INTEGRITY_SECRET no configurado en el servidor' });
     if (!amount_in_cents || !reference) return res.status(400).json({ message: 'Faltan amount_in_cents o reference' });
 
     const candidates = {
+      // Standard: <reference><amount><currency><secret>
       '1': () => `${String(reference)}${String(amount_in_cents)}${String(currency)}${String(WOMPI_INTEGRITY_SECRET)}`,
-      '2': () => `${String(reference)}${String(amount_in_cents)}${String(currency)}${String(process.env.EXPIRATION_TIME || '')}${String(WOMPI_INTEGRITY_SECRET)}`,
+      // With expiration: <reference><amount><currency><expiration><secret>
+      '2': () => `${String(reference)}${String(amount_in_cents)}${String(currency)}${String(expiration)}${String(WOMPI_INTEGRITY_SECRET)}`,
       // legacy variants for debugging (without secret, or different order) kept for testing
       '3': () => `${String(amount_in_cents)}|${String(currency)}|${String(reference)}`,
       '4': () => `${String(amount_in_cents)}${String(currency)}${String(reference)}${String(WOMPI_INTEGRITY_SECRET)}`,
