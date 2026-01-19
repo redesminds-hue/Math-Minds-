@@ -1257,10 +1257,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.addEventListener('keydown', escMini);
 
         // delegate inside mini for inc/dec/remove
+        // Stop propagation so the global document click handler doesn't run twice
         mini.addEventListener('click', (e)=>{
-          const inc = e.target && e.target.closest && e.target.closest('[data-inc]'); if (inc){ API.changeQty(inc.getAttribute('data-inc'), 1); API.open(); return; }
-          const dec = e.target && e.target.closest && e.target.closest('[data-dec]'); if (dec){ API.changeQty(dec.getAttribute('data-dec'), -1); API.open(); return; }
-          const rem = e.target && e.target.closest && e.target.closest('[data-remove]'); if (rem){ API.remove(rem.getAttribute('data-remove')); API.open(); return; }
+          const inc = e.target && e.target.closest && e.target.closest('[data-inc]'); if (inc){ e.stopPropagation(); API.changeQty(inc.getAttribute('data-inc'), 1); API.open(); return; }
+          const dec = e.target && e.target.closest && e.target.closest('[data-dec]'); if (dec){ e.stopPropagation(); API.changeQty(dec.getAttribute('data-dec'), -1); API.open(); return; }
+          const rem = e.target && e.target.closest && e.target.closest('[data-remove]'); if (rem){ e.stopPropagation(); API.remove(rem.getAttribute('data-remove')); API.open(); return; }
         });
 
       }catch(e){ API.showEmptyNotice('Carrito (vista rápida)'); }

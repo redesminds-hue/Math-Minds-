@@ -448,16 +448,21 @@
 
            
             const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzk6TLMy6MiWqbV0xhpKzVIXl7hmptVraLb6VnXg1VdLTPuOktQiCsJHUtP5RuMSwUb/exec'; // <-- paste your Apps Script URL here
+            const PAYMENT_SERVER_URL = 'http://localhost:3000';
 
             async function sendToSheet(payload){
-                if (!SHEET_WEBHOOK_URL) return { ok: false, error: 'NO_ENDPOINT' };
+                // Prefer sending via local payment server proxy to avoid CORS issues
+                const target = (typeof PAYMENT_SERVER_URL !== 'undefined' && PAYMENT_SERVER_URL) ? (PAYMENT_SERVER_URL + '/api/send-to-sheet') : SHEET_WEBHOOK_URL;
+                if (!target) return { ok: false, error: 'NO_ENDPOINT' };
                 try{
                     const controller = new AbortController();
                     const id = setTimeout(() => controller.abort(), 8000); // 8s timeout
-                    const resp = await fetch(SHEET_WEBHOOK_URL, {
+                    // Wrap payload into { action: 'create', payload }
+                    const body = JSON.stringify({ action: 'create', payload });
+                    const resp = await fetch(target, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
+                        body,
                         signal: controller.signal,
                         mode: 'cors'
                     });

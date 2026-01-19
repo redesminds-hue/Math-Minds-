@@ -9,7 +9,11 @@
 
   <!-- Registrar Service Worker lo antes posible para bloquear peticiones directas a /v1/transactions -->
   <script>
-    if ('serviceWorker' in navigator) {
+    // During local development the ServiceWorker may intercept requests
+    // and cause `Failed to fetch` if the local backend is not running.
+    // Set `DISABLE_SW_ON_DEV = true` to avoid registering the SW on localhost.
+    const DISABLE_SW_ON_DEV = true;
+    if ('serviceWorker' in navigator && !DISABLE_SW_ON_DEV) {
       try {
         navigator.serviceWorker.register('/sw-wompi-guard.js', { scope: '/' }).then(reg => {
           console.log('[wompi-sw] ServiceWorker registrado:', reg.scope);
@@ -17,6 +21,8 @@
       } catch(e) {
         console.warn('[wompi-sw] registro error', e);
       }
+    } else if (DISABLE_SW_ON_DEV) {
+      console.log('[wompi-sw] Registro de ServiceWorker deshabilitado en modo desarrollo.');
     }
   </script>
 
@@ -331,7 +337,13 @@ async function getOrCreateReference() {
           if (!j.used) return ref;
           // used -> fallthrough to generate new
         }
-      } catch (e) { /* if status check fails, keep ref to allow completing */ return ref; }
+      } catch (e) {
+        // If status check fails (network/backend error), do NOT reuse the possibly-stale ref.
+        // Safer to generate a fresh reference than to risk 'reference already used'.
+        console.warn('[getOrCreateReference] status check failed, generating new ref', e);
+        try { localStorage.removeItem(key); localStorage.removeItem(tsKey); } catch (er){}
+        // continue to generate new ref below
+      }
     }
     // generate new
     const newRef = `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
@@ -501,19 +513,26 @@ async function validarYCargarWidget() {
   localStorage.setItem('datos_entrega', JSON.stringify(entrega));
 
   const total = Number(localStorage.getItem('total_calc') || 0);
-  // Use a frozen reference if present and not used; otherwise create a new one
+  // Use a stable reference for the current payment attempt (avoid regenerating on every input)
   const reference = await getOrCreateReference();
   const amountInCents = Math.round(total * 100);
 
-  // Inyectar el widget automáticamente: solicitamos la firma y añadimos el script
+  // Auto-inject the Wompi widget once (prevent duplicates)
   try {
-    // Prevent duplicate or concurrent injections for the same reference
-    if (container.dataset.widgetReference === String(reference) || container.getAttribute('data-widget-loading') === String(reference) || container.querySelector(`script[data-reference="${reference}"]`)) return;
+    // If widget is already injected on the page, do nothing
+    if (window.__mm_widget_injected) return;
+    // If a widget injection is already in progress, skip duplicate starts
+    if (window.__mm_widget_loading) return;
+    window.__mm_widget_loading = true;
+
+    // Clean any previous content and remove any previous widget script tags to avoid duplicates
+    container.innerHTML = '';
+    const existingScripts = Array.from(document.querySelectorAll('script[src="https://checkout.wompi.co/widget.js"]'));
+    existingScripts.forEach(s => { try { s.parentNode && s.parentNode.removeChild(s); } catch (e){} });
 
     // mark as loading so concurrent calls don't duplicate the script
     container.setAttribute('data-widget-loading', String(reference));
 
-    container.innerHTML = '';
     const status = document.createElement('div');
     status.style.color = '#333'; status.style.fontSize = '14px'; status.style.marginBottom = '12px';
     status.innerText = 'Solicitando firma para mostrar la pasarela...';
@@ -531,6 +550,7 @@ async function validarYCargarWidget() {
     }
 
     const signature = sigJson.signature;
+
     // Validar llave pública
     if (!WOMPI_PUBLIC_KEY || (typeof WOMPI_PUBLIC_KEY !== 'string') || !WOMPI_PUBLIC_KEY.startsWith('pub_')) {
       status.innerText = 'Clave pública inválida o ausente.';
@@ -555,11 +575,16 @@ async function validarYCargarWidget() {
       try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
       container.setAttribute('data-widget-reference', String(reference));
       container.removeAttribute('data-widget-loading');
+      window.__mm_widget_injected = true;
+      window.__mm_widget_reference = String(reference);
+      window.__mm_widget_loading = false;
     });
 
     script.addEventListener('error', () => {
       try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
       container.removeAttribute('data-widget-loading');
+      window.__mm_widget_loading = false;
+      window.__mm_widget_injected = false;
       container.innerHTML = '<p style="color:#ff6b6b">Error cargando el widget.</p>';
     });
 
@@ -576,6 +601,13 @@ async function validarYCargarWidget() {
 ============================================ */
 async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast) {
   const container = document.getElementById('wompi-widget-container');
+  // If our widget is already injected for this reference, try to trigger its button instead of reinjecting
+  if (window.__mm_widget_injected && window.__mm_widget_reference === String(reference)) {
+    try {
+      const existingBtn = container.querySelector('button');
+      if (existingBtn) { existingBtn.click(); return; }
+    } catch (e) { /* ignore and continue to re-create */ }
+  }
   container.innerHTML = '';
 
   const status = document.createElement('div');
@@ -587,6 +619,12 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
 
   
     try {
+        // Before requesting signature, persist a pending registration to the sheet (non-blocking)
+        try {
+          const entrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}') || {};
+          const payloadToSheet = Object.assign({}, entrega, { reference, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
+          fetch(`${PAYMENT_SERVER_URL}/api/send-to-sheet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', payload: payloadToSheet }) }).then(r=>r.text().then(t=>console.log('sheet create response', t))).catch(e=>console.warn('sheet create failed', e));
+        } catch (e) { console.warn('Failed preparing sheet payload', e); }
       // Primero solicitamos la firma de integridad al servidor
       status.innerText = 'Solicitando firma al servidor...';
       const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {

@@ -26,11 +26,9 @@ self.addEventListener('fetch', event => {
             console.log('[wompi-sw] Intercepted Wompi POST to:', event.request.url, 'body:', reqBody);
           } catch (e) { /* ignore logging errors */ }
 
-        // Build a request to our local backend endpoint
-        const backendUrl = self.registration.scope.replace(/\/$/, '') + '/api/proxy-create-transaction';
-        // If scope resolution doesn't yield a full origin, fallback to localhost:3000
-        const fallbackBackend = 'http://localhost:3000/api/create-transaction';
-        const target = backendUrl.startsWith('http') ? backendUrl : fallbackBackend;
+        // Prefer our local payment server proxy (avoid deriving from SW scope which may be the LiveServer origin)
+        const preferredBackend = 'http://localhost:3000/api/proxy-create-transaction';
+        const target = preferredBackend;
 
         const proxyResp = await fetch(target, {
           method: 'POST',
@@ -41,17 +39,30 @@ self.addEventListener('fetch', event => {
         // Return backend response to the original caller
         const text = await proxyResp.text();
         const headers = new Headers(proxyResp.headers);
-        // ensure CORS-friendly headers
+        // ensure CORS-friendly headers for responses forwarded from the backend
         headers.set('Access-Control-Allow-Origin', '*');
+        headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        headers.set('Access-Control-Allow-Headers', '*');
         return new Response(text, { status: proxyResp.status, statusText: proxyResp.statusText, headers });
       } catch (err) {
         const body = JSON.stringify({ error: { type: 'SW_PROXY_ERROR', message: String(err) } });
-        return new Response(body, { status: 502, headers: { 'Content-Type': 'application/json' } });
+        return new Response(body, { status: 502, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
       }
     })());
     return;
   }
 
-  // Default: let the request go to network
-  event.respondWith(fetch(event.request));
+  // Default: let the request go to network but handle network errors to avoid unhandled rejections
+  event.respondWith((async () => {
+    try {
+      return await fetch(event.request);
+    } catch (err) {
+      // Return a safe JSON error response instead of letting the fetch fail silently in the SW
+      try { console.warn('[wompi-sw] network fetch failed for', event.request.url, err); } catch (e) {}
+      return new Response(JSON.stringify({ error: 'NETWORK_ERROR', message: String(err), url: event.request && event.request.url }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+  })());
 });

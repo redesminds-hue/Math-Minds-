@@ -1,0 +1,1 @@
+{"action":"create","payload":{"reference":"MM-test-auto-003","email":"test@example.com","colegio":"Colegio Test","grado":"5","nombre":"Test","apellido":"User","documento":"99999999","direccion":"Calle Test 123","telefono":"3000000000","carrito":[{"id":1,"name":"Libro","qty":1}]}}

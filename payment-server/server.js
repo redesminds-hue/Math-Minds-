@@ -108,7 +108,7 @@ app.post('/api/create-transaction', async (req, res) => {
 });
 
 // Webhook listener (para recibir notificaciones de Wompi)
-app.post('/api/webhook', (req, res) => {
+app.post('/api/webhook', async (req, res) => {
   try {
     const sigHeader = req.get('x-wompi-signature') || req.get('x-hook-signature') || req.get('x-wompi-webhook-signature') || req.get('x-signature') || req.get('x-wompi-signature'.toLowerCase());
     const bodyStr = JSON.stringify(req.body || {});
@@ -140,6 +140,18 @@ app.post('/api/webhook', (req, res) => {
       if (reference) {
         markRefUsed(reference, { source: 'webhook', payload: req.body });
         console.log('Marked reference used:', reference);
+        // Try to notify Google Sheets via the configured Apps Script webhook
+        try {
+          const sheetUrl = process.env.SHEET_WEBHOOK_URL;
+          if (sheetUrl) {
+            await fetch(sheetUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'update', payload: { reference, status: 'paid', paid: true, webhook: req.body } })
+            });
+            console.log('Sheet updated for reference:', reference);
+          }
+        } catch (e) { console.warn('Failed to update sheet from webhook', e); }
       }
     } catch (e) { console.warn('Could not extract reference from webhook payload', e); }
 
@@ -200,6 +212,28 @@ app.post('/api/generate-signature', (req, res) => {
   } catch (err) {
     console.error('Error generando firma:', err);
     return res.status(500).json({ message: 'Error generando firma', error: String(err) });
+  }
+});
+
+// Proxy endpoint to send data to a Google Apps Script webhook (avoids client-side CORS)
+app.post('/api/send-to-sheet', async (req, res) => {
+  try {
+    const sheetUrl = process.env.SHEET_WEBHOOK_URL || req.body.sheet_url;
+    if (!sheetUrl) return res.status(400).json({ message: 'SHEET_WEBHOOK_URL not configured' });
+    // Forward the entire incoming body to the Apps Script webhook so the
+    // `action` envelope is preserved (e.g. { action: 'create', payload: {...} }).
+    const forwardBody = req.body;
+    console.log('[payment-server] forwarding to sheet webhook:', JSON.stringify(forwardBody));
+    const r = await fetch(sheetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(forwardBody)
+    });
+    const text = await r.text().catch(() => '');
+    try { const json = JSON.parse(text); return res.status(r.status).json(json); } catch (e) { return res.status(r.status).send(text); }
+  } catch (err) {
+    console.error('Error proxying to sheet webhook:', err);
+    return res.status(500).json({ message: 'Error proxying to sheet', error: String(err) });
   }
 });
 
