@@ -130,8 +130,20 @@ app.post('/api/webhook', (req, res) => {
       return res.status(401).json({ message: 'Firma inválida', verified: false });
     }
 
+    // Intentar extraer la referencia de la transacción del payload según esquema Wompi
+    try {
+      const data = req.body && (req.body.data || req.body);
+      let reference = null;
+      if (data && data.transaction && data.transaction.reference) reference = data.transaction.reference;
+      if (!reference && data && data.reference) reference = data.reference;
+      if (!reference && req.body && req.body.reference) reference = req.body.reference;
+      if (reference) {
+        markRefUsed(reference, { source: 'webhook', payload: req.body });
+        console.log('Marked reference used:', reference);
+      }
+    } catch (e) { console.warn('Could not extract reference from webhook payload', e); }
+
     // Aquí procesa el evento (guardar en BD, actualizar estado, etc.)
-    // Por ahora devolvemos ok
     return res.status(200).json({ ok: true, verified });
   } catch (err) {
     console.error('Error en webhook handler:', err);
@@ -189,6 +201,41 @@ app.post('/api/generate-signature', (req, res) => {
     console.error('Error generando firma:', err);
     return res.status(500).json({ message: 'Error generando firma', error: String(err) });
   }
+});
+
+// Simple persistence for used references (file-backed)
+const fs = require('fs');
+const path = require('path');
+const USED_REFS_FILE = path.join(__dirname, 'used_references.json');
+
+function readUsedRefs() {
+  try {
+    if (!fs.existsSync(USED_REFS_FILE)) return {};
+    const txt = fs.readFileSync(USED_REFS_FILE, 'utf8') || '{}';
+    return JSON.parse(txt || '{}');
+  } catch (e) { console.warn('readUsedRefs error', e); return {}; }
+}
+
+function markRefUsed(reference, meta) {
+  try {
+    const all = readUsedRefs();
+    all[String(reference)] = { ts: Date.now(), meta: meta || null };
+    fs.writeFileSync(USED_REFS_FILE, JSON.stringify(all, null, 2), 'utf8');
+    return true;
+  } catch (e) { console.error('markRefUsed error', e); return false; }
+}
+
+function isRefUsed(reference) {
+  const all = readUsedRefs();
+  return Boolean(all && all[String(reference)]);
+}
+
+// Endpoint to check whether a reference has already been used
+app.get('/api/reference-status', (req, res) => {
+  const reference = req.query.reference || req.query.ref;
+  if (!reference) return res.status(400).json({ message: 'Falta referencia' });
+  const used = isRefUsed(reference);
+  return res.json({ reference, used });
 });
 
 app.get('/transaction-result', (req, res) => {

@@ -24,8 +24,7 @@
   <!-- Service Worker proxies Wompi POSTs to the backend; no client-side fetch/XHR blocking here -->
     <!-- Service Worker proxies Wompi POSTs to the backend; no client-side fetch/XHR blocking here -->
 
-  <!-- ✅ Script oficial del widget (necesario para Checkout Web) -->
-  <script src="https://checkout.wompi.co/widget.js" async data-public-key="pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK"></script>
+  <!-- Widget será inyectado dinámicamente cuando tengamos firma; NO cargarlo globalmente aquí -->
 
   <style>
     :root {
@@ -308,6 +307,39 @@ function getFrozenReference() {
   return ref;
 }
 
+function generateReference() {
+  // Always return a fresh unique reference for each payment attempt
+  // and clear any previously stored frozen reference to avoid reuse.
+  try { localStorage.removeItem('wompi_frozen_reference'); } catch (e) { /* ignore */ }
+  return `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
+}
+
+async function getOrCreateReference() {
+  const key = 'wompi_frozen_reference';
+  const tsKey = 'wompi_frozen_ts';
+  try {
+    let ref = localStorage.getItem(key);
+    const ts = Number(localStorage.getItem(tsKey) || '0');
+    const now = Date.now();
+    const EXPIRY_MS = 1000 * 60 * 60; // 1 hour
+    if (ref && (now - ts) < EXPIRY_MS) {
+      // Check with server if reference already used
+      try {
+        const r = await fetch(`${PAYMENT_SERVER_URL}/api/reference-status?reference=${encodeURIComponent(ref)}`);
+        if (r.ok) {
+          const j = await r.json().catch(()=>({used:false}));
+          if (!j.used) return ref;
+          // used -> fallthrough to generate new
+        }
+      } catch (e) { /* if status check fails, keep ref to allow completing */ return ref; }
+    }
+    // generate new
+    const newRef = `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
+    try { localStorage.setItem(key, newRef); localStorage.setItem(tsKey, String(Date.now())); } catch (e) {}
+    return newRef;
+  } catch (e) { return `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`; }
+}
+
 /* ============================================
    INIT
 ============================================ */
@@ -433,9 +465,9 @@ function agregarListeners() {
 }
 
 /* ============================================
-   VALIDAR Y PREPARAR
+  VALIDAR Y PREPARAR
 ============================================ */
-function validarYCargarWidget() {
+async function validarYCargarWidget() {
   const container = document.getElementById('wompi-widget-container');
 
   const sLast = document.getElementById('studentLastName').value.trim();
@@ -469,10 +501,74 @@ function validarYCargarWidget() {
   localStorage.setItem('datos_entrega', JSON.stringify(entrega));
 
   const total = Number(localStorage.getItem('total_calc') || 0);
-  const reference = getFrozenReference();
+  // Use a frozen reference if present and not used; otherwise create a new one
+  const reference = await getOrCreateReference();
   const amountInCents = Math.round(total * 100);
 
-  abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast);
+  // Inyectar el widget automáticamente: solicitamos la firma y añadimos el script
+  try {
+    // Prevent duplicate or concurrent injections for the same reference
+    if (container.dataset.widgetReference === String(reference) || container.getAttribute('data-widget-loading') === String(reference) || container.querySelector(`script[data-reference="${reference}"]`)) return;
+
+    // mark as loading so concurrent calls don't duplicate the script
+    container.setAttribute('data-widget-loading', String(reference));
+
+    container.innerHTML = '';
+    const status = document.createElement('div');
+    status.style.color = '#333'; status.style.fontSize = '14px'; status.style.marginBottom = '12px';
+    status.innerText = 'Solicitando firma para mostrar la pasarela...';
+    container.appendChild(status);
+
+    const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount_in_cents: amountInCents, reference, currency: WOMPI_CURRENCY })
+    });
+    const sigJson = await sigResp.json().catch(()=> ({}));
+    if (!sigResp.ok || !sigJson.signature) {
+      status.innerText = 'No se pudo obtener la firma para el widget.';
+      container.removeAttribute('data-widget-loading');
+      return;
+    }
+
+    const signature = sigJson.signature;
+    // Validar llave pública
+    if (!WOMPI_PUBLIC_KEY || (typeof WOMPI_PUBLIC_KEY !== 'string') || !WOMPI_PUBLIC_KEY.startsWith('pub_')) {
+      status.innerText = 'Clave pública inválida o ausente.';
+      container.removeAttribute('data-widget-loading');
+      return;
+    }
+
+    // Inyectar script del widget
+    const script = document.createElement('script');
+    script.src = 'https://checkout.wompi.co/widget.js';
+    script.async = true;
+    script.setAttribute('data-render', 'button');
+    script.setAttribute('data-public-key', WOMPI_PUBLIC_KEY);
+    script.setAttribute('data-currency', WOMPI_CURRENCY);
+    script.setAttribute('data-amount-in-cents', String(amountInCents));
+    script.setAttribute('data-reference', String(reference));
+    script.setAttribute('data-signature:integrity', signature);
+    const safeRedirect = String(PAYMENT_SERVER_URL).startsWith('http://localhost') ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
+    script.setAttribute('data-redirect-url', safeRedirect);
+
+    script.addEventListener('load', () => {
+      try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
+      container.setAttribute('data-widget-reference', String(reference));
+      container.removeAttribute('data-widget-loading');
+    });
+
+    script.addEventListener('error', () => {
+      try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
+      container.removeAttribute('data-widget-loading');
+      container.innerHTML = '<p style="color:#ff6b6b">Error cargando el widget.</p>';
+    });
+
+    container.appendChild(script);
+  } catch (e) {
+    container.removeAttribute('data-widget-loading');
+    container.innerHTML = '<p style="color:#ff6b6b">Error preparando la pasarela.</p>';
+    console.error(e);
+  }
 }
 
 /* ============================================
@@ -519,6 +615,12 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
 
       const signature = sigJson.signature;
 
+      // Validar llave pública antes de inyectar
+      if (!WOMPI_PUBLIC_KEY || (typeof WOMPI_PUBLIC_KEY !== 'string') || !WOMPI_PUBLIC_KEY.startsWith('pub_')) {
+        container.innerHTML = '<p style="color:#ff6b6b">Clave pública inválida o ausente.</p>';
+        return;
+      }
+
       // Inyectar el script del widget con los data-attributes (incluyendo data-signature:integrity)
       status.innerText = 'Preparando botón del widget...';
       // Limpiar contenedor e insertar script tag configurado
@@ -533,8 +635,9 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
       script.setAttribute('data-reference', String(reference));
       // attribute name must include colon as per widget API
       script.setAttribute('data-signature:integrity', signature);
-      // redirect to our server result endpoint
-      script.setAttribute('data-redirect-url', PAYMENT_SERVER_URL + '/transaction-result');
+      // redirect to our server result endpoint (use safe redirect when running on localhost)
+      const safeRedirect = String(PAYMENT_SERVER_URL).startsWith('http://localhost') ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
+      script.setAttribute('data-redirect-url', safeRedirect);
       // append optional expiration time if server returned it
       if (sigJson.payload && sigJson.payload.includes('T') && sigJson.payload.includes('Z')) {
         // If the server used expiration in the payload, try to extract it roughly and set attribute
@@ -542,41 +645,11 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
       }
       container.appendChild(script);
 
-      // After the widget script loads it will render a button. Attempt to auto-click it to open the checkout.
+      // After the widget script loads it will render a button.
       script.addEventListener('load', () => {
-        status.innerText = 'Abriendo widget...';
-        // Common patterns: the widget renders a button with data-wompi-button or similar; try generic button
-        setTimeout(() => {
-          const btn = container.querySelector('button') || document.querySelector('button[data-wompi]') || document.querySelector('button.wompi-button');
-          if (btn) { try { btn.click(); return; } catch (e) { /* ignore */ } }
-          // if no button clickable, fallback to create-transaction
-          (async () => {
-            status.innerText = 'Abriendo checkout fallback...';
-            const resp2 = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
-            });
-            const text2 = await resp2.text();
-            let data2 = {};
-            try { data2 = text2 ? JSON.parse(text2) : {}; } catch (err) { data2 = { raw: text2 }; }
-            const checkout2 = data2.checkout_url || (data2.data && data2.data.checkout_url);
-            if (checkout2) { window.open(checkout2, '_blank'); return; }
-            container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
-          })();
-        }, 600);
+        status.innerText = 'Widget listo. Presiona el botón de pago para continuar.';
       });
-      const resp2 = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
-      });
-      const text2 = await resp2.text();
-      let data2 = {};
-      try { data2 = text2 ? JSON.parse(text2) : {}; } catch (err) { data2 = { raw: text2 }; }
-      const checkout2 = data2.checkout_url || (data2.data && data2.data.checkout_url);
-      if (checkout2) { window.open(checkout2, '_blank'); return; }
-      container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
+      // Note: fallback to server-created checkout will be invoked only if widget fails to render or user chooses.
 
     } catch (e) {
       console.error(e);
