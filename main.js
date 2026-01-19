@@ -1844,6 +1844,17 @@ function getProductImage(productName) {
 
 function agregarAlCarrito(nombre, precioRaw, meta) {
   console.log('agregarAlCarrito called with', nombre, precioRaw, meta);
+  try{
+    if (!window._mm_last_add) window._mm_last_add = { key: '', ts: 0 };
+    const now = Date.now();
+    const key = String(nombre || '') + '::' + String(precioRaw || '');
+    // ignore duplicate calls for the same product that happen within 400ms
+    if (window._mm_last_add.key === key && (now - window._mm_last_add.ts) < 400) {
+      console.warn('Ignored duplicate agregarAlCarrito call for', key);
+      return;
+    }
+    window._mm_last_add.key = key; window._mm_last_add.ts = now;
+  }catch(e){}
     // Normalize price (accept numbers or formatted strings)
     const precioNum = Number(String(precioRaw).replace(/[^0-9.-]+/g, '')) || 0;
 
@@ -1937,6 +1948,7 @@ function actualizarContadores() {
 document.addEventListener('click', (e) => {
   const btn = e.target && e.target.closest && e.target.closest('.add-to-cart-btn');
   if (!btn) return;
+  try{ e.preventDefault(); e.stopImmediatePropagation(); }catch(err){}
   const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
   const price = btn.dataset.price || btn.getAttribute('data-price') || null;
   const colegio = btn.dataset.colegio || btn.getAttribute('data-colegio') || '';
@@ -1988,6 +2000,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
   const btn = e.target && e.target.closest && e.target.closest('.add-to-cart-modal');
   if (!btn) return;
+  try{ e.preventDefault(); e.stopImmediatePropagation(); }catch(err){}
   const prod = btn.dataset.product || btn.getAttribute('data-product') || null;
   const price = btn.dataset.price || btn.getAttribute('data-price') || null;
   let colegio = btn.dataset.colegio || btn.getAttribute('data-colegio') || '';

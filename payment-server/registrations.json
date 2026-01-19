@@ -1,0 +1,52 @@
+{
+  "MM-1768851878999-b1zrs8snr": {
+    "reference": "MM-1768851878999-b1zrs8snr",
+    "amount_in_cents": 3800000,
+    "student": {
+      "last": "aDEDF",
+      "first": "sdfDF",
+      "grade": "CUARTO",
+      "doc": "32123124",
+      "email": "dasef@gmail.co"
+    },
+    "parent": {
+      "acudiente": "thsrtht",
+      "documento": "3242342",
+      "colegio": "AMERICANO",
+      "ciudad": "Bogotá",
+      "direccion": "cale 2",
+      "telefono": "234143343",
+      "student": {
+        "last": "aDEDF",
+        "first": "sdfDF",
+        "grade": "CUARTO",
+        "doc": "32123124",
+        "email": "dasef@gmail.co"
+      }
+    },
+    "status": "pending",
+    "updated_at": "2026-01-19T20:18:41.081Z"
+  },
+  "MM-1768853753814-66ryps8jk": {
+    "reference": "MM-1768853753814-66ryps8jk",
+    "amount_in_cents": 11000000,
+    "student": {
+      "last": "gomez o",
+      "first": "oscar m",
+      "grade": "cuarto",
+      "doc": "1014129687",
+      "email": "juan@gmail.com"
+    },
+    "parent": {
+      "student": {
+        "last": "gomez o",
+        "first": "oscar m",
+        "grade": "cuarto",
+        "doc": "1014129687",
+        "email": "juan@gmail.com"
+      }
+    },
+    "status": "pending",
+    "updated_at": "2026-01-19T20:18:41.367Z"
+  }
+}
