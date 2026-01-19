@@ -7,8 +7,61 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- ✅ Script oficial del widget (necesario aunque uses el endpoint /p/) -->
-  <script src="https://checkout.wompi.co/widget.js" async></script>
+  <!-- Registrar Service Worker lo antes posible para bloquear peticiones directas a /v1/transactions -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      try {
+        navigator.serviceWorker.register('/sw-wompi-guard.js', { scope: '/' }).then(reg => {
+          console.log('[wompi-sw] ServiceWorker registrado:', reg.scope);
+        }).catch(err => console.warn('[wompi-sw] registro fallido:', err));
+      } catch(e) {
+        console.warn('[wompi-sw] registro error', e);
+      }
+    }
+  </script>
+
+  <!-- Using Widget Checkout Web only: do NOT load v1.js or call $wompi.initialize to avoid merchants/undefined. -->
+  <!-- Interceptor: bloquea intentos del frontend de llamar a /v1/transactions directamente -->
+  <script>
+    (function(){
+      const blockPattern = /https?:\/\/(?:api|sandbox)\.wompi\.co\/v1\/transactions/;
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = function(input, init){
+        try{
+          const url = typeof input === 'string' ? input : (input && input.url) || '';
+          if (url && blockPattern.test(url)){
+            console.warn('[wompi-guard] Bloqueado fetch a transacción desde el frontend:', url);
+            return Promise.resolve(new Response(JSON.stringify({ error: { type: 'CLIENT_BLOCKED', message: 'Frontend blocked calling /v1/transactions; use server.' } }), { status: 403, headers: { 'Content-Type':'application/json' } }));
+          }
+        }catch(e){ console.warn('[wompi-guard] error evaluando fetch URL', e); }
+        return originalFetch(input, init);
+      };
+
+      // También bloquear XHR clásicos
+      const origOpen = XMLHttpRequest.prototype.open;
+      const origSend = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function(method, url){
+        this._requestedUrl = url;
+        return origOpen.apply(this, arguments);
+      };
+      XMLHttpRequest.prototype.send = function(body){
+        try{
+          if (this._requestedUrl && blockPattern.test(this._requestedUrl)){
+            console.warn('[wompi-guard] Bloqueado XHR a transacción desde el frontend:', this._requestedUrl);
+            this.readyState = 4;
+            this.status = 403;
+            this.responseText = JSON.stringify({ error: { type: 'CLIENT_BLOCKED', message: 'Frontend blocked calling /v1/transactions; use server.' } });
+            if (typeof this.onload === 'function') this.onload();
+            return;
+          }
+        }catch(e){ console.warn('[wompi-guard] error evaluando XHR URL', e); }
+        return origSend.apply(this, arguments);
+      };
+    })();
+  </script>
+
+  <!-- ✅ Script oficial del widget (necesario para Checkout Web) -->
+  <script src="https://checkout.wompi.co/widget.js" async data-public-key="pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK"></script>
 
   <style>
     :root {
@@ -260,7 +313,8 @@
 /* ============================================
    CONFIG WOMPI + APPS SCRIPT (NO TOCAR EL DISEÑO)
 ============================================ */
-const WOMPI_PUBLIC_KEY = 'pub_fENJ3hdTJxdzs3hd35PxDBSMB4f85VrgiY3b6s1';
+// Usa la llave pública de prueba que proporcionaste
+const WOMPI_PUBLIC_KEY = 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK';
 const WOMPI_CURRENCY = 'COP';
 
 /**
@@ -272,6 +326,8 @@ const WOMPI_CURRENCY = 'COP';
 const WOMPI_ENV = 'test'; // <-- CAMBIA A 'prod' cuando ya estés en producción
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGMiQUtjx-kknEK1KpKFu0OecQ8dA0Ox-aOBWsy-SJ5dLKW9vhlP2ONNzjb9xxAYNpHw/exec';
+// URL del servidor que corre el endpoint de creación de transacciones
+const PAYMENT_SERVER_URL = 'http://localhost:3000';
 
 /* ============================================
    VARIABLES GLOBALES
@@ -438,7 +494,6 @@ function validarYCargarWidget() {
   if (checkbox && checkbox.checked) {
     const sAddress = document.getElementById('studentAddress').value.trim();
     const sPhone = document.getElementById('studentPhone').value.trim();
-
     if (!sAddress || !sPhone) {
       container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;">Completa dirección y teléfono para envío a domicilio</p>';
       return;
@@ -457,54 +512,6 @@ function validarYCargarWidget() {
 }
 
 /* ============================================
-   FIRMA (JSONP)
-============================================ */
-function obtenerFirma(amountInCents, reference) {
-  return new Promise((resolve) => {
-    const callbackName = '__wompi_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-    const script = document.createElement('script');
-
-    window[callbackName] = function(resp) {
-      try {
-        const signature = resp && resp.signature ? String(resp.signature).trim() : '';
-        const error = resp && resp.error ? String(resp.error) : '';
-        resolve({ signature, error, raw: resp });
-      } finally {
-        try { delete window[callbackName]; } catch(e){ window[callbackName]=undefined; }
-        if (script.parentNode) script.parentNode.removeChild(script);
-      }
-    };
-
-    const params = new URLSearchParams({
-      amountInCents: String(amountInCents),
-      reference: String(reference),
-      currency: WOMPI_CURRENCY,
-      env: WOMPI_ENV,
-      callback: callbackName
-    });
-
-    script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`;
-    script.async = true;
-
-    script.onerror = function() {
-      try { delete window[callbackName]; } catch(e){ window[callbackName]=undefined; }
-      if (script.parentNode) script.parentNode.removeChild(script);
-      resolve({ signature: '', error: 'No se pudo cargar el Apps Script (red/CSP)', raw: null });
-    };
-
-    setTimeout(() => {
-      if (window[callbackName]) {
-        try { delete window[callbackName]; } catch(e){ window[callbackName]=undefined; }
-        if (script.parentNode) script.parentNode.removeChild(script);
-        resolve({ signature: '', error: 'Timeout esperando respuesta del Apps Script', raw: null });
-      }
-    }, 12000);
-
-    document.head.appendChild(script);
-  });
-}
-
-/* ============================================
    ABRIR PASARELA (WOMPI)
 ============================================ */
 async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast) {
@@ -519,64 +526,32 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
   container.appendChild(status);
 
   try {
-    const { signature, error } = await obtenerFirma(amountInCents, reference);
+    // Crear la transacción en backend (backend usa PRIVATE_KEY y evita errores de public_key)
+    status.innerText = 'Creando transacción en el servidor...';
+    const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
+    });
+    const text = await resp.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (err) { data = { raw: text }; }
 
-    if (!signature) {
-      status.innerText = 'No se pudo generar la firma de integridad.';
-      const msg = document.createElement('pre');
-      msg.style.whiteSpace = 'pre-wrap';
-      msg.style.fontSize = '12px';
-      msg.style.color = '#b30000';
-      msg.textContent = error || 'El Apps Script no devolvió signature. Revisa secrets y WOMPI_ENV.';
-      container.appendChild(msg);
+    if (!resp.ok && !data.checkout_url) {
+      status.innerText = 'Error creando transacción: ' + (data.message || resp.status + ' ' + resp.statusText);
+      const pre = document.createElement('pre'); pre.style.whiteSpace='pre-wrap'; pre.textContent = JSON.stringify(data, null, 2); container.appendChild(pre);
       return;
     }
 
-    status.innerText = 'Listo para pagar con Wompi.';
+    const checkout = data.checkout_url || (data.data && data.data.checkout_url);
+    if (!checkout) {
+      status.innerText = 'No se recibió checkout_url desde el servidor.';
+      const pre = document.createElement('pre'); pre.style.whiteSpace='pre-wrap'; pre.textContent = JSON.stringify(data, null, 2); container.appendChild(pre);
+      return;
+    }
 
-    const payBtn = document.createElement('button');
-    payBtn.type = 'button';
-    payBtn.innerText = 'Pagar con Wompi';
-    payBtn.style.padding = '12px 18px';
-    payBtn.style.background = '#0b6cff';
-    payBtn.style.color = '#fff';
-    payBtn.style.border = 'none';
-    payBtn.style.borderRadius = '8px';
-    payBtn.style.cursor = 'pointer';
-
-    payBtn.addEventListener('click', () => {
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = 'https://checkout.wompi.co/p/';
-      form.style.display = 'none';
-
-      const phone = (document.getElementById('studentPhone') || {}).value || '3000000000';
-
-      const fields = {
-        'public-key': WOMPI_PUBLIC_KEY,
-        'currency': WOMPI_CURRENCY,
-        'amount-in-cents': String(amountInCents),
-        'reference': reference,
-        'signature:integrity': signature,
-        'redirect-url': 'https://transaction-redirect.wompi.co/check',
-        'customer-data:email': sEmail,
-        'customer-data:full-name': `${sFirst} ${sLast}`,
-        'customer-data:phone-number': phone
-      };
-
-      for (const [k, v] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = k;
-        input.value = v;
-        form.appendChild(input);
-      }
-
-      document.body.appendChild(form);
-      form.submit();
-    });
-
-    container.appendChild(payBtn);
+    status.innerText = 'Redirigiendo al checkout...';
+    window.open(checkout, '_blank');
 
   } catch (e) {
     console.error(e);
