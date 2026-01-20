@@ -48,5 +48,2829 @@
     },
     "status": "pending",
     "updated_at": "2026-01-19T20:18:41.367Z"
+  },
+  "TEST-1768923270772": {
+    "reference": "TEST-1768923270772",
+    "recorded_at": "2026-01-20T15:34:30.773Z",
+    "acudiente": "Prueba Server",
+    "documento": "000",
+    "email": "test@local",
+    "colegio": "Test",
+    "curso": "NA",
+    "ciudad": "Bogotá",
+    "direccion": "Calle Test",
+    "telefono": "3000000000",
+    "carrito": [
+      {
+        "title": "Test Item",
+        "price": 1000
+      }
+    ]
+  },
+  "REG-1768923339299-u3yvvs": {
+    "reference": "REG-1768923339299-u3yvvs",
+    "recorded_at": "2026-01-20T15:35:39.299Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923341682-a37t03": {
+    "reference": "REG-1768923341682-a37t03",
+    "recorded_at": "2026-01-20T15:35:41.682Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923344327-9zvttj": {
+    "reference": "REG-1768923344327-9zvttj",
+    "recorded_at": "2026-01-20T15:35:44.327Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923346671-rvu8wa": {
+    "reference": "REG-1768923346671-rvu8wa",
+    "recorded_at": "2026-01-20T15:35:46.671Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923352006-utnfvn": {
+    "reference": "REG-1768923352006-utnfvn",
+    "recorded_at": "2026-01-20T15:35:52.006Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923354464-f6l4gc": {
+    "reference": "REG-1768923354464-f6l4gc",
+    "recorded_at": "2026-01-20T15:35:54.464Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923361986-ynot8k": {
+    "reference": "REG-1768923361986-ynot8k",
+    "recorded_at": "2026-01-20T15:36:01.986Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923596460-tfajgh": {
+    "reference": "REG-1768923596460-tfajgh",
+    "recorded_at": "2026-01-20T15:39:56.460Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923599061-djqqeh": {
+    "reference": "REG-1768923599061-djqqeh",
+    "recorded_at": "2026-01-20T15:39:59.061Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923605984-21m6yg": {
+    "reference": "REG-1768923605984-21m6yg",
+    "recorded_at": "2026-01-20T15:40:05.984Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923608985-79ehz0": {
+    "reference": "REG-1768923608985-79ehz0",
+    "recorded_at": "2026-01-20T15:40:08.985Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923612988-p13ph7": {
+    "reference": "REG-1768923612988-p13ph7",
+    "recorded_at": "2026-01-20T15:40:12.988Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923615793-ye56bm": {
+    "reference": "REG-1768923615793-ye56bm",
+    "recorded_at": "2026-01-20T15:40:15.793Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923619990-cvre47": {
+    "reference": "REG-1768923619990-cvre47",
+    "recorded_at": "2026-01-20T15:40:19.990Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923623096-flkm0n": {
+    "reference": "REG-1768923623096-flkm0n",
+    "recorded_at": "2026-01-20T15:40:23.096Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923626444-4fpzwj": {
+    "reference": "REG-1768923626444-4fpzwj",
+    "recorded_at": "2026-01-20T15:40:26.444Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923631003-6768ow": {
+    "reference": "REG-1768923631003-6768ow",
+    "recorded_at": "2026-01-20T15:40:31.003Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923631859-hloi4p": {
+    "reference": "REG-1768923631859-hloi4p",
+    "recorded_at": "2026-01-20T15:40:31.859Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923633993-ojqwlj": {
+    "reference": "REG-1768923633993-ojqwlj",
+    "recorded_at": "2026-01-20T15:40:33.993Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923634327-j6k5vs": {
+    "reference": "REG-1768923634327-j6k5vs",
+    "recorded_at": "2026-01-20T15:40:34.327Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923637988-lagk3f": {
+    "reference": "REG-1768923637988-lagk3f",
+    "recorded_at": "2026-01-20T15:40:37.988Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923644999-39jqfh": {
+    "reference": "REG-1768923644999-39jqfh",
+    "recorded_at": "2026-01-20T15:40:44.999Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923647982-7hs2vw": {
+    "reference": "REG-1768923647982-7hs2vw",
+    "recorded_at": "2026-01-20T15:40:47.982Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923651995-qbh32j": {
+    "reference": "REG-1768923651995-qbh32j",
+    "recorded_at": "2026-01-20T15:40:51.995Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923654400-a5pnbs": {
+    "reference": "REG-1768923654400-a5pnbs",
+    "recorded_at": "2026-01-20T15:40:54.400Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923659987-f8055n": {
+    "reference": "REG-1768923659987-f8055n",
+    "recorded_at": "2026-01-20T15:40:59.987Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923660317-l34ndo": {
+    "reference": "REG-1768923660317-l34ndo",
+    "recorded_at": "2026-01-20T15:41:00.317Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923662980-lfugwm": {
+    "reference": "REG-1768923662980-lfugwm",
+    "recorded_at": "2026-01-20T15:41:02.980Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923663363-jh8yxv": {
+    "reference": "REG-1768923663363-jh8yxv",
+    "recorded_at": "2026-01-20T15:41:03.363Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923690802-q35jx7": {
+    "reference": "REG-1768923690802-q35jx7",
+    "recorded_at": "2026-01-20T15:41:30.802Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923693200-brsyrg": {
+    "reference": "REG-1768923693200-brsyrg",
+    "recorded_at": "2026-01-20T15:41:33.200Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923696060-e4q54p": {
+    "reference": "REG-1768923696060-e4q54p",
+    "recorded_at": "2026-01-20T15:41:36.060Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923700983-6q6a7n": {
+    "reference": "REG-1768923700983-6q6a7n",
+    "recorded_at": "2026-01-20T15:41:40.983Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923703980-iq2oh3": {
+    "reference": "REG-1768923703980-iq2oh3",
+    "recorded_at": "2026-01-20T15:41:43.980Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923860106-kldyjv": {
+    "reference": "REG-1768923860106-kldyjv",
+    "recorded_at": "2026-01-20T15:44:20.106Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923860308-aequul": {
+    "reference": "REG-1768923860308-aequul",
+    "recorded_at": "2026-01-20T15:44:20.308Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923862541-1ahgpm": {
+    "reference": "REG-1768923862541-1ahgpm",
+    "recorded_at": "2026-01-20T15:44:22.541Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923862726-fr1jav": {
+    "reference": "REG-1768923862726-fr1jav",
+    "recorded_at": "2026-01-20T15:44:22.726Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923864884-cx33gf": {
+    "reference": "REG-1768923864884-cx33gf",
+    "recorded_at": "2026-01-20T15:44:24.884Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923865134-m9g41g": {
+    "reference": "REG-1768923865134-m9g41g",
+    "recorded_at": "2026-01-20T15:44:25.134Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923870989-m27czb": {
+    "reference": "REG-1768923870989-m27czb",
+    "recorded_at": "2026-01-20T15:44:30.989Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923873984-k5nxmw": {
+    "reference": "REG-1768923873984-k5nxmw",
+    "recorded_at": "2026-01-20T15:44:33.984Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923874198-y8wsr8": {
+    "reference": "REG-1768923874198-y8wsr8",
+    "recorded_at": "2026-01-20T15:44:34.198Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923880265-pgwyn0": {
+    "reference": "REG-1768923880265-pgwyn0",
+    "recorded_at": "2026-01-20T15:44:40.265Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923880457-sbsndk": {
+    "reference": "REG-1768923880457-sbsndk",
+    "recorded_at": "2026-01-20T15:44:40.457Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923882618-h1o3me": {
+    "reference": "REG-1768923882618-h1o3me",
+    "recorded_at": "2026-01-20T15:44:42.618Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923882902-rena3k": {
+    "reference": "REG-1768923882902-rena3k",
+    "recorded_at": "2026-01-20T15:44:42.902Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923885502-6t4tfe": {
+    "reference": "REG-1768923885502-6t4tfe",
+    "recorded_at": "2026-01-20T15:44:45.502Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923885974-4cykma": {
+    "reference": "REG-1768923885974-4cykma",
+    "recorded_at": "2026-01-20T15:44:45.974Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923891480-ky03hr": {
+    "reference": "REG-1768923891480-ky03hr",
+    "recorded_at": "2026-01-20T15:44:51.480Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923895989-vj41b5": {
+    "reference": "REG-1768923895989-vj41b5",
+    "recorded_at": "2026-01-20T15:44:55.989Z",
+    "acudiente": "jonathan",
+    "documento": "5115612564",
+    "email": "iauioddj@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "calle 2",
+    "telefono": "31154632",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923896191-00iyns": {
+    "reference": "REG-1768923896191-00iyns",
+    "recorded_at": "2026-01-20T15:44:56.191Z",
+    "acudiente": "jfdssd",
+    "documento": "1241341",
+    "email": "dfxfsef@gmail.com",
+    "colegio": "AMERICANO",
+    "curso": "1",
+    "ciudad": "Bogotá",
+    "direccion": "callev2",
+    "telefono": "221434425",
+    "carrito": [
+      {
+        "id": "1768574603668",
+        "title": "SNAP CUBES X 50",
+        "price": 0,
+        "image": "",
+        "qty": 1,
+        "colegio": "AMERICANO",
+        "grado": "1"
+      }
+    ]
+  },
+  "REG-1768923907771-eo1k5u": {
+    "reference": "REG-1768923907771-eo1k5u",
+    "recorded_at": "2026-01-20T15:45:07.771Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923910218-1shpqy": {
+    "reference": "REG-1768923910218-1shpqy",
+    "recorded_at": "2026-01-20T15:45:10.218Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923912697-g3ufe6": {
+    "reference": "REG-1768923912697-g3ufe6",
+    "recorded_at": "2026-01-20T15:45:12.697Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923915212-bnx2n4": {
+    "reference": "REG-1768923915212-bnx2n4",
+    "recorded_at": "2026-01-20T15:45:15.212Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923919993-36ip8m": {
+    "reference": "REG-1768923919993-36ip8m",
+    "recorded_at": "2026-01-20T15:45:19.993Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923922991-apravp": {
+    "reference": "REG-1768923922991-apravp",
+    "recorded_at": "2026-01-20T15:45:22.991Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923927986-5g3pcg": {
+    "reference": "REG-1768923927986-5g3pcg",
+    "recorded_at": "2026-01-20T15:45:27.986Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923933140-qwx026": {
+    "reference": "REG-1768923933140-qwx026",
+    "recorded_at": "2026-01-20T15:45:33.140Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923935985-wamtco": {
+    "reference": "REG-1768923935985-wamtco",
+    "recorded_at": "2026-01-20T15:45:35.985Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923936323-ppukxa": {
+    "reference": "REG-1768923936323-ppukxa",
+    "recorded_at": "2026-01-20T15:45:36.323Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923940988-m6h7ip": {
+    "reference": "REG-1768923940988-m6h7ip",
+    "recorded_at": "2026-01-20T15:45:40.988Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923944250-xojgcw": {
+    "reference": "REG-1768923944250-xojgcw",
+    "recorded_at": "2026-01-20T15:45:44.250Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923946995-ese2s6": {
+    "reference": "REG-1768923946995-ese2s6",
+    "recorded_at": "2026-01-20T15:45:46.995Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923947358-46n93t": {
+    "reference": "REG-1768923947358-46n93t",
+    "recorded_at": "2026-01-20T15:45:47.358Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768923953010-zqo72n": {
+    "reference": "REG-1768923953010-zqo72n",
+    "recorded_at": "2026-01-20T15:45:53.010Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923955998-7zib8b": {
+    "reference": "REG-1768923955998-7zib8b",
+    "recorded_at": "2026-01-20T15:45:55.998Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923962178-7wys54": {
+    "reference": "REG-1768923962178-7wys54",
+    "recorded_at": "2026-01-20T15:46:02.178Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768923962414-pa10yd": {
+    "reference": "REG-1768923962414-pa10yd",
+    "recorded_at": "2026-01-20T15:46:02.414Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "TRANSICIÓN",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "reveal-math-student-edition-grado-1-volumen-2::JARDÍN UNIVERSO MÁGICO::TRANSICIÓN",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924006862-9lc7cq": {
+    "reference": "REG-1768924006862-9lc7cq",
+    "recorded_at": "2026-01-20T15:46:46.862Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924009124-x2e9gi": {
+    "reference": "REG-1768924009124-x2e9gi",
+    "recorded_at": "2026-01-20T15:46:49.124Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924011760-xh26q0": {
+    "reference": "REG-1768924011760-xh26q0",
+    "recorded_at": "2026-01-20T15:46:51.760Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924014860-70w93t": {
+    "reference": "REG-1768924014860-70w93t",
+    "recorded_at": "2026-01-20T15:46:54.860Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924017987-nrdofc": {
+    "reference": "REG-1768924017987-nrdofc",
+    "recorded_at": "2026-01-20T15:46:57.987Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924020407-lgalhh": {
+    "reference": "REG-1768924020407-lgalhh",
+    "recorded_at": "2026-01-20T15:47:00.407Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924025164-ltm2oq": {
+    "reference": "REG-1768924025164-ltm2oq",
+    "recorded_at": "2026-01-20T15:47:05.164Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924027990-7t9dkf": {
+    "reference": "REG-1768924027990-7t9dkf",
+    "recorded_at": "2026-01-20T15:47:07.990Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924030996-s9s3eb": {
+    "reference": "REG-1768924030996-s9s3eb",
+    "recorded_at": "2026-01-20T15:47:10.996Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924034004-lhvtvz": {
+    "reference": "REG-1768924034004-lhvtvz",
+    "recorded_at": "2026-01-20T15:47:14.004Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924036986-29pba2": {
+    "reference": "REG-1768924036986-29pba2",
+    "recorded_at": "2026-01-20T15:47:16.986Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924041999-cxun44": {
+    "reference": "REG-1768924041999-cxun44",
+    "recorded_at": "2026-01-20T15:47:21.999Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924048988-4xevf0": {
+    "reference": "REG-1768924048988-4xevf0",
+    "recorded_at": "2026-01-20T15:47:28.988Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924051984-oxrkg8": {
+    "reference": "REG-1768924051984-oxrkg8",
+    "recorded_at": "2026-01-20T15:47:31.984Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924056995-wd25ox": {
+    "reference": "REG-1768924056995-wd25ox",
+    "recorded_at": "2026-01-20T15:47:36.995Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924061988-34s2i5": {
+    "reference": "REG-1768924061988-34s2i5",
+    "recorded_at": "2026-01-20T15:47:41.988Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924066994-ila4lj": {
+    "reference": "REG-1768924066994-ila4lj",
+    "recorded_at": "2026-01-20T15:47:46.994Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924072007-f0zrza": {
+    "reference": "REG-1768924072007-f0zrza",
+    "recorded_at": "2026-01-20T15:47:52.007Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924076985-kr93s1": {
+    "reference": "REG-1768924076985-kr93s1",
+    "recorded_at": "2026-01-20T15:47:56.985Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924081978-iqnxo9": {
+    "reference": "REG-1768924081978-iqnxo9",
+    "recorded_at": "2026-01-20T15:48:01.978Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924086993-vz8yek": {
+    "reference": "REG-1768924086993-vz8yek",
+    "recorded_at": "2026-01-20T15:48:06.993Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924091999-mf4lzv": {
+    "reference": "REG-1768924091999-mf4lzv",
+    "recorded_at": "2026-01-20T15:48:12.000Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924096986-50u17e": {
+    "reference": "REG-1768924096986-50u17e",
+    "recorded_at": "2026-01-20T15:48:16.986Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924101993-slxoza": {
+    "reference": "REG-1768924101993-slxoza",
+    "recorded_at": "2026-01-20T15:48:21.993Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924106994-n0ojd6": {
+    "reference": "REG-1768924106994-n0ojd6",
+    "recorded_at": "2026-01-20T15:48:26.994Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924111972-wqlop2": {
+    "reference": "REG-1768924111972-wqlop2",
+    "recorded_at": "2026-01-20T15:48:31.972Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924116314-s2two4": {
+    "reference": "REG-1768924116314-s2two4",
+    "recorded_at": "2026-01-20T15:48:36.314Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924120999-si1ps6": {
+    "reference": "REG-1768924120999-si1ps6",
+    "recorded_at": "2026-01-20T15:48:40.999Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924125982-ucypsd": {
+    "reference": "REG-1768924125982-ucypsd",
+    "recorded_at": "2026-01-20T15:48:45.982Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924130990-ui0kcs": {
+    "reference": "REG-1768924130990-ui0kcs",
+    "recorded_at": "2026-01-20T15:48:50.990Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924135990-30gwz2": {
+    "reference": "REG-1768924135990-30gwz2",
+    "recorded_at": "2026-01-20T15:48:55.990Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924139001-bxwwjc": {
+    "reference": "REG-1768924139001-bxwwjc",
+    "recorded_at": "2026-01-20T15:48:59.001Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924141979-s5tp1l": {
+    "reference": "REG-1768924141979-s5tp1l",
+    "recorded_at": "2026-01-20T15:49:01.979Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924145167-yfsrbw": {
+    "reference": "REG-1768924145167-yfsrbw",
+    "recorded_at": "2026-01-20T15:49:05.167Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924147991-5dn8a0": {
+    "reference": "REG-1768924147991-5dn8a0",
+    "recorded_at": "2026-01-20T15:49:07.991Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924151000-pen4u7": {
+    "reference": "REG-1768924151000-pen4u7",
+    "recorded_at": "2026-01-20T15:49:11.000Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924156131-zbxpb3": {
+    "reference": "REG-1768924156131-zbxpb3",
+    "recorded_at": "2026-01-20T15:49:16.131Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924160992-kdws5h": {
+    "reference": "REG-1768924160992-kdws5h",
+    "recorded_at": "2026-01-20T15:49:20.992Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924163987-x2ofy7": {
+    "reference": "REG-1768924163987-x2ofy7",
+    "recorded_at": "2026-01-20T15:49:23.987Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924168986-4gsp4b": {
+    "reference": "REG-1768924168986-4gsp4b",
+    "recorded_at": "2026-01-20T15:49:28.986Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924171991-7e10m0": {
+    "reference": "REG-1768924171991-7e10m0",
+    "recorded_at": "2026-01-20T15:49:31.991Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924177991-001o3n": {
+    "reference": "REG-1768924177991-001o3n",
+    "recorded_at": "2026-01-20T15:49:37.991Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924180986-3d327y": {
+    "reference": "REG-1768924180986-3d327y",
+    "recorded_at": "2026-01-20T15:49:40.986Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924183980-73uoey": {
+    "reference": "REG-1768924183980-73uoey",
+    "recorded_at": "2026-01-20T15:49:43.980Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924189000-zp4kh4": {
+    "reference": "REG-1768924189000-zp4kh4",
+    "recorded_at": "2026-01-20T15:49:49.000Z",
+    "acudiente": "Jonathan",
+    "documento": "1112149878",
+    "email": "jona@gmail.com",
+    "colegio": "LA SALLE",
+    "curso": "2",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768844601844",
+        "title": "BASE TEN BLOCKS SET",
+        "price": 0,
+        "image": "../Multimedia/BASE TEN BLOCKS SET.png",
+        "qty": 5,
+        "colegio": "LA SALLE",
+        "grado": "2"
+      }
+    ]
+  },
+  "REG-1768924288924-pl2c1j": {
+    "reference": "REG-1768924288924-pl2c1j",
+    "recorded_at": "2026-01-20T15:51:28.924Z",
+    "acudiente": "Jonathab",
+    "documento": "1218518",
+    "email": "jona123@xn--gmail-sta.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "K4",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924313187-q3bv17": {
+    "reference": "REG-1768924313187-q3bv17",
+    "recorded_at": "2026-01-20T15:51:53.187Z",
+    "acudiente": "jonathan p",
+    "documento": "21324",
+    "email": "fsdafa@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "K4",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924329283-ilbmh3": {
+    "reference": "REG-1768924329283-ilbmh3",
+    "recorded_at": "2026-01-20T15:52:09.283Z",
+    "acudiente": "dsf",
+    "documento": "21323",
+    "email": "fwsfd@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "K3",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924474881-xihobs": {
+    "reference": "REG-1768924474881-xihobs",
+    "recorded_at": "2026-01-20T15:54:34.881Z",
+    "acudiente": "Juan",
+    "documento": "123123",
+    "email": "juan@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "K3",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924476864-ymdqe5": {
+    "reference": "REG-1768924476864-ymdqe5",
+    "recorded_at": "2026-01-20T15:54:36.864Z",
+    "acudiente": "",
+    "documento": "",
+    "email": "",
+    "colegio": "",
+    "curso": "",
+    "ciudad": "Bogotá",
+    "direccion": "",
+    "telefono": "",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924477642-zrj4su": {
+    "reference": "REG-1768924477642-zrj4su",
+    "recorded_at": "2026-01-20T15:54:37.642Z",
+    "acudiente": "",
+    "documento": "",
+    "email": "",
+    "colegio": "",
+    "curso": "",
+    "ciudad": "Bogotá",
+    "direccion": "",
+    "telefono": "",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
+  },
+  "REG-1768924566706-v1qczj": {
+    "reference": "REG-1768924566706-v1qczj",
+    "recorded_at": "2026-01-20T15:56:06.706Z",
+    "acudiente": "juan",
+    "documento": "123456",
+    "email": "juan12@gmail.com",
+    "colegio": "JARDÍN UNIVERSO MÁGICO",
+    "curso": "K3",
+    "ciudad": "Bogotá",
+    "direccion": "CALLE 153 # 16C - 72",
+    "telefono": "3202269287",
+    "carrito": [
+      {
+        "id": "1768923335097",
+        "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+        "price": 0,
+        "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+        "qty": 1,
+        "colegio": "JARDÍN UNIVERSO MÁGICO",
+        "grado": "TRANSICIÓN"
+      }
+    ]
   }
 }

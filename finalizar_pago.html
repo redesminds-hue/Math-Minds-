@@ -329,35 +329,15 @@ function generateReference() {
 }
 
 async function getOrCreateReference() {
-  const key = 'wompi_frozen_reference';
-  const tsKey = 'wompi_frozen_ts';
+  // Always generate and return a fresh reference to avoid reuse.
+  // This ensures every payment attempt uses a unique reference and prevents 'reference already used' errors.
   try {
-    let ref = localStorage.getItem(key);
-    const ts = Number(localStorage.getItem(tsKey) || '0');
-    const now = Date.now();
-    const EXPIRY_MS = 1000 * 60 * 60; // 1 hour
-    if (ref && (now - ts) < EXPIRY_MS) {
-      // Check with server if reference already used
-      try {
-        const r = await fetch(`${PAYMENT_SERVER_URL}/api/reference-status?reference=${encodeURIComponent(ref)}`);
-        if (r.ok) {
-          const j = await r.json().catch(()=>({used:false}));
-          if (!j.used) return ref;
-          // used -> fallthrough to generate new
-        }
-      } catch (e) {
-        // If status check fails (network/backend error), do NOT reuse the possibly-stale ref.
-        // Safer to generate a fresh reference than to risk 'reference already used'.
-        console.warn('[getOrCreateReference] status check failed, generating new ref', e);
-        try { localStorage.removeItem(key); localStorage.removeItem(tsKey); } catch (er){}
-        // continue to generate new ref below
-      }
-    }
-    // generate new
-    const newRef = `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
-    try { localStorage.setItem(key, newRef); localStorage.setItem(tsKey, String(Date.now())); } catch (e) {}
+    const newRef = generateReference();
+    try { localStorage.setItem('wompi_frozen_reference', newRef); localStorage.setItem('wompi_frozen_ts', String(Date.now())); } catch (e) {}
     return newRef;
-  } catch (e) { return `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`; }
+  } catch (e) {
+    return `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
+  }
 }
 
 /* ============================================
@@ -627,12 +607,11 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
 
   
     try {
-        // Before requesting signature, persist a pending registration to the sheet (non-blocking)
-        try {
-          const entrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}') || {};
-          const payloadToSheet = Object.assign({}, entrega, { reference, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
-          fetch(`${PAYMENT_SERVER_URL}/api/send-to-sheet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', payload: payloadToSheet }) }).then(r=>r.text().then(t=>console.log('sheet create response', t))).catch(e=>console.warn('sheet create failed', e));
-        } catch (e) { console.warn('Failed preparing sheet payload', e); }
+      // Nota: no persistimos automáticamente al abrir la pasarela aquí porque
+      // la inyección del widget puede ocurrir mientras el usuario aún está
+      // escribiendo campos y podría causar envíos prematuros.
+      // En su lugar, registraremos el intento solo cuando el usuario haga
+      // clic en el botón del widget (ver abajo).
       // Primero solicitamos la firma de integridad al servidor
       status.innerText = 'Solicitando firma al servidor...';
       const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
@@ -691,9 +670,35 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
       }
       container.appendChild(script);
 
-      // After the widget script loads it will render a button.
+      // After the widget script loads it will render a button. We attach
+      // a MutationObserver to detect when the button appears and then
+      // add a one-time click handler that will persist the registration
+      // to the sheet and allow the payment to proceed. This avoids
+      // creating the sheet row while the user is still typing.
       script.addEventListener('load', () => {
         status.innerText = 'Widget listo. Presiona el botón de pago para continuar.';
+        // If we already sent for this reference, skip attaching
+        if (!window.__mm_sheet_sent_for_reference) {
+          const mo = new MutationObserver((mutations, obs) => {
+            const btn = container.querySelector('button');
+            if (btn) {
+              // Attach one-time click handler
+              const onClick = (ev) => {
+                try {
+                  // mark sent to avoid duplicates
+                  window.__mm_sheet_sent_for_reference = reference;
+                  const entrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}') || {};
+                  const payloadToSheet = Object.assign({}, entrega, { reference, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
+                  fetch(`${PAYMENT_SERVER_URL}/api/send-to-sheet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', payload: payloadToSheet }) })
+                    .then(r => r.text().then(t => console.log('sheet create response', t))).catch(e => console.warn('sheet create failed', e));
+                } catch (e) { console.warn('Failed preparing sheet payload on click', e); }
+              };
+              btn.addEventListener('click', onClick, { once: true });
+              obs.disconnect();
+            }
+          });
+          mo.observe(container, { childList: true, subtree: true });
+        }
       });
       // Note: fallback to server-created checkout will be invoked only if widget fails to render or user chooses.
 

@@ -220,22 +220,75 @@ app.post('/api/send-to-sheet', async (req, res) => {
   try {
     const sheetUrl = process.env.SHEET_WEBHOOK_URL || req.body.sheet_url;
     if (!sheetUrl) return res.status(400).json({ message: 'SHEET_WEBHOOK_URL not configured' });
-    // Forward the entire incoming body to the Apps Script webhook so the
-    // `action` envelope is preserved (e.g. { action: 'create', payload: {...} }).
     const forwardBody = req.body;
     console.log('[payment-server] forwarding to sheet webhook:', JSON.stringify(forwardBody));
-    const r = await fetch(sheetUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(forwardBody)
-    });
-    const text = await r.text().catch(() => '');
-    try { const json = JSON.parse(text); return res.status(r.status).json(json); } catch (e) { return res.status(r.status).send(text); }
+
+    // Use helper to persist locally and forward
+    const result = await forwardToSheet(sheetUrl, forwardBody);
+    if (result && result.error) return res.status(502).json({ ok: false, error: result.error, details: result.details || null });
+    return res.status(result && result.status ? result.status : 200).send(result && result.body ? result.body : JSON.stringify({ ok: true }));
   } catch (err) {
     console.error('Error proxying to sheet webhook:', err);
     return res.status(500).json({ message: 'Error proxying to sheet', error: String(err) });
   }
 });
+
+// Helper to forward to Apps Script and persist locally + log last attempt
+async function forwardToSheet(sheetUrl, forwardBody){
+  const logFile = path.join(__dirname, 'last_sheet_try.json');
+  const record = { ts: new Date().toISOString(), sheetUrl, forwardBody };
+  try {
+    // Persist registration locally (JSON + CSV) without affecting forwarding
+    try {
+      const action = (forwardBody && forwardBody.action) || '';
+      const payload = (forwardBody && forwardBody.payload) ? forwardBody.payload : forwardBody;
+      if (action === 'create' || (payload && (payload.acudiente || payload.parent || payload.email || payload.telefono))) {
+        const regId = payload.reference || `REG-${Date.now()}-${Math.random().toString(36).substr(2,6)}`;
+        const recordEntry = Object.assign({ reference: regId, recorded_at: new Date().toISOString() }, payload || {});
+        const regsFile = path.join(__dirname, 'registrations.json');
+        let regs = {};
+        try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch (e) { regs = {}; }
+        regs[recordEntry.reference] = recordEntry;
+        try { fs.writeFileSync(regsFile, JSON.stringify(regs, null, 2), 'utf8'); } catch (e) { console.warn('Failed writing registrations.json', e); }
+        // CSV
+        try {
+          const csvFile = path.join(__dirname, 'registrations.csv');
+          const header = 'reference,status,amount_in_cents,student_first,student_last,parent_name,parent_email,colegio,curso,ciudad,direccion,telefono,carrito_json,recorded_at\n';
+          if (!fs.existsSync(csvFile)) fs.writeFileSync(csvFile, header, 'utf8');
+          const esc = (v) => { if (v === null || typeof v === 'undefined') return ''; const s = (typeof v === 'string') ? v : JSON.stringify(v); return '"' + String(s).replace(/"/g, '""') + '"'; };
+          const line = [
+            esc(recordEntry.reference),
+            esc(recordEntry.status || ''),
+            esc(recordEntry.amount_in_cents || ''),
+            esc((recordEntry.student && recordEntry.student.first) || ''),
+            esc((recordEntry.student && recordEntry.student.last) || ''),
+            esc(recordEntry.acudiente || (recordEntry.parent && recordEntry.parent.acudiente) || ''),
+            esc(recordEntry.email || (recordEntry.parent && recordEntry.parent.email) || ''),
+            esc(recordEntry.colegio || ''),
+            esc(recordEntry.curso || recordEntry.grade || ''),
+            esc(recordEntry.ciudad || ''),
+            esc(recordEntry.direccion || ''),
+            esc(recordEntry.telefono || ''),
+            esc(recordEntry.carrito || recordEntry.cart || ''),
+            esc(recordEntry.recorded_at || '')
+          ].join(',') + '\n';
+          fs.appendFileSync(csvFile, line, 'utf8');
+        } catch (e) { console.warn('Failed appending to registrations.csv', e); }
+      }
+    } catch (e) { console.warn('Failed to persist registration locally', e); }
+
+    // Forward to Apps Script
+    const r = await fetch(sheetUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(forwardBody) });
+    const text = await r.text().catch(()=>'');
+    record.response = { status: r.status, body: text };
+    try { fs.writeFileSync(logFile, JSON.stringify(record, null, 2), 'utf8'); } catch (e) { console.warn('Failed writing last_sheet_try.json', e); }
+    return { status: r.status, body: text };
+  } catch (err) {
+    record.error = String(err);
+    try { fs.writeFileSync(logFile, JSON.stringify(record, null, 2), 'utf8'); } catch (e) { console.warn('Failed writing last_sheet_try.json', e); }
+    return { error: String(err), details: err && err.stack ? err.stack : null };
+  }
+}
 
 // Simple persistence for used references (file-backed)
 const fs = require('fs');
@@ -274,6 +327,43 @@ app.get('/api/reference-status', (req, res) => {
 
 app.get('/transaction-result', (req, res) => {
   res.send('<h3>Resultado de la transacción (aquí procesa la respuesta o muéstrala al usuario)</h3><pre>' + JSON.stringify(req.query, null, 2) + '</pre>');
+});
+
+// Trigger a test send to the configured Apps Script webhook and return logged result
+app.get('/api/send-test-to-sheet', async (req, res) => {
+  try {
+    const sheetUrl = process.env.SHEET_WEBHOOK_URL;
+    if (!sheetUrl) return res.status(400).json({ ok: false, error: 'SHEET_WEBHOOK_URL not configured in .env' });
+    const testPayload = { action: 'create', payload: { reference: `TEST-${Date.now()}`, acudiente: 'Prueba Server', documento: '000', email: 'test@local', colegio: 'Test', curso: 'NA', ciudad: 'Bogotá', direccion: 'Calle Test', telefono: '3000000000', carrito: [{ title: 'Test Item', price: 1000 }] } };
+    const r = await forwardToSheet(sheetUrl, testPayload);
+    return res.json({ ok: true, result: r });
+  } catch (err) { return res.status(500).json({ ok: false, error: String(err) }); }
+});
+
+// View last attempt log
+app.get('/api/last-sheet-try', (req, res) => {
+  try {
+    const f = path.join(__dirname, 'last_sheet_try.json');
+    if (!fs.existsSync(f)) return res.json({ ok: false, error: 'no_log' });
+    const txt = fs.readFileSync(f, 'utf8') || '{}';
+    return res.send(txt);
+  } catch (e) { return res.status(500).json({ ok: false, error: String(e) }); }
+});
+
+// Endpoint to list persisted registrations with `paid` status
+app.get('/api/registrations', (req, res) => {
+  try {
+    const regsFile = path.join(__dirname, 'registrations.json');
+    let regs = {};
+    try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch (e) { regs = {}; }
+    const used = readUsedRefs();
+    const out = Object.keys(regs).map(k => {
+      const r = regs[k] || {};
+      const ref = r.reference || k;
+      return Object.assign({ paid: Boolean(used && used[ref]) }, r);
+    });
+    return res.json({ ok: true, count: out.length, registrations: out });
+  } catch (err) { return res.status(500).json({ ok: false, error: String(err) }); }
 });
 
 app.listen(PORT, () => console.log(`Payment demo server corriendo en http://localhost:${PORT}`));
