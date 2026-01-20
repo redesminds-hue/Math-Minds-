@@ -30,11 +30,24 @@ self.addEventListener('fetch', event => {
         const preferredBackend = 'http://localhost:3000/api/proxy-create-transaction';
         const target = preferredBackend;
 
-        const proxyResp = await fetch(target, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reqBody)
-        });
+        let proxyResp;
+        try {
+          proxyResp = await fetch(target, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqBody)
+          });
+        } catch (proxyErr) {
+          // Proxy to local backend failed (network error). Attempt fallback to direct network request
+          try {
+            console.warn('[wompi-sw] proxy to local backend failed, trying direct network request', proxyErr);
+            const directResp = await fetch(event.request);
+            return directResp;
+          } catch (directErr) {
+            console.warn('[wompi-sw] direct network attempt also failed', directErr);
+            throw proxyErr; // let outer catch handle returning 502
+          }
+        }
 
         // Return backend response to the original caller
         const text = await proxyResp.text();

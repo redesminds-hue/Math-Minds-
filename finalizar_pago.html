@@ -23,6 +23,14 @@
       }
     } else if (DISABLE_SW_ON_DEV) {
       console.log('[wompi-sw] Registro de ServiceWorker deshabilitado en modo desarrollo.');
+      // Unregister any previously installed service workers (useful during development)
+      try {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => {
+            try { r.unregister().then(ok => console.log('[wompi-sw] Unregistered SW', r.scope, ok)); } catch(e){ console.warn('[wompi-sw] unregister error', e); }
+          });
+        }).catch(e => console.warn('[wompi-sw] getRegistrations failed', e));
+      } catch(e) { console.warn('[wompi-sw] unregister error', e); }
     }
   </script>
 

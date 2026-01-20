@@ -29,7 +29,7 @@ router.post('/api/proxy-create-transaction', async (req, res, next) => {
 		// Call the internal create-transaction logic by delegating to the existing endpoint
 		// Forward as JSON with the fields our /api/create-transaction expects
 		const fetch = require('node-fetch');
-		const serverUrl = `http://localhost:${process.env.PORT || 3000}/api/create-transaction`;
+		const serverUrl = `http://127.0.0.1:${process.env.PORT || 3000}/api/create-transaction`;
 		const r = await fetch(serverUrl, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
