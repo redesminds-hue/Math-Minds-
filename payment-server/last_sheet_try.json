@@ -1,32 +1,45 @@
 {
-  "ts": "2026-01-20T15:56:06.706Z",
-  "sheetUrl": "https://script.google.com/macros/s/AKfycbzm1Jy3YKGxQ7GSazEDvVXBSG4Evvj-HH2jstlkiu0QQje-iNA-MtpkDBl7doK0yA5L/exec",
+  "ts": "2026-01-20T20:11:33.375Z",
+  "sheetUrl": "https://script.google.com/macros/s/AKfycbwNH88Z_Bn6_HvA0ktGrwuym33HA8fjA_6GDY4jg2LjCuaet6te-gYDNzXdVHI0gNX0/exec",
   "forwardBody": {
     "action": "create",
     "payload": {
-      "acudiente": "juan",
-      "documento": "123456",
-      "email": "juan12@gmail.com",
-      "colegio": "JARDÍN UNIVERSO MÁGICO",
-      "curso": "K3",
+      "reference": "MM-1768939891627-ak63frg8j",
+      "recorded_at": "2026-01-20T20:11:33.371Z",
+      "acudiente": "Juan",
+      "documento": "101240855",
+      "email": "juan@gmail.com",
+      "colegio": "LA ENSEÑANZA",
+      "curso": "11",
       "ciudad": "Bogotá",
-      "direccion": "CALLE 153 # 16C - 72",
-      "telefono": "3202269287",
+      "direccion": "calle 2",
+      "telefono": "31245748",
       "carrito": [
         {
-          "id": "1768923335097",
-          "title": "REVEAL MATH STUDENT EDITION GRADO 1 VOLUMEN 2",
+          "id": "1768938949481",
+          "title": "PLATAFORMA DE MATEMATICAS ALEKS MVP 12 MESES EDITORIAL McGraw Hill",
           "price": 0,
-          "image": "../Multimedia/REVEAL MATH GRADE 1 VOLUME 2.png",
+          "image": "../Multimedia/ALEKS IMAGEN.png",
           "qty": 1,
-          "colegio": "JARDÍN UNIVERSO MÁGICO",
-          "grado": "TRANSICIÓN"
+          "colegio": "LA ENSEÑANZA",
+          "grado": "10"
         }
-      ]
+      ],
+      "student": {
+        "last": "ws",
+        "first": "dxasd",
+        "grade": "dwsda",
+        "doc": "214314",
+        "email": "bdgfa@gmail.com"
+      },
+      "amount_in_cents": 13500000,
+      "currency": "COP",
+      "status": "pending",
+      "paid": false
     }
   },
   "response": {
     "status": 200,
-    "body": "{\"ok\":true,\"action\":\"create\",\"reference\":\"REG-1768924568436\"}"
+    "body": "{\"ok\":true,\"action\":\"create\",\"reference\":\"MM-1768939891627-ak63frg8j\",\"spreadsheetId\":\"1GdkIkOoSdZdFMB-yjoua-lpsj5h4GRM0RioozhE35ZM\",\"sheetName\":\"Registrations\"}"
   }
 }

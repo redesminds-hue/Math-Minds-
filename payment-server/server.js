@@ -1,12 +1,61 @@
-require('dotenv').config();
+// Ensure we load the .env file from this package directory even if the process
+// is started from a different working directory. This guarantees sensitive
+// vars like WOMPI_INTEGRITY_SECRET are available to the server.
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+// Ensure .env SHEET_WEBHOOK_URL is applied even if previously set in environment
+try {
+  const fs = require('fs');
+  const path = require('path');
+  const envPath = path.join(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    const raw = fs.readFileSync(envPath, 'utf8');
+    const match = raw.match(/^SHEET_WEBHOOK_URL=(.*)$/m);
+    if (match && match[1]) {
+      const v = match[1].trim();
+      if (v && process.env.SHEET_WEBHOOK_URL !== v) {
+        process.env.SHEET_WEBHOOK_URL = v;
+      }
+    }
+  }
+} catch (e) { /* ignore */ }
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors');
 
 const app = express();
+const path = require('path');
+const fs = require('fs');
+// Serve frontend static files from project root so pages and API share origin (avoids CORS)
+const STATIC_ROOT = path.join(__dirname, '..');
+app.use(express.static(STATIC_ROOT));
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// Ensure CORS responses reflect the requesting Origin and allow credentials.
+// We handle preflight responses explicitly here so the Access-Control-Allow-Origin
+// header is never the wildcard '*' when credentials are used by the client.
 app.use(express.json());
+app.use((req, res, next) => {
+  try {
+    const origin = req.get('origin') || req.get('Origin');
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+  } catch (e) { /* ignore */ }
+  return next();
+});
+
+// JSON parse error handler: return JSON instead of HTML when body-parser fails
+app.use((err, req, res, next) => {
+  try {
+    if (err && err.type === 'entity.parse.failed') {
+      return res.status(400).json({ ok: false, error: 'invalid_json', message: 'Could not parse JSON body' });
+    }
+  } catch (e) { /* ignore */ }
+  return next(err);
+});
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const REDIRECT_URL = process.env.REDIRECT_URL || 'http://localhost:3000/transaction-result';
@@ -140,16 +189,45 @@ app.post('/api/webhook', async (req, res) => {
       if (reference) {
         markRefUsed(reference, { source: 'webhook', payload: req.body });
         console.log('Marked reference used:', reference);
-        // Try to notify Google Sheets via the configured Apps Script webhook
+        // Try to notify Google Sheets via the configured Apps Script webhook.
+        // Prefer using an existing locally persisted registration (registrations.json) so the sheet row
+        // contains the full data the user submitted. If no local record exists, build a minimal payload
+        // from the webhook body and send a create action so the Apps Script inserts a row.
         try {
           const sheetUrl = process.env.SHEET_WEBHOOK_URL;
           if (sheetUrl) {
-            await fetch(sheetUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'update', payload: { reference, status: 'paid', paid: true, webhook: req.body } })
-            });
-            console.log('Sheet updated for reference:', reference);
+            // attempt to read local registration for this reference
+            let regs = {};
+            try {
+              const regsFile = path.join(__dirname, 'registrations.json');
+              if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}');
+            } catch (e) { regs = {}; }
+
+            let payloadToSend = null;
+            if (regs && regs[reference]) {
+              payloadToSend = regs[reference];
+              // ensure status updated
+              payloadToSend.status = payloadToSend.status || 'pending';
+              payloadToSend.paid = true;
+            } else {
+              // Build a minimal payload using common webhook fields
+              const data = req.body && (req.body.data || req.body) || {};
+              const transaction = data.transaction || data || {};
+              payloadToSend = {
+                reference,
+                status: 'paid',
+                paid: true,
+                amount_in_cents: transaction.amount_in_cents || transaction.amount || transaction.value || null,
+                currency: transaction.currency || 'COP',
+                customer_email: transaction.customer_email || transaction.email || (transaction.customer && transaction.customer.email) || '',
+                webhook: req.body
+              };
+            }
+
+            // Forward as 'create' so Apps Script can upsert the row based on reference
+            const forwardBody = { action: 'create', payload: payloadToSend };
+            const fresult = await forwardToSheet(sheetUrl, forwardBody);
+            console.log('Sheet create/update forwarded for reference:', reference, 'result:', JSON.stringify(fresult));
           }
         } catch (e) { console.warn('Failed to update sheet from webhook', e); }
       }
@@ -173,7 +251,7 @@ try {
 const crypto = require('crypto');
 app.post('/api/generate-signature', (req, res) => {
   try {
-    const { amount_in_cents, reference, currency = 'COP', format, expiration_time, expirationTime } = req.body;
+    const { amount_in_cents, reference, currency = 'COP', format, expiration_time, expirationTime, payload: registrationPayload } = req.body;
     const expiration = expiration_time || expirationTime || process.env.EXPIRATION_TIME || '';
     if (!WOMPI_INTEGRITY_SECRET) return res.status(400).json({ message: 'WOMPI_INTEGRITY_SECRET no configurado en el servidor' });
     if (!amount_in_cents || !reference) return res.status(400).json({ message: 'Faltan amount_in_cents o reference' });
@@ -208,10 +286,83 @@ app.post('/api/generate-signature', (req, res) => {
     const payload = (candidates[fmtKey] || candidates['1'])();
     // Signature must be SHA256 of concatenation (not HMAC) using the integrity secret
     const buf = crypto.createHash('sha256').update(String(payload), 'utf8').digest();
+    // If the client included a registration payload, persist it locally under the
+    // provided reference so the webhook can later find the full registration.
+    try {
+      if (registrationPayload && reference) {
+        const regsFile = path.join(__dirname, 'registrations.json');
+        let regs = {};
+        try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch(e){ regs = {}; }
+        const recordEntry = Object.assign({ reference: String(reference), recorded_at: new Date().toISOString(), status: 'pending', paid: false }, registrationPayload || {});
+        regs[String(reference)] = recordEntry;
+        try { fs.writeFileSync(regsFile, JSON.stringify(regs, null, 2), 'utf8'); } catch(e){ console.warn('Failed writing registrations.json in generate-signature', e); }
+        // If a sheet webhook is configured, attempt to forward the saved registration so the sheet
+        // immediately receives the row without waiting for the payment webhook.
+        try {
+          const sheetUrl = process.env.SHEET_WEBHOOK_URL;
+          if (sheetUrl) {
+            const forwardBody = { action: 'create', payload: recordEntry };
+            // fire-and-forget: don't block signature generation on sheet forwarding
+            forwardToSheet(sheetUrl, forwardBody).then(r => console.log('[payment-server] forwarded registration (generate-signature) to sheet:', r)).catch(e => console.warn('forwardToSheet error (generate-signature)', e));
+          }
+        } catch(e) { console.warn('Failed forwarding registration from generate-signature', e); }
+      }
+    } catch(e) { console.warn('Error persisting registration in generate-signature', e); }
     return res.json({ signature: buf.toString('hex'), signature_base64: buf.toString('base64'), payload });
   } catch (err) {
     console.error('Error generando firma:', err);
     return res.status(500).json({ message: 'Error generando firma', error: String(err) });
+  }
+});
+
+// Ensure OPTIONS preflight for generate-signature is handled explicitly
+app.options('/api/generate-signature', (req, res) => {
+  try {
+    const origin = req.get('origin') || req.get('Origin') || '*';
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } catch (e) {}
+  return res.sendStatus(204);
+});
+
+// Friendly GET handler so accidental GET requests do not surface a 405 in the console
+app.get('/api/generate-signature', (req, res) => {
+  try {
+    const amount_in_cents = req.query.amount_in_cents || req.query.amount || req.query.amountInCents;
+    const reference = req.query.reference || req.query.ref;
+    const currency = req.query.currency || 'COP';
+    const format = req.query.format || '1';
+    if (!amount_in_cents || !reference) {
+      return res.json({ ok: false, message: 'Use POST /api/generate-signature with JSON { amount_in_cents, reference } or provide amount_in_cents & reference as query params' });
+    }
+    if (!WOMPI_INTEGRITY_SECRET) return res.status(400).json({ message: 'WOMPI_INTEGRITY_SECRET no configurado en el servidor' });
+
+    const candidates = {
+      '1': () => `${String(reference)}${String(amount_in_cents)}${String(currency)}${String(WOMPI_INTEGRITY_SECRET)}`,
+      '2': () => `${String(reference)}${String(amount_in_cents)}${String(currency)}${String(process.env.EXPIRATION_TIME||'')}${String(WOMPI_INTEGRITY_SECRET)}`,
+      '3': () => `${String(amount_in_cents)}|${String(currency)}|${String(reference)}`,
+      '4': () => `${String(amount_in_cents)}${String(currency)}${String(reference)}${String(WOMPI_INTEGRITY_SECRET)}`,
+      '5': () => JSON.stringify({ amount_in_cents: String(amount_in_cents), currency: String(currency), reference: String(reference) })
+    };
+
+    if (format === 'all') {
+      const out = {};
+      Object.keys(candidates).forEach(k => {
+        const payload = candidates[k]();
+        const h = crypto.createHash('sha256').update(String(payload), 'utf8').digest();
+        out[k] = { hex: h.toString('hex'), b64: h.toString('base64'), payload };
+      });
+      return res.json({ signatures: out });
+    }
+
+    const payload = (candidates[String(format) || '1'])();
+    const buf = crypto.createHash('sha256').update(String(payload), 'utf8').digest();
+    return res.json({ signature: buf.toString('hex'), signature_base64: buf.toString('base64'), payload });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: String(err) });
   }
 });
 
@@ -230,6 +381,39 @@ app.post('/api/send-to-sheet', async (req, res) => {
   } catch (err) {
     console.error('Error proxying to sheet webhook:', err);
     return res.status(500).json({ message: 'Error proxying to sheet', error: String(err) });
+  }
+});
+
+// Persist a registration locally (registrations.json) without forwarding to Apps Script.
+// This allows the webhook to find the full registration when payment is confirmed.
+app.post('/api/save-registration', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const payload = body.payload || body;
+    const reference = payload.reference || body.reference || `REG-${Date.now()}-${Math.random().toString(36).substr(2,6)}`;
+    const regsFile = path.join(__dirname, 'registrations.json');
+    let regs = {};
+    try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch (e) { regs = {}; }
+    const recordEntry = Object.assign({ reference: reference, recorded_at: new Date().toISOString() }, payload || {});
+    regs[String(reference)] = recordEntry;
+    fs.writeFileSync(regsFile, JSON.stringify(regs, null, 2), 'utf8');
+    console.log('[payment-server] saved registration for reference:', reference);
+    // If configured, forward the registration to the Apps Script webhook so Sheets is updated
+    // immediately rather than waiting for the payment webhook.
+    let forwardResult = null;
+    try {
+      const sheetUrl = process.env.SHEET_WEBHOOK_URL || body.sheet_url;
+      if (sheetUrl) {
+        const forwardBody = { action: 'create', payload: recordEntry };
+        forwardResult = await forwardToSheet(sheetUrl, forwardBody);
+        console.log('[payment-server] forwarded registration to sheet:', forwardResult);
+      }
+    } catch (e) { console.warn('save-registration: forwarding to sheet failed', e); }
+
+    return res.json({ ok: true, reference, forwarded: forwardResult });
+  } catch (err) {
+    console.error('save-registration error', err);
+    return res.status(500).json({ ok: false, error: String(err) });
   }
 });
 
@@ -291,8 +475,7 @@ async function forwardToSheet(sheetUrl, forwardBody){
 }
 
 // Simple persistence for used references (file-backed)
-const fs = require('fs');
-const path = require('path');
+// `fs` and `path` are required at top-level to allow serving static files
 const USED_REFS_FILE = path.join(__dirname, 'used_references.json');
 
 function readUsedRefs() {
@@ -366,4 +549,70 @@ app.get('/api/registrations', (req, res) => {
   } catch (err) { return res.status(500).json({ ok: false, error: String(err) }); }
 });
 
-app.listen(PORT, () => console.log(`Payment demo server corriendo en http://localhost:${PORT}`));
+// Force send a specific registration to the configured Apps Script webhook
+app.post('/api/trigger-send', async (req, res) => {
+  try {
+    const reference = (req.body && (req.body.reference || req.body.ref)) || req.query.reference || req.query.ref;
+    if (!reference) return res.status(400).json({ ok: false, error: 'missing_reference' });
+    const regsFile = path.join(__dirname, 'registrations.json');
+    let regs = {};
+    try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch (e) { regs = {}; }
+    const record = regs[String(reference)];
+    if (!record) return res.status(404).json({ ok: false, error: 'not_found', reference });
+    const sheetUrl = process.env.SHEET_WEBHOOK_URL;
+    if (!sheetUrl) return res.status(400).json({ ok: false, error: 'SHEET_WEBHOOK_URL not configured' });
+    const forwardBody = { action: 'create', payload: record };
+    console.log('[payment-server] trigger-send for reference:', reference, 'forwarding to', sheetUrl);
+    const result = await forwardToSheet(sheetUrl, forwardBody);
+    return res.json({ ok: true, result });
+  } catch (err) {
+    console.error('trigger-send error', err);
+    return res.status(500).json({ ok: false, error: String(err) });
+  }
+});
+
+// List pending registrations (not yet marked as used by webhook)
+app.get('/api/pending-registrations', (req, res) => {
+  try {
+    const regsFile = path.join(__dirname, 'registrations.json');
+    let regs = {};
+    try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch (e) { regs = {}; }
+    const used = readUsedRefs();
+    const pending = Object.keys(regs).filter(k => !used[k]).map(k => regs[k]);
+    return res.json({ ok: true, count: pending.length, pending });
+  } catch (err) { return res.status(500).json({ ok: false, error: String(err) }); }
+});
+
+// Resend pending registrations to the configured Apps Script webhook.
+// Useful when automatic forwarding failed and you want to retry delivery.
+app.post('/api/resend-pending', async (req, res) => {
+  try {
+    const regsFile = path.join(__dirname, 'registrations.json');
+    let regs = {};
+    try { if (fs.existsSync(regsFile)) regs = JSON.parse(fs.readFileSync(regsFile, 'utf8') || '{}'); } catch (e) { regs = {}; }
+    const used = readUsedRefs();
+    const sheetUrl = process.env.SHEET_WEBHOOK_URL || req.body.sheet_url;
+    if (!sheetUrl) return res.status(400).json({ ok: false, error: 'SHEET_WEBHOOK_URL not configured' });
+
+    const toSend = Object.keys(regs).filter(k => !used[k]).map(k => regs[k]);
+    const results = {};
+    for (const rec of toSend) {
+      try {
+        const forwardBody = { action: 'create', payload: rec };
+        const r = await forwardToSheet(sheetUrl, forwardBody);
+        results[rec.reference || ('ref_' + Math.random().toString(36).slice(2,8))] = r;
+      } catch (e) {
+        results[rec.reference || ('ref_' + Math.random().toString(36).slice(2,8))] = { error: String(e) };
+      }
+    }
+    return res.json({ ok: true, attempted: toSend.length, results });
+  } catch (err) {
+    console.error('resend-pending error', err);
+    return res.status(500).json({ ok: false, error: String(err) });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Payment demo server corriendo en http://localhost:${PORT}`);
+  console.log('SHEET_WEBHOOK_URL =', process.env.SHEET_WEBHOOK_URL || '(not set)');
+});

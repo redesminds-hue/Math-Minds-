@@ -294,17 +294,26 @@
 const WOMPI_PUBLIC_KEY = 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK';
 const WOMPI_CURRENCY = 'COP';
 
-/**
- * ⚠️ TU LLAVE NO ES pub_test_... así que NO se puede detectar.
- * Elige manualmente:
- * - 'test' si estás en sandbox y tu Apps Script tiene WOMPI_INTEGRITY_SECRET_TEST
- * - 'prod' si estás en producción y tu Apps Script tiene WOMPI_INTEGRITY_SECRET_PROD
- */
+
+
 const WOMPI_ENV = 'test'; // <-- CAMBIA A 'prod' cuando ya estés en producción
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGMiQUtjx-kknEK1KpKFu0OecQ8dA0Ox-aOBWsy-SJ5dLKW9vhlP2ONNzjb9xxAYNpHw/exec';
 // URL del servidor que corre el endpoint de creación de transacciones
-const PAYMENT_SERVER_URL = 'http://localhost:3000';
+// Use same-origin when served over http(s). If opened via file:// fallback to localhost:3000
+let PAYMENT_SERVER_URL = 'http://localhost:3000';
+try{
+  // Only assume the page and the payment server are the same origin when
+  // the current page is actually served from the payment server (port 3000
+  // or hostname localhost). This avoids cases where a live-reload/static
+  // server (different port) would receive API requests and respond "Cannot GET".
+  if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
+    const isLocalhost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    if (isLocalhost && (window.location.port === '3000' || window.location.port === '' || window.location.port === undefined)) {
+      PAYMENT_SERVER_URL = window.location.origin;
+    }
+  }
+}catch(e){}
 
 /* ============================================
    VARIABLES GLOBALES
@@ -539,6 +548,9 @@ async function validarYCargarWidget() {
 
     const signature = sigJson.signature;
 
+    // Do not persist or send any registration from the client side.
+    // All Google Sheets updates will occur only when the server receives the payment webhook.
+
     // Validar llave pública
     if (!WOMPI_PUBLIC_KEY || (typeof WOMPI_PUBLIC_KEY !== 'string') || !WOMPI_PUBLIC_KEY.startsWith('pub_')) {
       status.innerText = 'Clave pública inválida o ausente.';
@@ -556,7 +568,7 @@ async function validarYCargarWidget() {
     script.setAttribute('data-amount-in-cents', String(amountInCents));
     script.setAttribute('data-reference', String(reference));
     script.setAttribute('data-signature:integrity', signature);
-    const safeRedirect = String(PAYMENT_SERVER_URL).startsWith('http://localhost') ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
+    const safeRedirect = (PAYMENT_SERVER_URL && String(PAYMENT_SERVER_URL).startsWith('http://localhost')) ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
     script.setAttribute('data-redirect-url', safeRedirect);
 
     script.addEventListener('load', () => {
@@ -566,14 +578,116 @@ async function validarYCargarWidget() {
       window.__mm_widget_injected = true;
       window.__mm_widget_reference = String(reference);
       window.__mm_widget_loading = false;
+      // Setup observer to detect widget iframe open/close and persist registration if needed
+      try {
+        const saveIfNeeded = () => {
+          try {
+            if (!window.__mm_widget_reference) return;
+            const ref = String(window.__mm_widget_reference);
+            if (window.__mm_saved_for_refs && window.__mm_saved_for_refs[ref]) return;
+            const entregaLocal = (function(){ try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch(e){ return {}; } })() || {};
+            const payload = Object.assign({}, entregaLocal, { reference: ref, amount_in_cents: Math.round(window.totalBase * 100), currency: WOMPI_CURRENCY, status: 'pending', paid: false });
+            const endpoint = PAYMENT_SERVER_URL + '/api/save-registration';
+            try{
+              if (navigator && navigator.sendBeacon) {
+                const blob = new Blob([JSON.stringify({ payload })], { type: 'application/json' });
+                navigator.sendBeacon(endpoint, blob);
+              } else {
+                fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }), keepalive: true }).catch(()=>{});
+              }
+            }catch(e){ try{ fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }) }).catch(()=>{}); }catch(_){}
+            }
+            window.__mm_saved_for_refs = window.__mm_saved_for_refs || {};
+            window.__mm_saved_for_refs[ref] = true;
+          } catch(e){ console.warn('saveIfNeeded error', e); }
+        };
+
+        // Observe iframes added/removed (widget may create an iframe/modal)
+        const mo = new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            if (m.addedNodes && m.addedNodes.length) {
+              for (const n of m.addedNodes) {
+                try { if (n.tagName === 'IFRAME' && (n.src||'').includes('wompi')) { /* iframe opened */ } } catch(e){}
+              }
+            }
+            if (m.removedNodes && m.removedNodes.length) {
+              for (const n of m.removedNodes) {
+                try { if (n.tagName === 'IFRAME' && (n.src||'').includes('wompi')) { /* iframe closed */ saveIfNeeded(); } } catch(e){}
+              }
+            }
+          }
+        });
+        mo.observe(document.body, { childList: true, subtree: true });
+
+        // Try to attach a one-time click handler to the widget button so we
+        // persist the registration when the user explicitly clicks to pay.
+        const attachButtonClick = () => {
+          try {
+            const btn = container.querySelector('button');
+            if (btn) {
+              btn.addEventListener('click', () => {
+                try { saveIfNeeded(); } catch(e){}
+              }, { once: true });
+            }
+          } catch (e) { /* ignore */ }
+        };
+        attachButtonClick();
+
+        // Also attempt to attach when new nodes are added (widget may render later)
+        const btnObserver = new MutationObserver((mutations) => { attachButtonClick(); });
+        btnObserver.observe(container, { childList: true, subtree: true });
+
+        // Also save when window regains focus (user returned from external checkout)
+        window.addEventListener('focus', () => { setTimeout(saveIfNeeded, 250); });
+      } catch(e) { console.warn('widget save observer setup failed', e); }
     });
+
+    // No delegated click handler: do not send or queue data on widget click.
+    // The registration is persisted to the server when the signature is generated,
+    // and the webhook will forward the row to Google Sheets when payment is confirmed.
 
     script.addEventListener('error', () => {
       try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
       container.removeAttribute('data-widget-loading');
       window.__mm_widget_loading = false;
       window.__mm_widget_injected = false;
-      container.innerHTML = '<p style="color:#ff6b6b">Error cargando el widget.</p>';
+      // Show user-friendly fallback and attempt to allow manual checkout
+      container.innerHTML = '<p style="color:#ff6b6b">Error cargando el widget. Usa la opción alternativa abajo para continuar con el pago.</p>';
+      // create fallback button
+      try{
+        const fb = document.createElement('button');
+        fb.type = 'button';
+        fb.textContent = 'Pagar (alternativa)';
+        fb.style.padding = '12px 18px'; fb.style.borderRadius='10px'; fb.style.background='#13d6eb'; fb.style.color='#000'; fb.style.border='none'; fb.style.cursor='pointer';
+        fb.addEventListener('click', async () => {
+          try{
+            // Prepare payload same as widget click
+            const entrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}') || {};
+            const studentPayload = {
+              student: {
+                first: (document.getElementById('studentFirstName') && document.getElementById('studentFirstName').value) || '',
+                last: (document.getElementById('studentLastName') && document.getElementById('studentLastName').value) || '',
+                grade: (document.getElementById('studentGrade') && document.getElementById('studentGrade').value) || '',
+                doc: (document.getElementById('studentDoc') && document.getElementById('studentDoc').value) || '',
+                email: (document.getElementById('studentEmail') && document.getElementById('studentEmail').value) || ''
+              }
+            };
+            const payloadToSheet = Object.assign({}, entrega, studentPayload, { reference, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
+            // send to sheet (queue/sendBeacon)
+
+            // Do not queue or send sheet data here; registration is saved on signature and webhook will handle Sheets update.
+
+            // Create transaction on server and open checkout_url
+            try{
+              const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, { method:'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: payloadToSheet.student && payloadToSheet.student.email || entrega.email, full_name: ((payloadToSheet.student && ((payloadToSheet.student.first||'') + ' ' + (payloadToSheet.student.last||''))) || entrega.acudiente || ''), reference, public_key: WOMPI_PUBLIC_KEY }) });
+              const txt = await resp.text(); let data={}; try{ data = txt ? JSON.parse(txt) : {}; }catch(e){ data = { raw: txt }; }
+              const checkout = data.checkout_url || (data.data && data.data.checkout_url);
+              if (checkout) { window.open(checkout, '_blank'); } else { alert('No se pudo crear la transacción. Intenta nuevamente.'); }
+            }catch(e){ console.warn('create-transaction failed', e); alert('No se pudo iniciar el pago automáticamente.'); }
+          }catch(e){ console.warn('fallback button error', e); }
+        });
+        container.appendChild(fb);
+      }catch(e){ console.warn('failed to create fallback button', e); }
     });
 
     container.appendChild(script);
@@ -661,7 +775,7 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
       // attribute name must include colon as per widget API
       script.setAttribute('data-signature:integrity', signature);
       // redirect to our server result endpoint (use safe redirect when running on localhost)
-      const safeRedirect = String(PAYMENT_SERVER_URL).startsWith('http://localhost') ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
+      const safeRedirect = (PAYMENT_SERVER_URL && String(PAYMENT_SERVER_URL).startsWith('http://localhost')) ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
       script.setAttribute('data-redirect-url', safeRedirect);
       // append optional expiration time if server returned it
       if (sigJson.payload && sigJson.payload.includes('T') && sigJson.payload.includes('Z')) {
@@ -677,28 +791,55 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
       // creating the sheet row while the user is still typing.
       script.addEventListener('load', () => {
         status.innerText = 'Widget listo. Presiona el botón de pago para continuar.';
-        // If we already sent for this reference, skip attaching
-        if (!window.__mm_sheet_sent_for_reference) {
-          const mo = new MutationObserver((mutations, obs) => {
-            const btn = container.querySelector('button');
-            if (btn) {
-              // Attach one-time click handler
-              const onClick = (ev) => {
-                try {
-                  // mark sent to avoid duplicates
-                  window.__mm_sheet_sent_for_reference = reference;
-                  const entrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}') || {};
-                  const payloadToSheet = Object.assign({}, entrega, { reference, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
-                  fetch(`${PAYMENT_SERVER_URL}/api/send-to-sheet`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', payload: payloadToSheet }) })
-                    .then(r => r.text().then(t => console.log('sheet create response', t))).catch(e => console.warn('sheet create failed', e));
-                } catch (e) { console.warn('Failed preparing sheet payload on click', e); }
-              };
-              btn.addEventListener('click', onClick, { once: true });
-              obs.disconnect();
+        // Do not attach any click handler to the widget; all sheet writes will be performed server-side when webhook confirms payment.
+        // However, ensure we persist the registration if the widget modal closes or the user returns to the page.
+        try {
+          const saveIfNeeded = () => {
+            try {
+              const ref = String(reference);
+              if (window.__mm_saved_for_refs && window.__mm_saved_for_refs[ref]) return;
+              const entregaLocal = (function(){ try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch(e){ return {}; } })() || {};
+              const payload = Object.assign({}, entregaLocal, { reference: ref, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
+              const endpoint = PAYMENT_SERVER_URL + '/api/save-registration';
+              try{
+                if (navigator && navigator.sendBeacon) {
+                  const blob = new Blob([JSON.stringify({ payload })], { type: 'application/json' });
+                  navigator.sendBeacon(endpoint, blob);
+                } else {
+                  fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }), keepalive: true }).catch(()=>{});
+                }
+              }catch(e){ try{ fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }) }).catch(()=>{}); }catch(_){}
+              }
+              window.__mm_saved_for_refs = window.__mm_saved_for_refs || {};
+              window.__mm_saved_for_refs[ref] = true;
+            } catch(e){ console.warn('saveIfNeeded error', e); }
+          };
+          const mo2 = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+              if (m.removedNodes && m.removedNodes.length) {
+                for (const n of m.removedNodes) {
+                  try { if (n.tagName === 'IFRAME' && (n.src||'').includes('wompi')) { saveIfNeeded(); } } catch(e){}
+                }
+              }
             }
           });
-          mo.observe(container, { childList: true, subtree: true });
-        }
+          mo2.observe(document.body, { childList: true, subtree: true });
+          window.addEventListener('focus', () => { setTimeout(saveIfNeeded, 250); });
+
+          // Attach click handler to widget button (if present) so we persist
+          // registration at the moment the user initiates payment.
+          const attachButtonClick = () => {
+            try {
+              const btn = container.querySelector('button');
+              if (btn) {
+                btn.addEventListener('click', () => { try { saveIfNeeded(); } catch(e){} }, { once: true });
+              }
+            } catch (e) { /* ignore */ }
+          };
+          attachButtonClick();
+          const btnObserver = new MutationObserver(() => { attachButtonClick(); });
+          btnObserver.observe(container, { childList: true, subtree: true });
+        } catch(e) { console.warn('widget save observer failed', e); }
       });
       // Note: fallback to server-created checkout will be invoked only if widget fails to render or user chooses.
 

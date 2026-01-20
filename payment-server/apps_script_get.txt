@@ -1,0 +1,1 @@
+﻿{"ok":true,"spreadsheetId":"1GdkIkOoSdZdFMB-yjoua-lpsj5h4GRM0RioozhE35ZM","url":"https://docs.google.com/spreadsheets/d/1GdkIkOoSdZdFMB-yjoua-lpsj5h4GRM0RioozhE35ZM/edit","sheetExists":true,"lastRow":2}

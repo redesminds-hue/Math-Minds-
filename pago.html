@@ -216,7 +216,7 @@
                         <input type="text" id="address" name="address_mm" autocomplete="off" required placeholder="Calle 123 # 45-67, Barrio">
                     </div>
                 </div>
-                <button type="button" class="btn-pay" onclick="(function(){try{const carrito=JSON.parse(localStorage.getItem('mm_cart_v1')||'[]'); if(!carrito||!carrito.length){alert('⚠️ El carrito está vacío.'); return;} const datosEntrega={acudiente:document.getElementById('parentName')?.value||'', documento:document.getElementById('documentId')?.value||'', email:document.getElementById('parentEmail')?.value||'', colegio:document.getElementById('college')?.value||'', curso:document.getElementById('grade')?.value||'', ciudad:document.getElementById('city')?.value||'', direccion:document.getElementById('address')?.value||'', telefono:document.getElementById('phone')?.value||'', carrito:carrito}; try{ localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega)); }catch(e){} try{ const payload = JSON.stringify({ action: 'create', payload: datosEntrega }); try { if (navigator && navigator.sendBeacon) { const blob = new Blob([payload], { type: 'application/json' }); navigator.sendBeacon('/api/send-to-sheet', blob); } else if (window.fetch) { try { fetch('/api/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(()=>{}); } catch(fe) { fetch('/api/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload }).catch(()=>{}); } } }catch(sendErr){ console.warn('Non-blocking send to sheet failed', sendErr); } try{ window.location.href='finalizar_pago.html'; }catch(e){ try{ window.open('finalizar_pago.html','_self'); }catch(__){} } }catch(err){ console.error('Inline continue handler error', err); try{ window.location.href='finalizar_pago.html'; }catch(e){} } })()">CONTINUAR AL ÚLTIMO PASO</button>
+                <button id="continueBtn" type="button" class="btn-pay">CONTINUAR AL ÚLTIMO PASO</button>
             </form>
         </div>
     </main>
@@ -431,8 +431,14 @@
             }
 
            
-            const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzk6TLMy6MiWqbV0xhpKzVIXl7hmptVraLb6VnXg1VdLTPuOktQiCsJHUtP5RuMSwUb/exec'; // <-- paste your Apps Script URL here
-            const PAYMENT_SERVER_URL = 'http://localhost:3000';
+                        const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzk6TLMy6MiWqbV0xhpKzVIXl7hmptVraLb6VnXg1VdLTPuOktQiCsJHUtP5RuMSwUb/exec'; // <-- paste your Apps Script URL here
+                        // Determine payment server: prefer page origin for same-origin requests; fallback to localhost when opened via file://
+                        let PAYMENT_SERVER_URL = 'http://localhost:3000';
+                        try{
+                            if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
+                                PAYMENT_SERVER_URL = window.location.origin;
+                            }
+                        }catch(e){}
 
             async function sendToSheet(payload){
                 // Prefer sending via local payment server proxy to avoid CORS issues
@@ -502,6 +508,48 @@
                 });
             }
 
+            // Attach click handler to explicit continue button (avoids native form submit)
+            const continueBtn = document.getElementById('continueBtn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', async function(ev){
+                    try { ev.preventDefault(); } catch(e){}
+                    try{
+                        const carrito = JSON.parse(localStorage.getItem('mm_cart_v1') || '[]');
+                        if (!carrito || !carrito.length) { alert('⚠️ El carrito está vacío.'); return; }
+                        const datosEntrega = {
+                            acudiente: document.getElementById('parentName')?.value || '',
+                            documento: document.getElementById('documentId')?.value || '',
+                            email: document.getElementById('parentEmail')?.value || '',
+                            colegio: document.getElementById('college')?.value || '',
+                            curso: document.getElementById('grade')?.value || '',
+                            ciudad: document.getElementById('city')?.value || '',
+                            direccion: document.getElementById('address')?.value || '',
+                            telefono: document.getElementById('phone')?.value || '',
+                            carrito: carrito
+                        };
+                        try{ localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega)); }catch(e){}
+
+                        // Persist registration on the server (non-blocking) so webhook can later forward it to Sheets when payment is confirmed.
+                        try{
+                            const saveEndpoint = 'http://localhost:3000/api/save-registration';
+                            const payload = { payload: datosEntrega };
+                            try{
+                                if (navigator && navigator.sendBeacon) {
+                                    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                                    navigator.sendBeacon(saveEndpoint, blob);
+                                } else {
+                                    // fire-and-forget
+                                    setTimeout(()=>{ fetch(saveEndpoint, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(()=>{}); }, 0);
+                                }
+                            }catch(e){ console.warn('save-registration attempt failed', e); }
+                        }catch(e){ /* ignore */ }
+
+                        // Navigate immediately to the final step
+                        try{ window.location.href = 'finalizar_pago.html'; }catch(e){ try{ window.open('finalizar_pago.html','_self'); }catch(__){} }
+                    }catch(err){ console.error('continueBtn handler error', err); try{ window.location.href='finalizar_pago.html'; }catch(e){} }
+                });
+            }
+
             // Handle form submit
             document.getElementById('payForm').addEventListener('submit', async function(e){
                 console.log('[payForm] submit handler start');
@@ -528,24 +576,20 @@
                 // persist locally as before for the app flow
                 try{ localStorage.setItem('datos_entrega', JSON.stringify(datosEntrega)); }catch(e){}
 
-                // Try to send to spreadsheet endpoint; don't block user if fails
-                if (SHEET_WEBHOOK_URL){
+                // Persist registration on the server (non-blocking) so webhook can later forward it to Sheets when payment is confirmed.
+                try{
+                    const saveEndpoint = 'http://localhost:3000/api/save-registration';
+                    const payload = { payload: datosEntrega };
                     try{
-                        const result = await sendToSheet(datosEntrega);
-                        if (!result.ok){
-                            console.warn('sendToSheet failed, queueing locally', result);
-                            queuePendingSubmission(datosEntrega);
+                        if (navigator && navigator.sendBeacon) {
+                            const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                            navigator.sendBeacon(saveEndpoint, blob);
                         } else {
-                            console.log('sendToSheet ok', result.data);
+                            // fire-and-forget
+                            setTimeout(()=>{ fetch(saveEndpoint, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(()=>{}); }, 0);
                         }
-                    }catch(e){
-                        console.warn('sendToSheet exception, queueing', e);
-                        queuePendingSubmission(datosEntrega);
-                    }
-                } else {
-                    // no endpoint configured -> queue locally so admin can export later
-                    queuePendingSubmission(datosEntrega);
-                }
+                    }catch(e){ console.warn('save-registration attempt failed', e); }
+                }catch(e){ /* ignore */ }
 
                                 // continue to confirmation step regardless
                                 try{
