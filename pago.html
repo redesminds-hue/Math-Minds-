@@ -485,12 +485,8 @@
            
                         const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzk6TLMy6MiWqbV0xhpKzVIXl7hmptVraLb6VnXg1VdLTPuOktQiCsJHUtP5RuMSwUb/exec'; // <-- paste your Apps Script URL here
                         // Determine payment server: prefer page origin for same-origin requests; fallback to localhost when opened via file://
-                        let PAYMENT_SERVER_URL = 'http://localhost:3000';
-                        try{
-                            if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
-                                PAYMENT_SERVER_URL = window.location.origin;
-                            }
-                        }catch(e){}
+                        // Use the deployed payment server on Render
+                        let PAYMENT_SERVER_URL = 'https://wompi-ybfs.onrender.com';
 
             async function sendToSheet(payload){
                 // Prefer sending via local payment server proxy to avoid CORS issues

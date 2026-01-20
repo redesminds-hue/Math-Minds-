@@ -300,17 +300,8 @@ const WOMPI_ENV = 'prod';
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGMiQUtjx-kknEK1KpKFu0OecQ8dA0Ox-aOBWsy-SJ5dLKW9vhlP2ONNzjb9xxAYNpHw/exec';
 // URL del servidor que corre el endpoint de creación de transacciones
 // Use same-origin when served over http(s). If opened via file:// fallback to localhost:3000
-// Determine payment server origin. When deployed, the payment server should
-// be served from the same origin as the frontend; in that case we use
-// `window.location.origin`. When opened via `file://` during local dev we
-// fallback to localhost:3000.
-let PAYMENT_SERVER_URL = 'http://localhost:3000';
-try{
-  if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
-    // Use the page origin as the payment server origin when served over http(s).
-    PAYMENT_SERVER_URL = window.location.origin;
-  }
-}catch(e){}
+// Use the deployed payment server on Render. Do NOT use localhost for production.
+const PAYMENT_SERVER_URL = 'https://wompi-ybfs.onrender.com';
 
 /* ============================================
    VARIABLES GLOBALES
