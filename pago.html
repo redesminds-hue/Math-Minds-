@@ -203,9 +203,34 @@
                     <div class="form-group">
                         <label>Ciudad</label>
                         <select id="city" name="city_mm" autocomplete="off" required>
+                            <option value="" disabled selected>Selecciona ciudad</option>
                             <option value="Bogotá">Bogotá D.C.</option>
-                            <option value="Nacional">Otras ciudades</option>
+                            <option value="Medellín">Medellín</option>
+                            <option value="Cali">Cali</option>
+                            <option value="Barranquilla">Barranquilla</option>
+                            <option value="Cartagena">Cartagena</option>
+                            <option value="Cúcuta">Cúcuta</option>
+                            <option value="Bucaramanga">Bucaramanga</option>
+                            <option value="Pereira">Pereira</option>
+                            <option value="Manizales">Manizales</option>
+                            <option value="Ibagué">Ibagué</option>
+                            <option value="Pasto">Pasto</option>
+                            <option value="Montería">Montería</option>
+                            <option value="Neiva">Neiva</option>
+                            <option value="Armenia">Armenia</option>
+                            <option value="Valledupar">Valledupar</option>
+                            <option value="Sincelejo">Sincelejo</option>
+                            <option value="Riohacha">Riohacha</option>
+                            <option value="Santa Marta">Santa Marta</option>
+                            <option value="Popayán">Popayán</option>
+                            <option value="Villavicencio">Villavicencio</option>
+                            <option value="Tunja">Tunja</option>
+                            <option value="Florencia">Florencia</option>
+                            <option value="Mocoa">Mocoa</option>
+                            <option value="San Andrés">San Andrés</option>
+                            <option value="Otra">Otra ciudad (especificar)</option>
                         </select>
+                        <input type="text" id="cityOther" name="city_other_mm" placeholder="Escribe tu ciudad si no está en la lista" style="display:none; margin-top:8px;" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>Celular</label>
@@ -422,6 +447,33 @@
                 populateGradesForCollege(e.target.value);
             });
 
+            // City other handling: show/hide input when 'Otra' selected
+            const citySel = document.getElementById('city');
+            const cityOtherEl = document.getElementById('cityOther');
+            function updateCityOtherVisibility(){
+                try{
+                    if (!citySel || !cityOtherEl) return;
+                    if (citySel.value === 'Otra'){
+                        cityOtherEl.style.display = 'block';
+                        cityOtherEl.required = true;
+                    } else {
+                        cityOtherEl.style.display = 'none';
+                        cityOtherEl.required = false;
+                    }
+                }catch(e){/* ignore */}
+            }
+            if (citySel) citySel.addEventListener('change', updateCityOtherVisibility);
+            // initialize visibility on load
+            setTimeout(updateCityOtherVisibility, 50);
+
+            function getSelectedCityValue(){
+                try{
+                    if (!citySel) return '';
+                    if (citySel.value === 'Otra') return (cityOtherEl && cityOtherEl.value) ? cityOtherEl.value.trim() : '';
+                    return citySel.value || '';
+                }catch(e){ return '' }
+            }
+
             // Persist grade selection so finalizar_pago can read it if datos_entrega lacks curso
             const gradeSelEl = document.getElementById('grade');
             if (gradeSelEl){
@@ -522,7 +574,7 @@
                             email: document.getElementById('parentEmail')?.value || '',
                             colegio: document.getElementById('college')?.value || '',
                             curso: document.getElementById('grade')?.value || '',
-                            ciudad: document.getElementById('city')?.value || '',
+                            ciudad: (typeof getSelectedCityValue === 'function') ? getSelectedCityValue() : (document.getElementById('city')?.value || ''),
                             direccion: document.getElementById('address')?.value || '',
                             telefono: document.getElementById('phone')?.value || '',
                             carrito: carrito
@@ -567,7 +619,7 @@
                     email: document.getElementById('parentEmail').value,
                     colegio: document.getElementById('college').value,
                     curso: document.getElementById('grade').value,
-                    ciudad: document.getElementById('city').value,
+                    ciudad: (typeof getSelectedCityValue === 'function') ? getSelectedCityValue() : (document.getElementById('city').value || ''),
                     direccion: document.getElementById('address').value,
                     telefono: document.getElementById('phone').value,
                     carrito: carrito

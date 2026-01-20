@@ -1,38 +1,38 @@
 {
-  "ts": "2026-01-20T20:11:33.375Z",
+  "ts": "2026-01-20T21:26:13.164Z",
   "sheetUrl": "https://script.google.com/macros/s/AKfycbwNH88Z_Bn6_HvA0ktGrwuym33HA8fjA_6GDY4jg2LjCuaet6te-gYDNzXdVHI0gNX0/exec",
   "forwardBody": {
     "action": "create",
     "payload": {
-      "reference": "MM-1768939891627-ak63frg8j",
-      "recorded_at": "2026-01-20T20:11:33.371Z",
-      "acudiente": "Juan",
-      "documento": "101240855",
-      "email": "juan@gmail.com",
-      "colegio": "LA ENSEÑANZA",
-      "curso": "11",
+      "reference": "MM-1768944367835-4nerpzg1t",
+      "recorded_at": "2026-01-20T21:26:13.162Z",
+      "acudiente": "THOMAS",
+      "documento": "123456",
+      "email": "thomas@gmail.com",
+      "colegio": "MODELIA",
+      "curso": "JARDÍN",
       "ciudad": "Bogotá",
-      "direccion": "calle 2",
-      "telefono": "31245748",
+      "direccion": "CALLE 153 # 16C - 72",
+      "telefono": "3202269287",
       "carrito": [
         {
-          "id": "1768938949481",
-          "title": "PLATAFORMA DE MATEMATICAS ALEKS MVP 12 MESES EDITORIAL McGraw Hill",
+          "id": "1768944288635",
+          "title": "SNAP CUBES X 100",
           "price": 0,
-          "image": "../Multimedia/ALEKS IMAGEN.png",
+          "image": "../Multimedia/Snap Cubes.png",
           "qty": 1,
-          "colegio": "LA ENSEÑANZA",
-          "grado": "10"
+          "colegio": "MODELIA",
+          "grado": "5"
         }
       ],
       "student": {
-        "last": "ws",
-        "first": "dxasd",
-        "grade": "dwsda",
-        "doc": "214314",
-        "email": "bdgfa@gmail.com"
+        "last": "gomez o",
+        "first": "oscar m",
+        "grade": "cuarto",
+        "doc": "1014129687",
+        "email": "juan@gmail.com"
       },
-      "amount_in_cents": 13500000,
+      "amount_in_cents": 6300000,
       "currency": "COP",
       "status": "pending",
       "paid": false
@@ -40,6 +40,6 @@
   },
   "response": {
     "status": 200,
-    "body": "{\"ok\":true,\"action\":\"create\",\"reference\":\"MM-1768939891627-ak63frg8j\",\"spreadsheetId\":\"1GdkIkOoSdZdFMB-yjoua-lpsj5h4GRM0RioozhE35ZM\",\"sheetName\":\"Registrations\"}"
+    "body": "{\"ok\":true,\"action\":\"create\",\"reference\":\"MM-1768944367835-4nerpzg1t\",\"spreadsheetId\":\"1GdkIkOoSdZdFMB-yjoua-lpsj5h4GRM0RioozhE35ZM\",\"sheetName\":\"Registrations\"}"
   }
 }

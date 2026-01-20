@@ -290,28 +290,25 @@
 /* ============================================
    CONFIG WOMPI + APPS SCRIPT (NO TOCAR EL DISEÑO)
 ============================================ */
-// Usa la llave pública de prueba que proporcionaste
-const WOMPI_PUBLIC_KEY = 'pub_test_B3FDnEk0nvEP7EUFzOEoRPl0N8HKGsgK';
+// Llave pública (modo producción). Esta es la llave pública que puede ir en el cliente.
+const WOMPI_PUBLIC_KEY = 'pub_prod_axnI5F0BmAoXEmks4Ci1uzGiwV3B40gF';
 const WOMPI_CURRENCY = 'COP';
 
-
-
-const WOMPI_ENV = 'test'; // <-- CAMBIA A 'prod' cuando ya estés en producción
+// Entorno: 'prod' activa comportamientos para producción (no afectan claves privadas)
+const WOMPI_ENV = 'prod';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGMiQUtjx-kknEK1KpKFu0OecQ8dA0Ox-aOBWsy-SJ5dLKW9vhlP2ONNzjb9xxAYNpHw/exec';
 // URL del servidor que corre el endpoint de creación de transacciones
 // Use same-origin when served over http(s). If opened via file:// fallback to localhost:3000
+// Determine payment server origin. When deployed, the payment server should
+// be served from the same origin as the frontend; in that case we use
+// `window.location.origin`. When opened via `file://` during local dev we
+// fallback to localhost:3000.
 let PAYMENT_SERVER_URL = 'http://localhost:3000';
 try{
-  // Only assume the page and the payment server are the same origin when
-  // the current page is actually served from the payment server (port 3000
-  // or hostname localhost). This avoids cases where a live-reload/static
-  // server (different port) would receive API requests and respond "Cannot GET".
   if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
-    const isLocalhost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    if (isLocalhost && (window.location.port === '3000' || window.location.port === '' || window.location.port === undefined)) {
-      PAYMENT_SERVER_URL = window.location.origin;
-    }
+    // Use the page origin as the payment server origin when served over http(s).
+    PAYMENT_SERVER_URL = window.location.origin;
   }
 }catch(e){}
 
@@ -446,8 +443,35 @@ function actualizarTotalConDomicilio(baseTotal) {
     info.style.display = 'none';
   }
 
+  // Update visual total
   document.getElementById('total-precio').innerText = `Total: $${totalFinal.toLocaleString()}`;
   localStorage.setItem('total_calc', totalFinal);
+
+  // Update product list to show/hide domicilio row
+  try {
+    const lista = document.getElementById('lista-productos');
+    if (lista) {
+      const existing = document.getElementById('domicilio-row');
+      if (checkbox && checkbox.checked) {
+        if (!existing) {
+          const row = document.createElement('div');
+          row.id = 'domicilio-row';
+          row.className = 'producto-row';
+          row.innerHTML = `
+            <div style="width:70px;height:60px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;border:1px solid #eee;color:#888;font-size:12px;">Env</div>
+            <div style="flex:1;">
+              <strong>Domicilio</strong><br>
+              Servicio de envío
+            </div>
+            <strong>$${COSTO_DOMICILIO.toLocaleString()}</strong>
+          `;
+          lista.appendChild(row);
+        }
+      } else {
+        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+      }
+    }
+  } catch(e){ console.warn('actualizarTotalConDomicilio: fallo al actualizar lista-productos', e); }
 }
 
 /* ============================================
@@ -471,6 +495,62 @@ function agregarListeners() {
       el.addEventListener('change', validarYCargarWidget);
     }
   });
+}
+
+// Evita que clics en botones/enlaces del widget disparen acciones por defecto
+// (p. ej. submit de formulario o navegación) que recarguen la página.
+function preventWidgetDefaultNavigation(container) {
+  try {
+    if (!container) return;
+    // Use capture phase to intercept before default action
+    container.addEventListener('click', function (e) {
+      try {
+        const el = e.target && e.target.closest && e.target.closest('button, a');
+        if (!el) return;
+        // Si es un enlace con href que provoca navegación o un botón tipo submit
+        const tag = el.tagName && el.tagName.toLowerCase();
+        const href = el.getAttribute && el.getAttribute('href');
+        const type = el.getAttribute && el.getAttribute('type');
+        if ((tag === 'a' && href && href !== '#' && href !== 'javascript:void(0)') || type === 'submit' || href === '#') {
+          e.preventDefault();
+        } else if (tag === 'a' && (href === '#' || href === '' || href === null)) {
+          e.preventDefault();
+        } else if (type === 'button' || tag === 'button') {
+          // evitar que botones dentro de formularios hagan submit por accidente
+          e.preventDefault();
+        }
+      } catch (err) { /* ignore */ }
+    }, true);
+  } catch (e) { /* ignore */ }
+}
+
+// Reemplaza el comportamiento del botón renderizado por el widget
+// para que en lugar de provocar una navegación en la página actual
+// abra el Web Checkout en nueva pestaña enviando los datos y la firma.
+function overrideWidgetButtonBehavior(container, amountInCents, reference, sEmail, sFirst, sLast) {
+  try {
+    if (!container) return;
+    const tryAttach = () => {
+      try {
+        const btn = container.querySelector('button');
+        if (!btn) return false;
+        btn.addEventListener('click', function (e) {
+          try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
+          try {
+            abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast);
+          } catch (err) { console.warn('override open failed', err); }
+        }, { once: true });
+        return true;
+      } catch (err) { return false; }
+    };
+
+    if (!tryAttach()) {
+      const mo = new MutationObserver((mutations) => {
+        if (tryAttach()) mo.disconnect();
+      });
+      mo.observe(container, { childList: true, subtree: true });
+    }
+  } catch (e) { /* ignore */ }
 }
 
 /* ============================================
@@ -558,28 +638,32 @@ async function validarYCargarWidget() {
       return;
     }
 
-    // Inyectar script del widget
-    const script = document.createElement('script');
-    script.src = 'https://checkout.wompi.co/widget.js';
-    script.async = true;
-    script.setAttribute('data-render', 'button');
-    script.setAttribute('data-public-key', WOMPI_PUBLIC_KEY);
-    script.setAttribute('data-currency', WOMPI_CURRENCY);
-    script.setAttribute('data-amount-in-cents', String(amountInCents));
-    script.setAttribute('data-reference', String(reference));
-    script.setAttribute('data-signature:integrity', signature);
-    const safeRedirect = (PAYMENT_SERVER_URL && String(PAYMENT_SERVER_URL).startsWith('http://localhost')) ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
-    script.setAttribute('data-redirect-url', safeRedirect);
-
-    script.addEventListener('load', () => {
-      try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
+    // Instead of injecting Wompi widget script (which may load v1.js and cause
+    // initialization errors on some environments), render a native button that
+    // opens the Web Checkout directly with the server-provided signature.
+    try {
+      if (status && status.parentNode) try { status.parentNode.removeChild(status); } catch(e){}
       container.setAttribute('data-widget-reference', String(reference));
       container.removeAttribute('data-widget-loading');
-      window.__mm_widget_injected = true;
+      window.__mm_widget_injected = false;
       window.__mm_widget_reference = String(reference);
       window.__mm_widget_loading = false;
-      // Setup observer to detect widget iframe open/close and persist registration if needed
-      try {
+
+      const nativeBtn = document.createElement('button');
+      nativeBtn.type = 'button';
+      nativeBtn.textContent = 'Pagar Aqui';
+      nativeBtn.style.padding = '12px 18px'; nativeBtn.style.borderRadius='10px'; nativeBtn.style.background='#13d6eb'; nativeBtn.style.color='#000'; nativeBtn.style.border='none'; nativeBtn.style.cursor='pointer';
+      nativeBtn.addEventListener('click', (e) => {
+        try { e.preventDefault(); } catch(_){}
+        abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast);
+      });
+      container.appendChild(nativeBtn);
+    } catch (e) {
+      console.error('failed to render native checkout button', e);
+    }
+
+    // Setup observer to detect iframe open/close and persist registration if needed
+    try {
         const saveIfNeeded = () => {
           try {
             if (!window.__mm_widget_reference) return;
@@ -640,57 +724,10 @@ async function validarYCargarWidget() {
         // Also save when window regains focus (user returned from external checkout)
         window.addEventListener('focus', () => { setTimeout(saveIfNeeded, 250); });
       } catch(e) { console.warn('widget save observer setup failed', e); }
-    });
 
     // No delegated click handler: do not send or queue data on widget click.
     // The registration is persisted to the server when the signature is generated,
     // and the webhook will forward the row to Google Sheets when payment is confirmed.
-
-    script.addEventListener('error', () => {
-      try { if (status && status.parentNode) status.parentNode.removeChild(status); } catch(e){}
-      container.removeAttribute('data-widget-loading');
-      window.__mm_widget_loading = false;
-      window.__mm_widget_injected = false;
-      // Show user-friendly fallback and attempt to allow manual checkout
-      container.innerHTML = '<p style="color:#ff6b6b">Error cargando el widget. Usa la opción alternativa abajo para continuar con el pago.</p>';
-      // create fallback button
-      try{
-        const fb = document.createElement('button');
-        fb.type = 'button';
-        fb.textContent = 'Pagar (alternativa)';
-        fb.style.padding = '12px 18px'; fb.style.borderRadius='10px'; fb.style.background='#13d6eb'; fb.style.color='#000'; fb.style.border='none'; fb.style.cursor='pointer';
-        fb.addEventListener('click', async () => {
-          try{
-            // Prepare payload same as widget click
-            const entrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}') || {};
-            const studentPayload = {
-              student: {
-                first: (document.getElementById('studentFirstName') && document.getElementById('studentFirstName').value) || '',
-                last: (document.getElementById('studentLastName') && document.getElementById('studentLastName').value) || '',
-                grade: (document.getElementById('studentGrade') && document.getElementById('studentGrade').value) || '',
-                doc: (document.getElementById('studentDoc') && document.getElementById('studentDoc').value) || '',
-                email: (document.getElementById('studentEmail') && document.getElementById('studentEmail').value) || ''
-              }
-            };
-            const payloadToSheet = Object.assign({}, entrega, studentPayload, { reference, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
-            // send to sheet (queue/sendBeacon)
-
-            // Do not queue or send sheet data here; registration is saved on signature and webhook will handle Sheets update.
-
-            // Create transaction on server and open checkout_url
-            try{
-              const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, { method:'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: payloadToSheet.student && payloadToSheet.student.email || entrega.email, full_name: ((payloadToSheet.student && ((payloadToSheet.student.first||'') + ' ' + (payloadToSheet.student.last||''))) || entrega.acudiente || ''), reference, public_key: WOMPI_PUBLIC_KEY }) });
-              const txt = await resp.text(); let data={}; try{ data = txt ? JSON.parse(txt) : {}; }catch(e){ data = { raw: txt }; }
-              const checkout = data.checkout_url || (data.data && data.data.checkout_url);
-              if (checkout) { window.open(checkout, '_blank'); } else { alert('No se pudo crear la transacción. Intenta nuevamente.'); }
-            }catch(e){ console.warn('create-transaction failed', e); alert('No se pudo iniciar el pago automáticamente.'); }
-          }catch(e){ console.warn('fallback button error', e); }
-        });
-        container.appendChild(fb);
-      }catch(e){ console.warn('failed to create fallback button', e); }
-    });
-
-    container.appendChild(script);
   } catch (e) {
     container.removeAttribute('data-widget-loading');
     container.innerHTML = '<p style="color:#ff6b6b">Error preparando la pasarela.</p>';
@@ -760,37 +797,37 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
         return;
       }
 
-      // Inyectar el script del widget con los data-attributes (incluyendo data-signature:integrity)
-      status.innerText = 'Preparando botón del widget...';
-      // Limpiar contenedor e insertar script tag configurado
-      container.innerHTML = '';
-      const script = document.createElement('script');
-      script.src = 'https://checkout.wompi.co/widget.js';
-      script.async = true;
-      script.setAttribute('data-render', 'button');
-      script.setAttribute('data-public-key', WOMPI_PUBLIC_KEY);
-      script.setAttribute('data-currency', WOMPI_CURRENCY);
-      script.setAttribute('data-amount-in-cents', String(amountInCents));
-      script.setAttribute('data-reference', String(reference));
-      // attribute name must include colon as per widget API
-      script.setAttribute('data-signature:integrity', signature);
-      // redirect to our server result endpoint (use safe redirect when running on localhost)
-      const safeRedirect = (PAYMENT_SERVER_URL && String(PAYMENT_SERVER_URL).startsWith('http://localhost')) ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
-      script.setAttribute('data-redirect-url', safeRedirect);
-      // append optional expiration time if server returned it
-      if (sigJson.payload && sigJson.payload.includes('T') && sigJson.payload.includes('Z')) {
-        // If the server used expiration in the payload, try to extract it roughly and set attribute
-        // The frontend should also pass expiration if desired; for now we skip precise parsing
-      }
-      container.appendChild(script);
+      // Instead of injecting the Wompi widget script (which may load v1.js
+      // and cause initialization errors like merchants/undefined), render a
+      // native button that opens the Web Checkout directly with the
+      // server-provided signature.
+      try {
+        if (status && status.parentNode) try { status.parentNode.removeChild(status); } catch(e){}
+        container.innerHTML = '';
+        container.setAttribute('data-widget-reference', String(reference));
+        const nativeBtn = document.createElement('button');
+        nativeBtn.type = 'button';
+        nativeBtn.textContent = 'Pagar - Web Checkout';
+        nativeBtn.style.padding = '12px 18px'; nativeBtn.style.borderRadius='10px'; nativeBtn.style.background='#13d6eb'; nativeBtn.style.color='#000'; nativeBtn.style.border='none'; nativeBtn.style.cursor='pointer';
+        nativeBtn.addEventListener('click', (e) => { try{ e.preventDefault(); }catch(_){ }; abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast); });
+        container.appendChild(nativeBtn);
+      } catch (e) { console.error('failed to render native checkout button', e); }
 
-      // After the widget script loads it will render a button. We attach
-      // a MutationObserver to detect when the button appears and then
-      // add a one-time click handler that will persist the registration
-      // to the sheet and allow the payment to proceed. This avoids
-      // creating the sheet row while the user is still typing.
-      script.addEventListener('load', () => {
-        status.innerText = 'Widget listo. Presiona el botón de pago para continuar.';
+      // Also attach navigation prevention to container
+      try { preventWidgetDefaultNavigation(container); } catch(e){}
+
+      // And ensure if any widget button appears later we override it to open web checkout
+      try { overrideWidgetButtonBehavior(container, amountInCents, reference, sEmail, sFirst, sLast); } catch(e){}
+
+      // The rest of the code continues to set up observers that persist registration
+      // when iframes are closed or window regains focus.
+      (function(){ /* continue below */ })();
+      
+      // NOTE: we intentionally do not append the remote widget script.
+
+      // After the (native) button is ready, proceed with the registration observers
+      {
+        
         // Do not attach any click handler to the widget; all sheet writes will be performed server-side when webhook confirms payment.
         // However, ensure we persist the registration if the widget modal closes or the user returns to the page.
         try {
@@ -840,13 +877,86 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
           const btnObserver = new MutationObserver(() => { attachButtonClick(); });
           btnObserver.observe(container, { childList: true, subtree: true });
         } catch(e) { console.warn('widget save observer failed', e); }
-      });
+      }
       // Note: fallback to server-created checkout will be invoked only if widget fails to render or user chooses.
 
     } catch (e) {
       console.error(e);
       container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
     }
+}
+
+/* ============================================
+   WEB CHECKOUT (FORM)
+   Construye y envía un formulario GET a https://checkout.wompi.co/p/
+============================================ */
+async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast) {
+  try {
+    // Solicitar firma al servidor
+    const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount_in_cents: amountInCents, reference, currency: WOMPI_CURRENCY })
+    });
+    const sigJson = await sigResp.json().catch(() => ({}));
+    if (!sigResp.ok || !sigJson.signature) {
+      // Fallback: pedir checkout_url al servidor
+      try {
+        const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
+        });
+        const txt = await resp.text(); let data={}; try{ data = txt ? JSON.parse(txt) : {}; }catch(e){ data = { raw: txt }; }
+        const checkout = data.checkout_url || (data.data && data.data.checkout_url);
+        if (checkout) { window.open(checkout, '_blank'); return; }
+      } catch(e) { console.warn('create-transaction fallback failed', e); }
+      alert('No fue posible obtener la firma para Web Checkout. Intenta nuevamente.');
+      return;
+    }
+
+    const signature = sigJson.signature;
+    // Construir formulario GET apuntando al Web Checkout
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = 'https://checkout.wompi.co/p/';
+    form.target = '_blank';
+
+    const add = (name, value) => {
+      const i = document.createElement('input');
+      i.type = 'hidden'; i.name = name; i.value = String(value || ''); form.appendChild(i);
+    };
+
+    add('public-key', WOMPI_PUBLIC_KEY);
+    add('currency', WOMPI_CURRENCY);
+    add('amount-in-cents', String(amountInCents));
+    add('reference', String(reference));
+    add('signature:integrity', signature);
+    const safeRedirect = (PAYMENT_SERVER_URL && String(PAYMENT_SERVER_URL).startsWith('http://localhost')) ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
+    add('redirect-url', safeRedirect);
+    add('customer-data:email', sEmail || '');
+    add('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
+    try { add('customer-data:phone-number', document.getElementById('studentPhone') && document.getElementById('studentPhone').value || ''); } catch(e){}
+    try { add('customer-data:legal-id', document.getElementById('studentDoc') && document.getElementById('studentDoc').value || ''); } catch(e){}
+    try { add('customer-data:legal-id-type', 'CC'); } catch(e){}
+    // address-line-1 will be added only if shipping is requested (below)
+    // Add shipping fields only when user requested domicilio or when address is present
+    try {
+      const shipRequested = (document.getElementById('solicitar-domicilio') && document.getElementById('solicitar-domicilio').checked) || (document.getElementById('studentAddress') && String(document.getElementById('studentAddress').value||'').trim());
+      if (shipRequested) {
+        try { add('shipping-address:address-line-1', document.getElementById('studentAddress') && document.getElementById('studentAddress').value || ''); } catch(e){}
+        try { add('shipping-address:country', (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.ciudad || d.pais || d.country) ? (d.country||d.pais||'CO') : 'CO'; }catch(e){ return 'CO'; } })()); } catch(e){}
+        try { add('shipping-address:city', (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.ciudad||d.city) ? (d.ciudad||d.city) : ''; }catch(e){ return ''; } })()); } catch(e){}
+        try { add('shipping-address:region', (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.region||d.departamento||'') ? (d.region||d.departamento||'') : ''; }catch(e){ return ''; } })()); } catch(e){}
+        try { add('shipping-address:phone-number', document.getElementById('studentPhone') && document.getElementById('studentPhone').value || (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.telefono||d.phone||d.movil) ? (d.telefono||d.phone||d.movil) : ''; }catch(e){ return ''; } })()); } catch(e){}
+      }
+    } catch(e) {}
+
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+  } catch (e) {
+    console.error('abrirWebCheckout error', e);
+    alert('Error al abrir Web Checkout. Intenta nuevamente.');
+  }
 }
 
 /* ============================================
