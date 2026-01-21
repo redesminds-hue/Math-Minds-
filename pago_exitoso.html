@@ -642,9 +642,24 @@
       try {
         // Obtener datos del localStorage
         const datosEntrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}');
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        // Soportar varios nombres de clave para el carrito usados en otras páginas
+        const possibleCartKeys = ['cart', 'mm_cart_v1', 'mm_pedido', 'pedido', 'cart_items', 'cartItems'];
+        let rawCart = [];
+        for (const k of possibleCartKeys){
+          try{
+            const v = localStorage.getItem(k);
+            if (v){
+              const parsed = JSON.parse(v || '[]');
+              if (Array.isArray(parsed) && parsed.length>0){ rawCart = parsed; break; }
+            }
+          }catch(e){ /* ignore parse errors */ }
+        }
+        // Fallback to empty array
+        const cart = rawCart || [];
         const total = Number(localStorage.getItem('total_calc') || 0);
-        const reference = getQueryParams().reference || window.__mm_widget_reference || 'MM-' + Date.now();
+        // Tomar la referencia real buscando entre los posibles nombres que envía Wompi
+        const qParams = getQueryParams();
+        const reference = qParams.reference || qParams.tx_reference || qParams.transaction_reference || qParams.transaction || qParams.tx || qParams.tx_id || window.__mm_widget_reference || (localStorage.getItem('wompi_reference') || '') || 'MM-' + Date.now();
         
         // Mostrar productos
         const productsList = document.getElementById('productsList');
@@ -652,27 +667,62 @@
         let shippingCost = 0;
 
         if (cart && cart.length > 0) {
+          // Intentar obtener baseDeDatos local para buscar precios faltantes
+          let bdb = (window.baseDeDatos || []);
+          try{ if ((!bdb || bdb.length===0) && localStorage.getItem('mm_baseDeDatos')) bdb = JSON.parse(localStorage.getItem('mm_baseDeDatos') || '[]'); }catch(e){ bdb = bdb || []; }
+
+          // Normalizar texto para comparación
+          function normalizeText(s){
+            try { return (s||'').toString().trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/['"`]/g,'').replace(/[^a-z0-9\s]/g,''); }
+            catch(e){ return (s||'').toString().trim().toLowerCase(); }
+          }
+
+          // Normalizar propiedades de cada item y, si falta precio, buscar en baseDeDatos
+          const normalized = cart.map(it => {
+            const nombreRaw = it.nombre || it.title || it.name || it.producto || it.descripcion || '';
+            const nombre = String(nombreRaw).trim() || 'Producto';
+            let precio = Number(it.precio || it.price || it.costo || it.unit_price || it.valor || it.amount || 0) || 0;
+            const cantidad = Number(it.cantidad || it.qty || it.quantity || it.cant || 1) || 1;
+
+            if ((!precio || precio === 0) && (bdb && bdb.length > 0)){
+              const n = normalizeText(nombre);
+              let found = null;
+              for (const r of bdb){
+                const prod = (r.producto || r.title || r.name || '').toString();
+                const np = normalizeText(prod);
+                if (!np) continue;
+                if (np === n || np.includes(n) || n.includes(np)) { found = r; break; }
+              }
+              if (found){
+                precio = Number(found.costo || found.price || found.valor || found.unit_price || 0) || precio;
+              }
+            }
+
+            return { nombre, precio, cantidad };
+          });
+
           let html = '';
-          cart.forEach((item, index) => {
-            const itemPrice = (item.precio || 0) * (item.cantidad || 1);
+          normalized.forEach((item, index) => {
+            const itemPrice = item.precio * item.cantidad;
             subtotal += itemPrice;
             const bgColor = index % 2 === 0 ? 'rgba(19, 214, 235, 0.08)' : 'rgba(16, 185, 129, 0.08)';
             html += `
               <div class="receipt-item" style="background: ${bgColor}; border-left: 4px solid var(--purple); padding: 12px; margin-bottom: 8px; border-radius: 8px; border-bottom: none;">
-                <div style="margin-bottom: 8px;">
-                  <span class="item-name" style="font-size: 14px; font-weight: 700;">${item.nombre || 'Producto'}</span>
+                <div style="margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
+                  <span class="item-name" style="font-size: 14px; font-weight: 700;">${item.nombre}</span>
+                  <span style="font-size:13px; font-weight:700; color:var(--success);">${formatCurrency(item.precio)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                  <span class="item-qty" style="color: #666; margin: 0;">Cantidad: <strong>${item.cantidad || 1}</strong></span>
-                  <span class="item-price" style="color: var(--success); font-weight: 700; margin: 0;">Precio unitario: ${formatCurrency(item.precio || 0)}</span>
-                </div>
-                <div style="text-align: right; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1);">
-                  <span style="font-size: 13px; font-weight: 700; color: var(--black);">Subtotal: ${formatCurrency(itemPrice)}</span>
+                  <span class="item-qty" style="color: #666; margin: 0;">Cantidad: <strong>${item.cantidad}</strong></span>
+                  <span style="color: #666; font-weight: 600; margin: 0;">Subtotal: <strong style="color:var(--black);">${formatCurrency(itemPrice)}</strong></span>
                 </div>
               </div>
             `;
           });
           productsList.innerHTML = html;
+
+          // Reassign cart variable to normalized for usage in receiptData
+          window._receipt_cart_normalized = normalized;
         }
 
         // Calcular envío si existe
@@ -695,7 +745,7 @@
         // Guardar para descarga
         window.receiptData = {
           reference: refNum,
-          items: cart,
+          items: window._receipt_cart_normalized || cart,
           subtotal: subtotal,
           shipping: shippingCost,
           total: totalFinal,
@@ -827,7 +877,7 @@
                 </div>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
-                <p style="margin: 0; color: #666; font-size: 11px;">Precio unitario: $${Math.round(item.precio || 0).toLocaleString('es-CO')}</p>
+                <p style="margin: 0; color: #666; font-size: 11px;">$${Math.round(item.precio || 0).toLocaleString('es-CO')}</p>
                 <p style="margin: 0; font-weight: 800; color: #10b981; font-size: 13px;">$${Math.round((item.precio || 0) * (item.cantidad || 1)).toLocaleString('es-CO')}</p>
               </div>
             </div>
