@@ -889,127 +889,97 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
 ============================================ */
 async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast, popup) {
   try {
-    // Solicitar firma al servidor
+    // 1) Firma desde tu servidor
     const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount_in_cents: amountInCents, reference, currency: WOMPI_CURRENCY })
     });
+
     const sigJson = await sigResp.json().catch(() => ({}));
     if (!sigResp.ok || !sigJson.signature) {
-      // Fallback: pedir checkout_url al servidor
-      try {
-        const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
-        });
-        const txt = await resp.text(); let data={}; try{ data = txt ? JSON.parse(txt) : {}; }catch(e){ data = { raw: txt }; }
-        const checkout = data.checkout_url || (data.data && data.data.checkout_url);
-        if (checkout) {
-          if (popup && !popup.closed) popup.location.href = checkout;
-          else window.location.href = checkout; // fallback misma pestaña
-          return;
-        }
-
-      } catch(e) { console.warn('create-transaction fallback failed', e); }
-      alert('No fue posible obtener la firma para Web Checkout. Intenta nuevamente.');
+      alert('No fue posible obtener la firma. Intenta nuevamente.');
+      if (popup && !popup.closed) popup.close();
       return;
     }
 
     const signature = sigJson.signature;
-    // Construir formulario GET apuntando al Web Checkout
-    const form = document.createElement('form');
-    form.method = 'GET';
-    form.action = 'https://checkout.wompi.co/p/';
-    form.target = '_self';
 
-    const add = (name, value) => {
-      const i = document.createElement('input');
-      i.type = 'hidden'; i.name = name; i.value = String(value || ''); form.appendChild(i);
-    };
-
-    add('public-key', WOMPI_PUBLIC_KEY);
-    add('currency', WOMPI_CURRENCY);
-    add('amount-in-cents', String(amountInCents));
-    add('reference', String(reference));
-    add('signature:integrity', signature);
-    add('redirect-url', 'https://mathmindscol.com/pago_exitoso.html');
-    add('customer-data:email', sEmail || '');
-    add('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
-    try { add('customer-data:phone-number', document.getElementById('studentPhone') && document.getElementById('studentPhone').value || ''); } catch(e){}
-    try { add('customer-data:legal-id', document.getElementById('studentDoc') && document.getElementById('studentDoc').value || ''); } catch(e){}
-    try { add('customer-data:legal-id-type', 'CC'); } catch(e){}
-    // address-line-1 will be added only if shipping is requested (below)
-    // Add shipping fields only when user requested domicilio or when address is present
-    try {
-      const shipRequested = (document.getElementById('solicitar-domicilio') && document.getElementById('solicitar-domicilio').checked) || (document.getElementById('studentAddress') && String(document.getElementById('studentAddress').value||'').trim());
-      if (shipRequested) {
-        try { add('shipping-address:address-line-1', document.getElementById('studentAddress') && document.getElementById('studentAddress').value || ''); } catch(e){}
-        try { add('shipping-address:country', (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.ciudad || d.pais || d.country) ? (d.country||d.pais||'CO') : 'CO'; }catch(e){ return 'CO'; } })()); } catch(e){}
-        try { add('shipping-address:city', (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.ciudad||d.city) ? (d.ciudad||d.city) : ''; }catch(e){ return ''; } })()); } catch(e){}
-        try { add('shipping-address:region', (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.region||d.departamento||'') ? (d.region||d.departamento||'') : ''; }catch(e){ return ''; } })()); } catch(e){}
-        try { add('shipping-address:phone-number', document.getElementById('studentPhone') && document.getElementById('studentPhone').value || (function(){ try{ const d=JSON.parse(localStorage.getItem('datos_entrega')||'{}'); return d && (d.telefono||d.phone||d.movil) ? (d.telefono||d.phone||d.movil) : ''; }catch(e){ return ''; } })()); } catch(e){}
-      }
-    } catch(e) {}
-
-    if (popup && !popup.closed) {
-      // Crear el form dentro del popup (Safari-friendly)
-      const pdoc = popup.document;
-      const pform = pdoc.createElement('form');
-      pform.method = 'GET';
-      pform.action = 'https://checkout.wompi.co/p/';
-      pform.target = '_self';
-
-      const padd = (name, value) => {
-        const i = pdoc.createElement('input');
-        i.type = 'hidden';
-        i.name = name;
-        i.value = String(value || '');
-        pform.appendChild(i);
-      };
-
-      padd('public-key', WOMPI_PUBLIC_KEY);
-      padd('currency', WOMPI_CURRENCY);
-      padd('amount-in-cents', String(amountInCents));
-      padd('reference', String(reference));
-      padd('signature:integrity', signature);
-      padd('redirect-url', 'https://mathmindscol.com/pago_exitoso.html');
-      padd('customer-data:email', sEmail || '');
-      padd('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
-
-      try { padd('customer-data:phone-number', (document.getElementById('studentPhone')?.value || '')); } catch(e){}
-      try { padd('customer-data:legal-id', (document.getElementById('studentDoc')?.value || '')); } catch(e){}
-      try { padd('customer-data:legal-id-type', 'CC'); } catch(e){}
-
-      // Shipping opcional (igual que antes)
-      try {
-        const shipRequested =
-          (document.getElementById('solicitar-domicilio')?.checked) ||
-          (String(document.getElementById('studentAddress')?.value || '').trim());
-
-        if (shipRequested) {
-          padd('shipping-address:address-line-1', (document.getElementById('studentAddress')?.value || ''));
-          const d = (() => { try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch(e){ return {}; } })();
-          padd('shipping-address:country', (d.country || d.pais || 'CO'));
-          padd('shipping-address:city', (d.ciudad || d.city || ''));
-          padd('shipping-address:region', (d.region || d.departamento || ''));
-          padd('shipping-address:phone-number', (document.getElementById('studentPhone')?.value || d.telefono || d.phone || d.movil || ''));
-        }
-      } catch(e) {}
-
-      // Render mínimo por si el popup está en blanco
-      if (!pdoc.body) pdoc.write('<body></body>');
-      pdoc.body.appendChild(pform);
-      pform.submit();
-    } else {
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
+    // 2) Validaciones mínimas
+    if (!WOMPI_PUBLIC_KEY || !String(WOMPI_PUBLIC_KEY).startsWith('pub_')) {
+      alert('Clave pública WOMPI inválida/ausente.');
+      if (popup && !popup.closed) popup.close();
+      return;
     }
 
+    // 3) Params obligatorios (según docs de Web Checkout)
+    const params = new URLSearchParams();
+    params.set('public-key', WOMPI_PUBLIC_KEY);
+    params.set('currency', WOMPI_CURRENCY);
+    params.set('amount-in-cents', String(amountInCents));
+    params.set('reference', String(reference));
+    params.set('signature:integrity', signature);
 
+    // Opcionales típicos
+    params.set('redirect-url', 'https://mathmindscol.com/pago_exitoso.html');
+    params.set('customer-data:email', sEmail || '');
+    params.set('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
+    const doc = (document.getElementById('studentDoc')?.value || '').trim();
+    if (doc) {
+      params.set('customer-data:legal-id', doc);
+      params.set('customer-data:legal-id-type', 'CC');
+    }
+    const phone = (document.getElementById('studentPhone')?.value || '').trim();
+    if (phone) params.set('customer-data:phone-number', phone);
+
+    // 4) Shipping SOLO si está COMPLETO (si no, NO mandes nada)
+    const domicilioChecked = !!document.getElementById('solicitar-domicilio')?.checked;
+    if (domicilioChecked) {
+      const address = (document.getElementById('studentAddress')?.value || '').trim();
+      const d = (() => { try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch { return {}; } })();
+      const shipCity = String(d.ciudad || d.city || '').trim();
+      const shipRegion = String(d.region || d.departamento || '').trim();
+
+      // Según el ejemplo de Wompi para Web Checkout, si envías shipping, city+region deben ir. :contentReference[oaicite:1]{index=1}
+     // ✅ NO enviar shipping-address:* NUNCA.
+    // El domicilio solo afecta el precio; la dirección/teléfono se guardan en tu sistema, no en Wompi.
+    try {
+      // Si quieres, puedes guardar un flag interno para tu backend/Sheets:
+      const shipRequested = !!document.getElementById('solicitar-domicilio')?.checked;
+
+      // (Opcional) guarda esto en localStorage para usarlo luego en tu webhook/Sheets
+      const entregaLocal = (() => { 
+        try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } 
+        catch(e){ return {}; } 
+      })();
+
+      entregaLocal.shipping_requested = shipRequested;
+      entregaLocal.shipping_cost = shipRequested ? 13000 : 0;
+
+      // Guarda dirección/teléfono SOLO para tu operación interna
+      entregaLocal.shipping_address = (document.getElementById('studentAddress')?.value || '').trim();
+      entregaLocal.shipping_phone = (document.getElementById('studentPhone')?.value || '').trim();
+
+      localStorage.setItem('datos_entrega', JSON.stringify(entregaLocal));
+    } catch(e) {}
+
+    }
+
+    // 5) Navegar al checkout
+    const url = `https://checkout.wompi.co/p/?${params.toString()}`;
+
+    // Debug rápido: mira que NO diga public-key=undefined
+    console.log('[WOMPI CHECKOUT URL]', url);
+
+    if (popup && !popup.closed) {
+      popup.location.replace(url);
+    } else {
+      window.location.href = url;
+    }
   } catch (e) {
     console.error('abrirWebCheckout error', e);
     alert('Error al abrir Web Checkout. Intenta nuevamente.');
+    if (popup && !popup.closed) popup.close();
   }
 }
 
