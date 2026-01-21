@@ -7,11 +7,7 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Registrar Service Worker lo antes posible para bloquear peticiones directas a /v1/transactions -->
   <script>
-    // During local development the ServiceWorker may intercept requests
-    // and cause `Failed to fetch` if the local backend is not running.
-    // Set `DISABLE_SW_ON_DEV = true` to avoid registering the SW on localhost.
     const DISABLE_SW_ON_DEV = true;
     if ('serviceWorker' in navigator && !DISABLE_SW_ON_DEV) {
       try {
@@ -23,7 +19,6 @@
       }
     } else if (DISABLE_SW_ON_DEV) {
       console.log('[wompi-sw] Registro de ServiceWorker deshabilitado en modo desarrollo.');
-      // Unregister any previously installed service workers (useful during development)
       try {
         navigator.serviceWorker.getRegistrations().then(regs => {
           regs.forEach(r => {
@@ -34,178 +29,31 @@
     }
   </script>
 
-  <!-- Using Widget Checkout Web only: do NOT load v1.js or call $wompi.initialize to avoid merchants/undefined. -->
-  <!-- Service Worker proxies Wompi POSTs to the backend; no client-side fetch/XHR blocking here -->
-    <!-- Service Worker proxies Wompi POSTs to the backend; no client-side fetch/XHR blocking here -->
-
-  <!-- Widget será inyectado dinámicamente cuando tengamos firma; NO cargarlo globalmente aquí -->
-
   <style>
-    :root {
-      --black: #111;
-      --purple: #13d6eba2;
-      --light-gray: #f4f7f6;
-    }
-
-    body {
-      background-color: var(--light-gray);
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    .header-mini {
-      background: #fff;
-      padding: 15px 40px;
-      border-bottom: 2px solid var(--black);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .logo-mini { width: 80px; }
-
-    .btn-back {
-      text-decoration: none;
-      color: var(--black);
-      font-weight: 700;
-      font-size: 13px;
-      text-transform: uppercase;
-      padding: 8px 14px;
-      border: 1.5px solid var(--black);
-      border-radius: 10px;
-      margin-left: auto;
-    }
-
-    .container-final {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 30px;
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 36px;
-      box-shadow: 0 8px 20px rgba(17,17,17,0.06);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-
-    h3 {
-      margin-top: 0;
-      text-transform: uppercase;
-      font-size: 18px;
-      border-bottom: 2px solid var(--purple);
-      display: inline-block;
-      margin-bottom: 28px;
-    }
-
-    .producto-row {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .producto-row img {
-      width: 70px;
-      height: 60px;
-      object-fit: contain;
-      background: #f9f9f9;
-      border-radius: 10px;
-    }
-
-    .form-group {
-      margin-bottom: 22px;
-    }
-
-    .input-estudiante {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1.5px solid rgba(0,0,0,0.12);
-      border-radius: 10px;
-      font-size: 15px;
-      margin-top: 8px;
-      margin-bottom: 0;
-      box-sizing: border-box;
-      line-height: 1.5;
-    }
-
-    label {
-      display: block;
-      font-size: 12px;
-      color: #222;
-      font-weight: 600;
-      margin-bottom: 8px;
-      letter-spacing: 0.6px;
-    }
-
-    .student-note {
-      color: #b30000;
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 28px;
-      margin-top: 0;
-      line-height: 1.6;
-    }
-
-    .acudiente-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px 24px;
-      align-items: start;
-    }
-
-    .acudiente-row { background: #f9f9f9; padding: 14px; border-radius: 8px; }
-
-    .acudiente-label { display: block; font-size: 11px; color: #555; font-weight: 700; margin-bottom: 8px; }
-
-    .acudiente-value { font-size: 14px; color: #111; line-height: 1.5; }
-
-    .total-box {
-      text-align: right;
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: 900;
-    }
-
-    .domicilio-section {
-      background: #f0f8ff;
-      padding: 24px;
-      border-radius: 10px;
-      margin-top: 28px;
-      margin-bottom: 28px;
-      border: 1px solid #ccc;
-      display: none;
-    }
-
-    .domicilio-section h4 {
-      margin-top: 0;
-      margin-bottom: 18px;
-      font-size: 16px;
-    }
-
-    .domicilio-section label {
-      cursor: pointer;
-      margin: 0;
-      line-height: 1.5;
-    }
-
-    .domicilio-info {
-      color: #666;
-      font-size: 13px;
-      margin-top: 12px;
-      margin-bottom: 0;
-      display: none;
-    }
-
-    @media (max-width: 850px) {
-      .container-final { grid-template-columns: 1fr; }
-    }
+    :root { --black:#111; --purple:#13d6eba2; --light-gray:#f4f7f6; }
+    body { background-color:var(--light-gray); font-family:'Poppins',sans-serif; margin:0; padding:0; }
+    .header-mini { background:#fff; padding:15px 40px; border-bottom:2px solid var(--black); display:flex; align-items:center; gap:20px; }
+    .logo-mini { width:80px; }
+    .btn-back { text-decoration:none; color:var(--black); font-weight:700; font-size:13px; text-transform:uppercase; padding:8px 14px; border:1.5px solid var(--black); border-radius:10px; margin-left:auto; }
+    .container-final { display:grid; grid-template-columns:1.2fr 0.8fr; gap:30px; max-width:1100px; margin:40px auto; padding:0 20px; }
+    .card { background:#fff; border-radius:16px; padding:36px; box-shadow:0 8px 20px rgba(17,17,17,0.06); border:1px solid rgba(0,0,0,0.06); }
+    h3 { margin-top:0; text-transform:uppercase; font-size:18px; border-bottom:2px solid var(--purple); display:inline-block; margin-bottom:28px; }
+    .producto-row { display:flex; align-items:center; gap:15px; padding:15px 0; border-bottom:1px solid #eee; }
+    .producto-row img { width:70px; height:60px; object-fit:contain; background:#f9f9f9; border-radius:10px; }
+    .form-group { margin-bottom:22px; }
+    .input-estudiante { width:100%; padding:14px 16px; border:1.5px solid rgba(0,0,0,0.12); border-radius:10px; font-size:15px; margin-top:8px; margin-bottom:0; box-sizing:border-box; line-height:1.5; }
+    label { display:block; font-size:12px; color:#222; font-weight:600; margin-bottom:8px; letter-spacing:0.6px; }
+    .student-note { color:#b30000; font-size:15px; font-weight:700; margin-bottom:28px; margin-top:0; line-height:1.6; }
+    .acudiente-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; align-items:start; }
+    .acudiente-row { background:#f9f9f9; padding:14px; border-radius:8px; }
+    .acudiente-label { display:block; font-size:11px; color:#555; font-weight:700; margin-bottom:8px; }
+    .acudiente-value { font-size:14px; color:#111; line-height:1.5; }
+    .total-box { text-align:right; margin-top:20px; font-size:24px; font-weight:900; }
+    .domicilio-section { background:#f0f8ff; padding:24px; border-radius:10px; margin-top:28px; margin-bottom:28px; border:1px solid #ccc; display:none; }
+    .domicilio-section h4 { margin-top:0; margin-bottom:18px; font-size:16px; }
+    .domicilio-section label { cursor:pointer; margin:0; line-height:1.5; }
+    .domicilio-info { color:#666; font-size:13px; margin-top:12px; margin-bottom:0; display:none; }
+    @media (max-width:850px){ .container-final{ grid-template-columns:1fr; } }
   </style>
 </head>
 
@@ -280,7 +128,6 @@
       </div>
     </div>
 
-    <!-- Pasarela de Pago -->
     <div id="wompi-widget-container" style="margin-top: 20px;"></div>
   </div>
 
@@ -288,53 +135,60 @@
 
 <script>
 /* ============================================
-   CONFIG WOMPI + APPS SCRIPT (NO TOCAR EL DISEÑO)
+   CONFIG
 ============================================ */
-// Llave pública (modo producción). Esta es la llave pública que puede ir en el cliente.
 const WOMPI_PUBLIC_KEY = 'pub_prod_axnI5F0BmAoXEmks4Ci1uzGiwV3B40gF';
 const WOMPI_CURRENCY = 'COP';
-
-// Entorno: 'prod' activa comportamientos para producción (no afectan claves privadas)
 const WOMPI_ENV = 'prod';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGMiQUtjx-kknEK1KpKFu0OecQ8dA0Ox-aOBWsy-SJ5dLKW9vhlP2ONNzjb9xxAYNpHw/exec';
-// URL del servidor que corre el endpoint de creación de transacciones
-// Use same-origin when served over http(s). If opened via file:// fallback to localhost:3000
-// Use the deployed payment server on Render. Do NOT use localhost for production.
 const PAYMENT_SERVER_URL = 'https://wompi-ybfs.onrender.com';
 
-/* ============================================
-   VARIABLES GLOBALES
-============================================ */
 window.totalBase = 0;
 
-function getFrozenReference() {
-  const key = 'wompi_frozen_reference';
-  let ref = localStorage.getItem(key);
-  if (!ref) {
-    ref = `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
-    localStorage.setItem(key, ref);
-  }
-  return ref;
-}
-
 function generateReference() {
-  // Always return a fresh unique reference for each payment attempt
-  // and clear any previously stored frozen reference to avoid reuse.
-  try { localStorage.removeItem('wompi_frozen_reference'); } catch (e) { /* ignore */ }
+  try { localStorage.removeItem('wompi_frozen_reference'); } catch (e) {}
   return `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
 }
-
 async function getOrCreateReference() {
-  // Always generate and return a fresh reference to avoid reuse.
-  // This ensures every payment attempt uses a unique reference and prevents 'reference already used' errors.
   try {
     const newRef = generateReference();
-    try { localStorage.setItem('wompi_frozen_reference', newRef); localStorage.setItem('wompi_frozen_ts', String(Date.now())); } catch (e) {}
+    try {
+      localStorage.setItem('wompi_frozen_reference', newRef);
+      localStorage.setItem('wompi_frozen_ts', String(Date.now()));
+    } catch (e) {}
     return newRef;
   } catch (e) {
     return `MM-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
   }
+}
+
+/* ✅ NUEVO: sincroniza domicilio + confirmaciones a datos_entrega (para que llegue a Sheets) */
+function syncDomicilioToLocalStorage_() {
+  try {
+    const checkbox = document.getElementById('solicitar-domicilio');
+    const shipRequested = !!(checkbox && checkbox.checked);
+
+    const entregaLocal = (() => {
+      try { return JSON.parse(localStorage.getItem('datos_entrega') || '{}'); }
+      catch(e){ return {}; }
+    })();
+
+    // Guardamos en varios nombres para máxima compatibilidad (Apps Script soporta ambos)
+    entregaLocal.con_domicilio = shipRequested;
+    entregaLocal.domicilio_costo = shipRequested ? 13000 : 0;
+
+    entregaLocal.shipping_requested = shipRequested;
+    entregaLocal.shipping_cost = shipRequested ? 13000 : 0;
+
+    entregaLocal.domicilio_direccion_confirm = (document.getElementById('studentAddress')?.value || '').trim();
+    entregaLocal.domicilio_telefono_confirm = (document.getElementById('studentPhone')?.value || '').trim();
+
+    entregaLocal.shipping_address = entregaLocal.domicilio_direccion_confirm;
+    entregaLocal.shipping_phone = entregaLocal.domicilio_telefono_confirm;
+
+    localStorage.setItem('datos_entrega', JSON.stringify(entregaLocal));
+  } catch(e) {}
 }
 
 /* ============================================
@@ -434,11 +288,9 @@ function actualizarTotalConDomicilio(baseTotal) {
     info.style.display = 'none';
   }
 
-  // Update visual total
   document.getElementById('total-precio').innerText = `Total: $${totalFinal.toLocaleString()}`;
   localStorage.setItem('total_calc', totalFinal);
 
-  // Update product list to show/hide domicilio row
   try {
     const lista = document.getElementById('lista-productos');
     if (lista) {
@@ -462,7 +314,10 @@ function actualizarTotalConDomicilio(baseTotal) {
         if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
       }
     }
-  } catch(e){ console.warn('actualizarTotalConDomicilio: fallo al actualizar lista-productos', e); }
+  } catch(e){ console.warn('actualizarTotalConDomicilio: fallo', e); }
+
+  // ✅ NUEVO: guardar domicilio en datos_entrega cada vez que cambie total
+  syncDomicilioToLocalStorage_();
 }
 
 /* ============================================
@@ -474,6 +329,7 @@ function agregarListeners() {
     checkbox.addEventListener('change', () => {
       actualizarTotalConDomicilio(window.totalBase);
       document.getElementById('campos-domicilio-confirmacion').style.display = checkbox.checked ? 'block' : 'none';
+      syncDomicilioToLocalStorage_(); // ✅ NUEVO
       validarYCargarWidget();
     });
   }
@@ -482,66 +338,10 @@ function agregarListeners() {
   campos.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener('input', validarYCargarWidget);
-      el.addEventListener('change', validarYCargarWidget);
+      el.addEventListener('input', () => { syncDomicilioToLocalStorage_(); validarYCargarWidget(); });
+      el.addEventListener('change', () => { syncDomicilioToLocalStorage_(); validarYCargarWidget(); });
     }
   });
-}
-
-// Evita que clics en botones/enlaces del widget disparen acciones por defecto
-// (p. ej. submit de formulario o navegación) que recarguen la página.
-function preventWidgetDefaultNavigation(container) {
-  try {
-    if (!container) return;
-    // Use capture phase to intercept before default action
-    container.addEventListener('click', function (e) {
-      try {
-        const el = e.target && e.target.closest && e.target.closest('button, a');
-        if (!el) return;
-        // Si es un enlace con href que provoca navegación o un botón tipo submit
-        const tag = el.tagName && el.tagName.toLowerCase();
-        const href = el.getAttribute && el.getAttribute('href');
-        const type = el.getAttribute && el.getAttribute('type');
-        if ((tag === 'a' && href && href !== '#' && href !== 'javascript:void(0)') || type === 'submit' || href === '#') {
-          e.preventDefault();
-        } else if (tag === 'a' && (href === '#' || href === '' || href === null)) {
-          e.preventDefault();
-        } else if (type === 'button' || tag === 'button') {
-          // evitar que botones dentro de formularios hagan submit por accidente
-          e.preventDefault();
-        }
-      } catch (err) { /* ignore */ }
-    }, true);
-  } catch (e) { /* ignore */ }
-}
-
-// Reemplaza el comportamiento del botón renderizado por el widget
-// para que en lugar de provocar una navegación en la página actual
-// abra el Web Checkout en nueva pestaña enviando los datos y la firma.
-function overrideWidgetButtonBehavior(container, amountInCents, reference, sEmail, sFirst, sLast) {
-  try {
-    if (!container) return;
-    const tryAttach = () => {
-      try {
-        const btn = container.querySelector('button');
-        if (!btn) return false;
-        btn.addEventListener('click', function (e) {
-          try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
-          try {
-            abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast);
-          } catch (err) { console.warn('override open failed', err); }
-        }, { once: true });
-        return true;
-      } catch (err) { return false; }
-    };
-
-    if (!tryAttach()) {
-      const mo = new MutationObserver((mutations) => {
-        if (tryAttach()) mo.disconnect();
-      });
-      mo.observe(container, { childList: true, subtree: true });
-    }
-  } catch (e) { /* ignore */ }
 }
 
 /* ============================================
@@ -578,28 +378,22 @@ async function validarYCargarWidget() {
 
   const entrega = JSON.parse(localStorage.getItem('datos_entrega')) || {};
   entrega.student = { last: sLast, first: sFirst, grade: sGrade, doc: sDoc, email: sEmail };
+  // ✅ duplicado útil para Apps Script
+  entrega.student_email = sEmail;
   localStorage.setItem('datos_entrega', JSON.stringify(entrega));
 
+  // ✅ asegurar domicilio sincronizado
+  syncDomicilioToLocalStorage_();
+
   const total = Number(localStorage.getItem('total_calc') || 0);
-  // Use a stable reference for the current payment attempt (avoid regenerating on every input)
   const reference = await getOrCreateReference();
   const amountInCents = Math.round(total * 100);
 
-  // Auto-inject the Wompi widget once (prevent duplicates)
   try {
-    // If widget is already injected on the page, do nothing
-    if (window.__mm_widget_injected) return;
-    // If a widget injection is already in progress, skip duplicate starts
     if (window.__mm_widget_loading) return;
     window.__mm_widget_loading = true;
 
-    // Clean any previous content and remove any previous widget script tags to avoid duplicates
     container.innerHTML = '';
-    const existingScripts = Array.from(document.querySelectorAll('script[src="https://checkout.wompi.co/widget.js"]'));
-    existingScripts.forEach(s => { try { s.parentNode && s.parentNode.removeChild(s); } catch (e){} });
-
-    // mark as loading so concurrent calls don't duplicate the script
-    container.setAttribute('data-widget-loading', String(reference));
 
     const status = document.createElement('div');
     status.style.color = '#333'; status.style.fontSize = '14px'; status.style.marginBottom = '12px';
@@ -613,283 +407,100 @@ async function validarYCargarWidget() {
     const sigJson = await sigResp.json().catch(()=> ({}));
     if (!sigResp.ok || !sigJson.signature) {
       status.innerText = 'No se pudo obtener la firma para el widget.';
-      container.removeAttribute('data-widget-loading');
-      return;
-    }
-
-    const signature = sigJson.signature;
-
-    // Do not persist or send any registration from the client side.
-    // All Google Sheets updates will occur only when the server receives the payment webhook.
-
-    // Validar llave pública
-    if (!WOMPI_PUBLIC_KEY || (typeof WOMPI_PUBLIC_KEY !== 'string') || !WOMPI_PUBLIC_KEY.startsWith('pub_')) {
-      status.innerText = 'Clave pública inválida o ausente.';
-      container.removeAttribute('data-widget-loading');
-      return;
-    }
-
-    // Instead of injecting Wompi widget script (which may load v1.js and cause
-    // initialization errors on some environments), render a native button that
-    // opens the Web Checkout directly with the server-provided signature.
-    try {
-      if (status && status.parentNode) try { status.parentNode.removeChild(status); } catch(e){}
-      container.setAttribute('data-widget-reference', String(reference));
-      container.removeAttribute('data-widget-loading');
-      window.__mm_widget_injected = false;
-      window.__mm_widget_reference = String(reference);
       window.__mm_widget_loading = false;
-
-      const nativeBtn = document.createElement('button');
-      nativeBtn.type = 'button';
-      nativeBtn.textContent = 'Pagar Aqui';
-      nativeBtn.style.padding = '12px 18px'; nativeBtn.style.borderRadius='10px'; nativeBtn.style.background='#13d6eb'; nativeBtn.style.color='#000'; nativeBtn.style.border='none'; nativeBtn.style.cursor='pointer';
-      nativeBtn.addEventListener('click', (e) => {
-        try { e.preventDefault(); } catch(_){}
-
-        // ✅ abrir ventana SINCRÓNICA (permitida en móvil porque nace del click)
-        const popup = window.open('about:blank', '_blank');
-
-        // si el navegador bloqueó popup, cae a misma pestaña
-        abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast, popup);
-      });
-
-      container.appendChild(nativeBtn);
-    } catch (e) {
-      console.error('failed to render native checkout button', e);
+      return;
     }
 
-    // Setup observer to detect iframe open/close and persist registration if needed
-    try {
-        const saveIfNeeded = () => {
-          try {
-            if (!window.__mm_widget_reference) return;
-            const ref = String(window.__mm_widget_reference);
-            if (window.__mm_saved_for_refs && window.__mm_saved_for_refs[ref]) return;
-            const entregaLocal = (function(){ try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch(e){ return {}; } })() || {};
-            const payload = Object.assign({}, entregaLocal, { reference: ref, amount_in_cents: Math.round(window.totalBase * 100), currency: WOMPI_CURRENCY, status: 'pending', paid: false });
-            const endpoint = PAYMENT_SERVER_URL + '/api/save-registration';
-            try{
-              if (navigator && navigator.sendBeacon) {
-                const blob = new Blob([JSON.stringify({ payload })], { type: 'application/json' });
-                navigator.sendBeacon(endpoint, blob);
-              } else {
-                fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }), keepalive: true }).catch(()=>{});
-              }
-            }catch(e){ try{ fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }) }).catch(()=>{}); }catch(_){}
-            }
-            window.__mm_saved_for_refs = window.__mm_saved_for_refs || {};
-            window.__mm_saved_for_refs[ref] = true;
-          } catch(e){ console.warn('saveIfNeeded error', e); }
-        };
+    if (!WOMPI_PUBLIC_KEY || !String(WOMPI_PUBLIC_KEY).startsWith('pub_')) {
+      status.innerText = 'Clave pública inválida o ausente.';
+      window.__mm_widget_loading = false;
+      return;
+    }
 
-        // Observe iframes added/removed (widget may create an iframe/modal)
-        const mo = new MutationObserver((mutations) => {
-          for (const m of mutations) {
-            if (m.addedNodes && m.addedNodes.length) {
-              for (const n of m.addedNodes) {
-                try { if (n.tagName === 'IFRAME' && (n.src||'').includes('wompi')) { /* iframe opened */ } } catch(e){}
-              }
-            }
-            if (m.removedNodes && m.removedNodes.length) {
-              for (const n of m.removedNodes) {
-                try { if (n.tagName === 'IFRAME' && (n.src||'').includes('wompi')) { /* iframe closed */ saveIfNeeded(); } } catch(e){}
-              }
-            }
-          }
-        });
-        mo.observe(document.body, { childList: true, subtree: true });
+    if (status && status.parentNode) try { status.parentNode.removeChild(status); } catch(e){}
 
-        // Try to attach a one-time click handler to the widget button so we
-        // persist the registration when the user explicitly clicks to pay.
-        const attachButtonClick = () => {
-          try {
-            const btn = container.querySelector('button');
-            if (btn) {
-              btn.addEventListener('click', () => {
-                try { saveIfNeeded(); } catch(e){}
-              }, { once: true });
-            }
-          } catch (e) { /* ignore */ }
-        };
-        attachButtonClick();
+    window.__mm_widget_reference = String(reference);
+    window.__mm_widget_loading = false;
 
-        // Also attempt to attach when new nodes are added (widget may render later)
-        const btnObserver = new MutationObserver((mutations) => { attachButtonClick(); });
-        btnObserver.observe(container, { childList: true, subtree: true });
+    const nativeBtn = document.createElement('button');
+    nativeBtn.type = 'button';
+    nativeBtn.textContent = 'Pagar Aqui';
+    nativeBtn.style.padding = '12px 18px';
+    nativeBtn.style.borderRadius = '10px';
+    nativeBtn.style.background = '#13d6eb';
+    nativeBtn.style.color = '#000';
+    nativeBtn.style.border = 'none';
+    nativeBtn.style.cursor = 'pointer';
 
-        // Also save when window regains focus (user returned from external checkout)
-        window.addEventListener('focus', () => { setTimeout(saveIfNeeded, 250); });
-      } catch(e) { console.warn('widget save observer setup failed', e); }
+    nativeBtn.addEventListener('click', (e) => {
+      try { e.preventDefault(); } catch(_){}
 
-    // No delegated click handler: do not send or queue data on widget click.
-    // The registration is persisted to the server when the signature is generated,
-    // and the webhook will forward the row to Google Sheets when payment is confirmed.
+      // ✅ Antes de abrir checkout, persistimos registro (con domicilio + confirmaciones)
+      try { saveRegistrationIfNeeded_(reference); } catch(_){}
+
+      const popup = window.open('about:blank', '_blank');
+      abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast, popup);
+    });
+
+    container.appendChild(nativeBtn);
+
   } catch (e) {
-    container.removeAttribute('data-widget-loading');
+    window.__mm_widget_loading = false;
     container.innerHTML = '<p style="color:#ff6b6b">Error preparando la pasarela.</p>';
     console.error(e);
   }
 }
 
-/* ============================================
-   ABRIR PASARELA (WOMPI)
-============================================ */
-async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast) {
-  const container = document.getElementById('wompi-widget-container');
-  // If our widget is already injected for this reference, try to trigger its button instead of reinjecting
-  if (window.__mm_widget_injected && window.__mm_widget_reference === String(reference)) {
+/* ✅ NUEVO: persistir registro con el monto correcto (incluye domicilio si aplica) */
+function saveRegistrationIfNeeded_(reference) {
+  try {
+    const ref = String(reference);
+    window.__mm_saved_for_refs = window.__mm_saved_for_refs || {};
+    if (window.__mm_saved_for_refs[ref]) return;
+
+    // asegurar domicilio sincronizado
+    syncDomicilioToLocalStorage_();
+
+    const entregaLocal = (() => { 
+      try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } 
+      catch(e){ return {}; } 
+    })() || {};
+
+    const totalFinal = Number(localStorage.getItem('total_calc') || 0);
+    const amountInCentsReal = Math.round(totalFinal * 100);
+
+    const payload = Object.assign({}, entregaLocal, {
+      reference: ref,
+      amount_in_cents: amountInCentsReal,
+      currency: WOMPI_CURRENCY,
+      status: 'pending',
+      paid: false
+    });
+
+    const endpoint = PAYMENT_SERVER_URL + '/api/save-registration';
+
     try {
-      const existingBtn = container.querySelector('button');
-      if (existingBtn) { existingBtn.click(); return; }
-    } catch (e) { /* ignore and continue to re-create */ }
-  }
-  container.innerHTML = '';
-
-  const status = document.createElement('div');
-  status.style.color = '#333';
-  status.style.fontSize = '14px';
-  status.style.marginBottom = '12px';
-  status.innerText = 'Preparando pasarela de pago...';
-  container.appendChild(status);
-
-  
-    try {
-      // Nota: no persistimos automáticamente al abrir la pasarela aquí porque
-      // la inyección del widget puede ocurrir mientras el usuario aún está
-      // escribiendo campos y podría causar envíos prematuros.
-      // En su lugar, registraremos el intento solo cuando el usuario haga
-      // clic en el botón del widget (ver abajo).
-      // Primero solicitamos la firma de integridad al servidor
-      status.innerText = 'Solicitando firma al servidor...';
-      const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount_in_cents: amountInCents, reference, currency: WOMPI_CURRENCY })
-      });
-      const sigJson = await sigResp.json().catch(() => ({}));
-      if (!sigResp.ok || !sigJson.signature) {
-        console.warn('Firma no disponible, fallback a creación de transacción en servidor', sigJson);
-        // Fallback: pedir al servidor que cree la transacción y usar checkout_url
-        status.innerText = 'Creando transacción en el servidor...';
-        const resp = await fetch(`${PAYMENT_SERVER_URL}/api/create-transaction`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, email: sEmail, full_name: `${sFirst} ${sLast}`, reference, public_key: WOMPI_PUBLIC_KEY })
-        });
-        const text = await resp.text();
-        let data = {};
-        try { data = text ? JSON.parse(text) : {}; } catch (err) { data = { raw: text }; }
-        const checkout = data.checkout_url || (data.data && data.data.checkout_url);
-        if (checkout) { window.open(checkout, '_blank'); return; }
-        container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
-        return;
+      if (navigator && navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify({ payload })], { type: 'application/json' });
+        navigator.sendBeacon(endpoint, blob);
+      } else {
+        fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }), keepalive: true }).catch(()=>{});
       }
-
-      const signature = sigJson.signature;
-
-      // Validar llave pública antes de inyectar
-      if (!WOMPI_PUBLIC_KEY || (typeof WOMPI_PUBLIC_KEY !== 'string') || !WOMPI_PUBLIC_KEY.startsWith('pub_')) {
-        container.innerHTML = '<p style="color:#ff6b6b">Clave pública inválida o ausente.</p>';
-        return;
-      }
-
-      // Instead of injecting the Wompi widget script (which may load v1.js
-      // and cause initialization errors like merchants/undefined), render a
-      // native button that opens the Web Checkout directly with the
-      // server-provided signature.
-      try {
-        if (status && status.parentNode) try { status.parentNode.removeChild(status); } catch(e){}
-        container.innerHTML = '';
-        container.setAttribute('data-widget-reference', String(reference));
-        const nativeBtn = document.createElement('button');
-        nativeBtn.type = 'button';
-        nativeBtn.textContent = 'Pagar - Web Checkout';
-        nativeBtn.style.padding = '12px 18px'; nativeBtn.style.borderRadius='10px'; nativeBtn.style.background='#13d6eb'; nativeBtn.style.color='#000'; nativeBtn.style.border='none'; nativeBtn.style.cursor='pointer';
-        nativeBtn.addEventListener('click', (e) => { try{ e.preventDefault(); }catch(_){ }; abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast); });
-        container.appendChild(nativeBtn);
-      } catch (e) { console.error('failed to render native checkout button', e); }
-
-      // Also attach navigation prevention to container
-      try { preventWidgetDefaultNavigation(container); } catch(e){}
-
-      // And ensure if any widget button appears later we override it to open web checkout
-      try { overrideWidgetButtonBehavior(container, amountInCents, reference, sEmail, sFirst, sLast); } catch(e){}
-
-      // The rest of the code continues to set up observers that persist registration
-      // when iframes are closed or window regains focus.
-      (function(){ /* continue below */ })();
-      
-      // NOTE: we intentionally do not append the remote widget script.
-
-      // After the (native) button is ready, proceed with the registration observers
-      {
-        
-        // Do not attach any click handler to the widget; all sheet writes will be performed server-side when webhook confirms payment.
-        // However, ensure we persist the registration if the widget modal closes or the user returns to the page.
-        try {
-          const saveIfNeeded = () => {
-            try {
-              const ref = String(reference);
-              if (window.__mm_saved_for_refs && window.__mm_saved_for_refs[ref]) return;
-              const entregaLocal = (function(){ try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch(e){ return {}; } })() || {};
-              const payload = Object.assign({}, entregaLocal, { reference: ref, amount_in_cents: amountInCents, currency: WOMPI_CURRENCY, status: 'pending', paid: false });
-              const endpoint = PAYMENT_SERVER_URL + '/api/save-registration';
-              try{
-                if (navigator && navigator.sendBeacon) {
-                  const blob = new Blob([JSON.stringify({ payload })], { type: 'application/json' });
-                  navigator.sendBeacon(endpoint, blob);
-                } else {
-                  fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }), keepalive: true }).catch(()=>{});
-                }
-              }catch(e){ try{ fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }) }).catch(()=>{}); }catch(_){}
-              }
-              window.__mm_saved_for_refs = window.__mm_saved_for_refs || {};
-              window.__mm_saved_for_refs[ref] = true;
-            } catch(e){ console.warn('saveIfNeeded error', e); }
-          };
-          const mo2 = new MutationObserver((mutations) => {
-            for (const m of mutations) {
-              if (m.removedNodes && m.removedNodes.length) {
-                for (const n of m.removedNodes) {
-                  try { if (n.tagName === 'IFRAME' && (n.src||'').includes('wompi')) { saveIfNeeded(); } } catch(e){}
-                }
-              }
-            }
-          });
-          mo2.observe(document.body, { childList: true, subtree: true });
-          window.addEventListener('focus', () => { setTimeout(saveIfNeeded, 250); });
-
-          // Attach click handler to widget button (if present) so we persist
-          // registration at the moment the user initiates payment.
-          const attachButtonClick = () => {
-            try {
-              const btn = container.querySelector('button');
-              if (btn) {
-                btn.addEventListener('click', () => { try { saveIfNeeded(); } catch(e){} }, { once: true });
-              }
-            } catch (e) { /* ignore */ }
-          };
-          attachButtonClick();
-          const btnObserver = new MutationObserver(() => { attachButtonClick(); });
-          btnObserver.observe(container, { childList: true, subtree: true });
-        } catch(e) { console.warn('widget save observer failed', e); }
-      }
-      // Note: fallback to server-created checkout will be invoked only if widget fails to render or user chooses.
-
-    } catch (e) {
-      console.error(e);
-      container.innerHTML = '<p style="color: #ff6b6b; font-size: 14px;"><b>Error procesando pago</b></p>';
+    } catch(e) {
+      fetch(endpoint, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ payload }) }).catch(()=>{});
     }
+
+    window.__mm_saved_for_refs[ref] = true;
+  } catch(e) {
+    console.warn('saveRegistrationIfNeeded_ error', e);
+  }
 }
 
 /* ============================================
-   WEB CHECKOUT (FORM)
-   Construye y envía un formulario GET a https://checkout.wompi.co/p/
+   WEB CHECKOUT
 ============================================ */
 async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast, popup) {
   try {
-    // 1) Firma desde tu servidor
     const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -905,14 +516,12 @@ async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast,
 
     const signature = sigJson.signature;
 
-    // 2) Validaciones mínimas
     if (!WOMPI_PUBLIC_KEY || !String(WOMPI_PUBLIC_KEY).startsWith('pub_')) {
       alert('Clave pública WOMPI inválida/ausente.');
       if (popup && !popup.closed) popup.close();
       return;
     }
 
-    // 3) Params obligatorios (según docs de Web Checkout)
     const params = new URLSearchParams();
     params.set('public-key', WOMPI_PUBLIC_KEY);
     params.set('currency', WOMPI_CURRENCY);
@@ -920,62 +529,28 @@ async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast,
     params.set('reference', String(reference));
     params.set('signature:integrity', signature);
 
-    // Opcionales típicos
     params.set('redirect-url', 'https://mathmindscol.com/pago_exitoso.html');
     params.set('customer-data:email', sEmail || '');
     params.set('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
+
     const doc = (document.getElementById('studentDoc')?.value || '').trim();
     if (doc) {
       params.set('customer-data:legal-id', doc);
       params.set('customer-data:legal-id-type', 'CC');
     }
+
     const phone = (document.getElementById('studentPhone')?.value || '').trim();
     if (phone) params.set('customer-data:phone-number', phone);
 
-    // 4) Shipping SOLO si está COMPLETO (si no, NO mandes nada)
-    const domicilioChecked = !!document.getElementById('solicitar-domicilio')?.checked;
-    if (domicilioChecked) {
-      const address = (document.getElementById('studentAddress')?.value || '').trim();
-      const d = (() => { try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch { return {}; } })();
-      const shipCity = String(d.ciudad || d.city || '').trim();
-      const shipRegion = String(d.region || d.departamento || '').trim();
+    // ✅ mantener sincronizado domicilio (para Sheets)
+    syncDomicilioToLocalStorage_();
 
-      // Según el ejemplo de Wompi para Web Checkout, si envías shipping, city+region deben ir. :contentReference[oaicite:1]{index=1}
-     // ✅ NO enviar shipping-address:* NUNCA.
-    // El domicilio solo afecta el precio; la dirección/teléfono se guardan en tu sistema, no en Wompi.
-    try {
-      // Si quieres, puedes guardar un flag interno para tu backend/Sheets:
-      const shipRequested = !!document.getElementById('solicitar-domicilio')?.checked;
-
-      // (Opcional) guarda esto en localStorage para usarlo luego en tu webhook/Sheets
-      const entregaLocal = (() => { 
-        try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } 
-        catch(e){ return {}; } 
-      })();
-
-      entregaLocal.shipping_requested = shipRequested;
-      entregaLocal.shipping_cost = shipRequested ? 13000 : 0;
-
-      // Guarda dirección/teléfono SOLO para tu operación interna
-      entregaLocal.shipping_address = (document.getElementById('studentAddress')?.value || '').trim();
-      entregaLocal.shipping_phone = (document.getElementById('studentPhone')?.value || '').trim();
-
-      localStorage.setItem('datos_entrega', JSON.stringify(entregaLocal));
-    } catch(e) {}
-
-    }
-
-    // 5) Navegar al checkout
     const url = `https://checkout.wompi.co/p/?${params.toString()}`;
-
-    // Debug rápido: mira que NO diga public-key=undefined
     console.log('[WOMPI CHECKOUT URL]', url);
 
-    if (popup && !popup.closed) {
-      popup.location.replace(url);
-    } else {
-      window.location.href = url;
-    }
+    if (popup && !popup.closed) popup.location.replace(url);
+    else window.location.href = url;
+
   } catch (e) {
     console.error('abrirWebCheckout error', e);
     alert('Error al abrir Web Checkout. Intenta nuevamente.');
@@ -991,3 +566,4 @@ init();
 
 </body>
 </html>
+
