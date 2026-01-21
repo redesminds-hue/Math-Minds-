@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
       --black: #111;
@@ -32,8 +33,9 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 15px;
       color: var(--black);
+      overflow-x: hidden;
     }
 
     @keyframes gradientShift {
@@ -44,15 +46,36 @@
 
     .success-container {
       width: 100%;
-      max-width: 600px;
+      max-width: 650px;
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
       border-radius: 30px;
-      padding: 50px 30px;
+      padding: 40px 30px;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 0 40px rgba(19, 214, 235, 0.2);
       text-align: center;
       animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
       border: 2px solid var(--black);
+      overflow-y: auto;
+      max-height: calc(100vh - 30px);
+      scrollbar-width: thin;
+      scrollbar-color: var(--purple) transparent;
+    }
+
+    .success-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .success-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .success-container::-webkit-scrollbar-thumb {
+      background: var(--purple);
+      border-radius: 3px;
+    }
+
+    .success-container::-webkit-scrollbar-thumb:hover {
+      background: var(--black);
     }
 
     @keyframes slideUp {
@@ -66,17 +89,16 @@
       }
     }
 
-    /* Logo animado */
     .logo-success {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 30px;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
       animation: logoFloat 3s ease-in-out infinite;
     }
 
     @keyframes logoFloat {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
+      50% { transform: translateY(-15px); }
     }
 
     .logo-success img {
@@ -88,9 +110,9 @@
 
     /* Checkmark animado */
     .checkmark-circle {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 25px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
       background: linear-gradient(135deg, #10b981, #059669);
       border-radius: 50%;
       display: flex;
@@ -123,7 +145,7 @@
     .checkmark::after {
       content: '✓';
       color: white;
-      font-size: 60px;
+      font-size: 50px;
       font-weight: 800;
       line-height: 1;
       animation: checkPulse 0.6s ease-in-out 0.3s both;
@@ -135,10 +157,10 @@
     }
 
     .success-title {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 800;
       color: var(--black);
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
       animation: fadeInDown 1s ease 0.2s both;
@@ -156,19 +178,19 @@
     }
 
     .success-subtitle {
-      font-size: 18px;
+      font-size: 16px;
       color: #666;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       line-height: 1.6;
       animation: fadeInDown 1s ease 0.4s both;
     }
 
     .divider {
-      width: 60px;
-      height: 4px;
+      width: 50px;
+      height: 3px;
       background: linear-gradient(90deg, var(--purple), var(--success));
       border-radius: 2px;
-      margin: 25px auto;
+      margin: 15px auto 20px;
       animation: fadeInDown 1s ease 0.3s both;
     }
 
@@ -176,8 +198,8 @@
       background: linear-gradient(135deg, rgba(19, 214, 235, 0.05), rgba(16, 185, 129, 0.05));
       border: 2px solid var(--purple);
       border-radius: 15px;
-      padding: 20px;
-      margin: 25px 0;
+      padding: 15px;
+      margin: 20px 0;
       text-align: left;
       animation: fadeInDown 1s ease 0.5s both;
     }
@@ -186,8 +208,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      font-size: 14px;
+      padding: 6px 0;
+      font-size: 13px;
     }
 
     .info-label {
@@ -201,33 +223,33 @@
     }
 
     .thanks-text {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--black);
-      margin: 30px 0 20px;
+      margin: 20px 0 12px;
       animation: fadeInDown 1s ease 0.6s both;
     }
 
     .thanks-description {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
-      line-height: 1.8;
-      margin-bottom: 30px;
+      line-height: 1.6;
+      margin-bottom: 20px;
       animation: fadeInDown 1s ease 0.7s both;
     }
 
     .btn-group {
       display: flex;
-      gap: 15px;
+      gap: 12px;
       flex-direction: column;
       animation: fadeInDown 1s ease 0.8s both;
     }
 
     .btn-primary, .btn-secondary {
-      padding: 15px 30px;
+      padding: 12px 24px;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       text-decoration: none;
       border: 2px solid transparent;
@@ -262,43 +284,242 @@
     }
 
     .celebration {
-      font-size: 24px;
+      font-size: 20px;
       animation: bounce 1s ease-in-out infinite;
       display: inline-block;
-      margin: 0 5px;
+      margin: 0 4px;
     }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Recibo */
+    .receipt-section {
+      background: linear-gradient(135deg, rgba(19, 214, 235, 0.08), rgba(16, 185, 129, 0.08));
+      border: 2px solid var(--purple);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 15px 0;
+      text-align: left;
+      animation: fadeInDown 1s ease 0.5s both;
+    }
+
+    .receipt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--purple);
+    }
+
+    .receipt-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .receipt-number {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--purple);
+      background: rgba(19, 214, 235, 0.15);
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      font-size: 12px;
+    }
+
+    .receipt-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .item-qty {
+      color: #666;
+      margin: 0 10px;
+      min-width: 35px;
+      text-align: center;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--success);
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .receipt-summary {
+      background: rgba(19, 214, 235, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 12px;
+      border: 1px solid var(--purple);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+      font-size: 12px;
+    }
+
+    .summary-row.subtotal {
+      color: #666;
+    }
+
+    .summary-row.total {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--success);
+      padding-top: 8px;
+      border-top: 2px solid var(--purple);
+      margin-top: 10px;
+    }
+
+    .reference-box {
+      background: var(--black);
+      color: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      animation: fadeInDown 1s ease 0.6s both;
+    }
+
+    .reference-label {
+      font-size: 10px;
+      color: #ccc;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .reference-value {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      word-break: break-all;
+    }
+
+    .download-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 12px;
+      background: linear-gradient(135deg, var(--purple), var(--success));
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(19, 214, 235, 0.3);
+      animation: fadeInDown 1s ease 0.7s both;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(19, 214, 235, 0.4);
+    }
+
+    .print-content {
+      display: none;
     }
 
     /* Responsive */
     @media (max-width: 600px) {
       .success-container {
-        padding: 35px 20px;
+        padding: 30px 18px;
         border-radius: 20px;
       }
 
       .success-title {
-        font-size: 28px;
+        font-size: 26px;
       }
 
       .success-subtitle {
-        font-size: 16px;
+        font-size: 14px;
       }
 
       .thanks-text {
-        font-size: 16px;
+        font-size: 15px;
+      }
+
+      .thanks-description {
+        font-size: 12px;
       }
 
       .btn-group {
         flex-direction: column;
+        gap: 10px;
       }
 
       .logo-success {
-        width: 100px;
-        height: 100px;
+        width: 85px;
+        height: 85px;
+      }
+
+      .checkmark-circle {
+        width: 70px;
+        height: 70px;
+      }
+
+      .receipt-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 0;
+      }
+
+      .item-price {
+        min-width: auto;
+        text-align: left;
+        margin-top: 6px;
+      }
+
+      .receipt-summary {
+        padding: 12px;
+      }
+
+      .summary-row {
+        font-size: 11px;
+      }
+
+      .reference-value {
+        font-size: 14px;
+        letter-spacing: 1px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      .success-container {
+        border: 1px solid #000;
+        box-shadow: none;
+        max-height: none;
+      }
+      .btn-group, .download-btn, #transactionInfo {
+        display: none;
       }
     }
   </style>
@@ -332,17 +553,53 @@
     <!-- Información de la transacción -->
     <div class="info-box" id="transactionInfo">
       <div class="info-row">
-        <span class="info-label">Estado de la transacción:</span>
-        <span class="info-value" id="statusDisplay">Procesando...</span>
+        <span class="info-label">Estado:</span>
+        <span class="info-value" id="statusDisplay">✓ Aprobado</span>
       </div>
       <div class="info-row">
-        <span class="info-label">Referencia:</span>
-        <span class="info-value" id="referenceDisplay">Obteniendo...</span>
+        <span class="info-label">Transacción:</span>
+        <span class="info-value" id="referenceDisplay">Procesando...</span>
       </div>
       <div class="info-row">
-        <span class="info-label">Recibo:</span>
+        <span class="info-label">Confirmación:</span>
         <span class="info-value" id="receiptDisplay">Enviando...</span>
       </div>
+    </div>
+
+    <!-- RECIBO PROFESIONAL -->
+    <div class="receipt-section" id="receiptContainer">
+      <div class="receipt-header">
+        <span class="receipt-title">RECIBO DE COMPRA</span>
+        <span class="receipt-number" id="receiptNum">MM-XXXXX</span>
+      </div>
+
+      <div id="productsList" style="margin-bottom: 20px;">
+        <!-- Los productos se cargarán aquí con JavaScript -->
+      </div>
+
+      <div class="receipt-summary">
+        <div class="summary-row subtotal">
+          <span>Subtotal:</span>
+          <span id="summarySubtotal">$0</span>
+        </div>
+        <div class="summary-row subtotal" id="shippingRow" style="display: none;">
+          <span>Envío:</span>
+          <span id="summaryShipping">$0</span>
+        </div>
+        <div class="summary-row total">
+          <span>TOTAL PAGADO:</span>
+          <span id="summaryTotal">$0</span>
+        </div>
+      </div>
+
+      <!-- Referencia de Wompi -->
+      <div class="reference-box">
+        <div class="reference-label">Referencia Wompi</div>
+        <div class="reference-value" id="wompiReference">MM-XXXXXXXXXX</div>
+      </div>
+
+      <!-- Botón de descarga -->
+      <button class="download-btn" onclick="descargarRecibo()">📥 Descargar Recibo (PDF)</button>
     </div>
 
     <!-- Texto de agradecimiento -->
@@ -377,32 +634,107 @@
       return out;
     }
 
+    function formatCurrency(amount) {
+      return '$' + Math.round(amount).toLocaleString('es-CO');
+    }
+
+    function loadReceiptData() {
+      try {
+        // Obtener datos del localStorage
+        const datosEntrega = JSON.parse(localStorage.getItem('datos_entrega') || '{}');
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const total = Number(localStorage.getItem('total_calc') || 0);
+        const reference = getQueryParams().reference || window.__mm_widget_reference || 'MM-' + Date.now();
+        
+        // Mostrar productos
+        const productsList = document.getElementById('productsList');
+        let subtotal = 0;
+        let shippingCost = 0;
+
+        if (cart && cart.length > 0) {
+          let html = '';
+          cart.forEach(item => {
+            const itemPrice = (item.precio || 0) * (item.cantidad || 1);
+            subtotal += itemPrice;
+            html += `
+              <div class="receipt-item">
+                <span class="item-name">${item.nombre || 'Producto'}</span>
+                <span class="item-qty">x${item.cantidad || 1}</span>
+                <span class="item-price">${formatCurrency(itemPrice)}</span>
+              </div>
+            `;
+          });
+          productsList.innerHTML = html;
+        }
+
+        // Calcular envío si existe
+        if (datosEntrega.domicilio_checked) {
+          shippingCost = 13000;
+          document.getElementById('shippingRow').style.display = 'flex';
+          document.getElementById('summaryShipping').innerText = formatCurrency(shippingCost);
+        }
+
+        // Actualizar resumen
+        const totalFinal = total || (subtotal + shippingCost);
+        document.getElementById('summarySubtotal').innerText = formatCurrency(subtotal);
+        document.getElementById('summaryTotal').innerText = formatCurrency(totalFinal);
+        
+        // Referencia de Wompi (format MM-XXXXX)
+        const refNum = reference.toString().substring(0, 10).toUpperCase();
+        document.getElementById('receiptNum').innerText = refNum;
+        document.getElementById('wompiReference').innerText = refNum;
+
+        // Guardar para descarga
+        window.receiptData = {
+          reference: refNum,
+          items: cart,
+          subtotal: subtotal,
+          shipping: shippingCost,
+          total: totalFinal,
+          date: new Date().toLocaleDateString('es-CO'),
+          time: new Date().toLocaleTimeString('es-CO')
+        };
+
+        // Limpiar localStorage después de mostrar
+        setTimeout(() => {
+          localStorage.removeItem('cart');
+          localStorage.removeItem('total_calc');
+        }, 1000);
+
+      } catch(e) {
+        console.error('Error loading receipt:', e);
+      }
+    }
+
     function updateTransactionInfo(status, reference, receipt) {
       document.getElementById('statusDisplay').innerText = status;
-      document.getElementById('referenceDisplay').innerText = reference || 'N/A';
+      document.getElementById('referenceDisplay').innerText = reference || 'Wompi';
       document.getElementById('receiptDisplay').innerText = receipt ? '✓ Enviado' : 'Procesando...';
     }
 
     async function check(){
       const q = getQueryParams();
       
+      // Cargar datos del recibo primero
+      loadReceiptData();
+      
       // Prefer reference param if present
       const reference = q.reference || q.tx_reference || q.transaction_reference || '';
       const transaction_id = q.transaction || q.tx || '';
       
       if (!reference && !transaction_id){ 
-        updateTransactionInfo('Completado', 'Disponible en tu correo', 'Enviando...');
+        updateTransactionInfo('✓ Completado', 'Wompi', 'Enviando...');
         return; 
       }
 
       if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('REPLACE')===0){ 
-        updateTransactionInfo('Completado', reference || transaction_id, 'Pendiente');
+        updateTransactionInfo('✓ Completado', reference || transaction_id, 'Pendiente');
         return; 
       }
 
       try{
         let attempts = 0; 
-        const maxAttempts = 12; // ~1 minute polling
+        const maxAttempts = 12;
         
         while(attempts < maxAttempts){
           const resp = await fetch(APPS_SCRIPT_URL + '?action=get_payment_status',{
@@ -418,7 +750,7 @@
             const status = last.values[6] || 'APROBADO';
             const receipt = last.values[9] || '';
             
-            updateTransactionInfo(status, reference || transaction_id, receipt ? '✓ Enviado' : 'Procesando...');
+            updateTransactionInfo('✓ ' + status, reference || transaction_id, receipt ? '✓ Enviado' : 'Procesando...');
             
             if (['APPROVED','PAID','AUTHORIZED'].indexOf(String(status).toUpperCase()) !== -1){ 
               return; 
@@ -429,14 +761,136 @@
           await new Promise(r=>setTimeout(r,5000));
         }
         
-        updateTransactionInfo('Aprobado', reference || transaction_id, 'Enviando...');
+        updateTransactionInfo('✓ Aprobado', reference || transaction_id, 'Confirmando...');
       }catch(e){ 
-        updateTransactionInfo('Completado', reference || transaction_id, 'Confirmando...');
+        console.warn('Check error:', e);
+        updateTransactionInfo('✓ Completado', reference || transaction_id, 'Confirmando...');
       }
     }
 
-    // Ejecutar verificación cuando la página cargue
-    check();
+    function descargarRecibo() {
+      const receiptNum = window.receiptData?.reference || 'Recibo';
+      const element = document.getElementById('receiptContainer');
+      
+      if (!element) {
+        alert('No hay datos del recibo para descargar');
+        return;
+      }
+
+      // Clonar el elemento para no afectar la página
+      const elementClone = element.cloneNode(true);
+      
+      // Remover el botón de descarga del clone
+      const btnDescargar = elementClone.querySelector('.download-btn');
+      if (btnDescargar) {
+        btnDescargar.remove();
+      }
+
+      // Crear un contenedor temporal con toda la información
+      const container = document.createElement('div');
+      container.style.padding = '30px';
+      container.style.background = '#ffffff';
+      container.style.fontFamily = "'Poppins', Arial, sans-serif";
+      container.style.width = '210mm';
+      
+      // HTML completo para el PDF
+      container.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #111; padding-bottom: 20px;">
+          <div style="font-size: 40px; font-weight: 800; color: #10b981; margin-bottom: 10px;">✓</div>
+          <h1 style="margin: 10px 0; color: #111; font-size: 28px; font-weight: 800;">¡PAGO EXITOSO!</h1>
+          <p style="color: #666; margin: 5px 0; font-size: 14px;">Transacción completada con éxito</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p style="margin: 8px 0; font-size: 13px;"><strong>Referencia de Pago:</strong> ${window.receiptData?.reference || 'N/A'}</p>
+          <p style="margin: 8px 0; font-size: 13px;"><strong>Fecha:</strong> ${window.receiptData?.date || ''}</p>
+          <p style="margin: 8px 0; font-size: 13px;"><strong>Hora:</strong> ${window.receiptData?.time || ''}</p>
+        </div>
+
+        <div style="border-top: 2px solid #111; border-bottom: 2px solid #111; padding: 15px 0; margin: 20px 0;">
+          <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 15px; color: #111;">DETALLE DE COMPRA</h3>
+          
+          ${(window.receiptData?.items || []).map(item => `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
+              <div>
+                <p style="margin: 0; font-weight: 600; color: #111;">${item.nombre || 'Producto'}</p>
+                <p style="margin: 2px 0; color: #666; font-size: 11px;">Cantidad: ${item.cantidad || 1}</p>
+              </div>
+              <p style="margin: 0; font-weight: 700; color: #10b981;">$${Math.round((item.precio || 0) * (item.cantidad || 1)).toLocaleString('es-CO')}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #ddd;">
+          <div style="display: flex; justify-content: space-between; margin: 10px 0; font-size: 12px;">
+            <span style="color: #666;">Subtotal:</span>
+            <span style="font-weight: 600; color: #111;">$${Math.round(window.receiptData?.subtotal || 0).toLocaleString('es-CO')}</span>
+          </div>
+          ${window.receiptData?.shipping ? `
+            <div style="display: flex; justify-content: space-between; margin: 10px 0; font-size: 12px;">
+              <span style="color: #666;">Envío:</span>
+              <span style="font-weight: 600; color: #111;">$${Math.round(window.receiptData?.shipping || 0).toLocaleString('es-CO')}</span>
+            </div>
+          ` : ''}
+          <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 10px; border-top: 2px solid #111; font-size: 16px; font-weight: 800;">
+            <span style="color: #111;">TOTAL PAGADO:</span>
+            <span style="color: #10b981;">$${Math.round(window.receiptData?.total || 0).toLocaleString('es-CO')}</span>
+          </div>
+        </div>
+
+        <div style="background: #111; color: #fff; padding: 18px; border-radius: 8px; text-align: center; margin: 25px 0;">
+          <p style="font-size: 10px; color: #ccc; margin: 0 0 8px 0; font-weight: 700; letter-spacing: 2px;">REFERENCIA WOMPI</p>
+          <p style="font-size: 20px; font-weight: 800; letter-spacing: 3px; margin: 0; font-family: 'Courier New', monospace;">${window.receiptData?.reference || 'MM-XXXXX'}</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px; line-height: 1.8;">
+          <p style="margin: 5px 0;"><strong>¡Gracias por tu compra en Math Minds!</strong></p>
+          <p style="margin: 5px 0;">Este documento es tu comprobante de pago oficial</p>
+          <p style="margin: 5px 0;">Conserva este PDF como referencia de tu transacción</p>
+          <p style="margin: 10px 0 0 0; font-size: 10px; color: #999;">Math Minds © 2026</p>
+        </div>
+      `;
+
+      // Agregar al body temporalmente
+      document.body.appendChild(container);
+
+      // Configuración para html2pdf
+      const opt = {
+        margin: 5,
+        filename: `Recibo-MathMinds-${receiptNum}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          windowHeight: 800
+        },
+        jsPDF: { 
+          orientation: 'portrait', 
+          unit: 'mm', 
+          format: 'a4'
+        }
+      };
+
+      // Generar PDF
+      html2pdf()
+        .set(opt)
+        .from(container)
+        .save()
+        .then(() => {
+          // Remover elemento temporal después de descargar
+          document.body.removeChild(container);
+        })
+        .catch(err => {
+          console.error('Error al descargar PDF:', err);
+          document.body.removeChild(container);
+          alert('Hubo un error al descargar el recibo');
+        });
+    }
+
+    // Ejecutar cuando carga la página
+    document.addEventListener('DOMContentLoaded', check);
   </script>
 </body>
 </html>
