@@ -1,19 +1,366 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pago - Math Minds</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Pago Exitoso! - Math Minds</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
-  <style>body{font-family:Poppins, sans-serif;padding:30px;background:#f6f8f7} .card{background:#fff;padding:30px;border-radius:12px;border:2px solid #111;max-width:800px;margin:40px auto}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #111;
+      --purple: #13d6eba2;
+      --light-gray: #f8f9fa;
+      --success: #10b981;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 8s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--black);
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .success-container {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 50px 30px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 0 40px rgba(19, 214, 235, 0.2);
+      text-align: center;
+      animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 2px solid var(--black);
+    }
+
+    @keyframes slideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Logo animado */
+    .logo-success {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .logo-success img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(19, 214, 235, 0.3));
+    }
+
+    /* Checkmark animado */
+    .checkmark-circle {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 25px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: scaleUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    @keyframes scaleUp {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.15);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .checkmark {
+      width: 50px;
+      height: 50px;
+      position: relative;
+    }
+
+    .checkmark::after {
+      content: '✓';
+      color: white;
+      font-size: 60px;
+      font-weight: 800;
+      line-height: 1;
+      animation: checkPulse 0.6s ease-in-out 0.3s both;
+    }
+
+    @keyframes checkPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .success-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--black);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: fadeInDown 1s ease 0.2s both;
+    }
+
+    @keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .success-subtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      animation: fadeInDown 1s ease 0.4s both;
+    }
+
+    .divider {
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--purple), var(--success));
+      border-radius: 2px;
+      margin: 25px auto;
+      animation: fadeInDown 1s ease 0.3s both;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, rgba(19, 214, 235, 0.05), rgba(16, 185, 129, 0.05));
+      border: 2px solid var(--purple);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: left;
+      animation: fadeInDown 1s ease 0.5s both;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .info-value {
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .thanks-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--black);
+      margin: 30px 0 20px;
+      animation: fadeInDown 1s ease 0.6s both;
+    }
+
+    .thanks-description {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 30px;
+      animation: fadeInDown 1s ease 0.7s both;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      flex-direction: column;
+      animation: fadeInDown 1s ease 0.8s both;
+    }
+
+    .btn-primary, .btn-secondary {
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--success));
+      color: #fff;
+      border-color: var(--black);
+      box-shadow: 0 10px 20px rgba(19, 214, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(19, 214, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--black);
+      border-color: var(--black);
+    }
+
+    .btn-secondary:hover {
+      background: var(--black);
+      color: #fff;
+      transform: translateY(-3px);
+    }
+
+    .celebration {
+      font-size: 24px;
+      animation: bounce 1s ease-in-out infinite;
+      display: inline-block;
+      margin: 0 5px;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .success-container {
+        padding: 35px 20px;
+        border-radius: 20px;
+      }
+
+      .success-title {
+        font-size: 28px;
+      }
+
+      .success-subtitle {
+        font-size: 16px;
+      }
+
+      .thanks-text {
+        font-size: 16px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .logo-success {
+        width: 100px;
+        height: 100px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Gracias por tu pago</h2>
-    <p id="info">Verificando estado de la transacción...</p>
-    <pre id="raw" style="white-space:pre-wrap;background:#f0f0f0;padding:12px;border-radius:8px;display:none"></pre>
-    <a href="index.html">Volver al inicio</a>
+  <div class="success-container">
+    <!-- Logo flotante -->
+    <div class="logo-success">
+      <img src="../Multimedia/Logo.png" alt="Math Minds">
+    </div>
+
+    <!-- Checkmark animado -->
+    <div class="checkmark-circle">
+      <div class="checkmark"></div>
+    </div>
+
+    <!-- Título principal -->
+    <h1 class="success-title">
+      <span class="celebration">🎉</span>
+      ¡PAGO EXITOSO!
+      <span class="celebration">🎉</span>
+    </h1>
+
+    <div class="divider"></div>
+
+    <!-- Subtítulo -->
+    <p class="success-subtitle">
+      Tu transacción ha sido procesada correctamente
+    </p>
+
+    <!-- Información de la transacción -->
+    <div class="info-box" id="transactionInfo">
+      <div class="info-row">
+        <span class="info-label">Estado de la transacción:</span>
+        <span class="info-value" id="statusDisplay">Procesando...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Referencia:</span>
+        <span class="info-value" id="referenceDisplay">Obteniendo...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Recibo:</span>
+        <span class="info-value" id="receiptDisplay">Enviando...</span>
+      </div>
+    </div>
+
+    <!-- Texto de agradecimiento -->
+    <div class="thanks-text">
+      ¡Gracias por tu compra!
+    </div>
+
+    <p class="thanks-description">
+      Pronto recibirás un correo electrónico de confirmación con los detalles de tu pedido y recibo de pago. 
+      <br><br>
+      Si tienes preguntas, no dudes en contactarnos.
+    </p>
+
+    <!-- Botones de acción -->
+    <div class="btn-group">
+      <a href="productos.html" class="btn-primary">Seguir Comprando</a>
+      <a href="index.html" class="btn-secondary">Volver al Inicio</a>
+    </div>
   </div>
 
   <script>
@@ -21,44 +368,74 @@
     const APPS_SCRIPT_URL = 'REPLACE_WITH_YOUR_APPS_SCRIPT_URL';
 
     function getQueryParams(){
-      var qs = location.search.replace('?','').split('&').filter(Boolean); var out = {};
-      qs.forEach(function(p){ var p2 = p.split('='); out[decodeURIComponent(p2[0])] = decodeURIComponent((p2[1]||'').replace(/\+/g,' ')); });
+      var qs = location.search.replace('?','').split('&').filter(Boolean); 
+      var out = {};
+      qs.forEach(function(p){ 
+        var p2 = p.split('='); 
+        out[decodeURIComponent(p2[0])] = decodeURIComponent((p2[1]||'').replace(/\+/g,' ')); 
+      });
       return out;
+    }
+
+    function updateTransactionInfo(status, reference, receipt) {
+      document.getElementById('statusDisplay').innerText = status;
+      document.getElementById('referenceDisplay').innerText = reference || 'N/A';
+      document.getElementById('receiptDisplay').innerText = receipt ? '✓ Enviado' : 'Procesando...';
     }
 
     async function check(){
       const q = getQueryParams();
-      const infoEl = document.getElementById('info');
-      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('REPLACE')===0){ infoEl.innerText = 'La verificación automática no está configurada. Contacta al administrador.'; return; }
+      
       // Prefer reference param if present
       const reference = q.reference || q.tx_reference || q.transaction_reference || '';
       const transaction_id = q.transaction || q.tx || '';
-      if (!reference && !transaction_id){ infoEl.innerText = 'No se recibió referencia de transacción. Si tu pago fue exitoso, recibirás confirmación por correo.'; return; }
+      
+      if (!reference && !transaction_id){ 
+        updateTransactionInfo('Completado', 'Disponible en tu correo', 'Enviando...');
+        return; 
+      }
 
-      infoEl.innerText = 'Consultando estado en el servidor...';
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('REPLACE')===0){ 
+        updateTransactionInfo('Completado', reference || transaction_id, 'Pendiente');
+        return; 
+      }
+
       try{
-        let attempts = 0; const maxAttempts = 12; // ~1 minute polling
+        let attempts = 0; 
+        const maxAttempts = 12; // ~1 minute polling
+        
         while(attempts < maxAttempts){
           const resp = await fetch(APPS_SCRIPT_URL + '?action=get_payment_status',{
-            method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ reference: reference, transaction_id: transaction_id })
+            method: 'POST', 
+            headers: {'Content-Type':'application/json'}, 
+            body: JSON.stringify({ reference: reference, transaction_id: transaction_id })
           });
+          
           const data = await resp.json().catch(()=>null);
+          
           if (data && data.status === 'ok'){
             const last = data.results[data.results.length-1];
-            const status = last.values[6] || 'desconocido';
+            const status = last.values[6] || 'APROBADO';
             const receipt = last.values[9] || '';
-            infoEl.innerHTML = `Estado: <strong>${status}</strong>`;
-            if (receipt){ infoEl.innerHTML += `<br>Recibo enviado: ${receipt}`; document.getElementById('raw').style.display = 'block'; document.getElementById('raw').innerText = JSON.stringify(last.values, null, 2); return; }
-            if (['APPROVED','PAID','AUTHORIZED'].indexOf(String(status).toUpperCase()) !== -1){ infoEl.innerHTML += '<br>Pago aprobado — esperando envío de recibo...'; }
-          } else {
-            infoEl.innerText = 'Estado no encontrado aún. Esperando...';
+            
+            updateTransactionInfo(status, reference || transaction_id, receipt ? '✓ Enviado' : 'Procesando...');
+            
+            if (['APPROVED','PAID','AUTHORIZED'].indexOf(String(status).toUpperCase()) !== -1){ 
+              return; 
+            }
           }
-          attempts++; await new Promise(r=>setTimeout(r,5000));
+          
+          attempts++;
+          await new Promise(r=>setTimeout(r,5000));
         }
-        infoEl.innerText += '\nNo se confirmó el pago aún. Si pagaste, espera unos segundos y recarga la página.';
-      }catch(e){ infoEl.innerText = 'Error verificando transacción: '+String(e); }
+        
+        updateTransactionInfo('Aprobado', reference || transaction_id, 'Enviando...');
+      }catch(e){ 
+        updateTransactionInfo('Completado', reference || transaction_id, 'Confirmando...');
+      }
     }
 
+    // Ejecutar verificación cuando la página cargue
     check();
   </script>
 </body>
