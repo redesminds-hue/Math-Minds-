@@ -443,7 +443,16 @@
     
     comoComprar: {
       pattern: /cómo compro|como puedo comprar| como comprar| como compro| cómo comprar|quiero comprar|proceso de compra|pasos para comprar|cómo realizo|forma de compra|modalidad de compra|procedimiento|compra en línea|compra online|realizar una compra|efectuar compra|hacer una compra/i,
-      response: () => "🛒 **¿Cómo comprar en Math Minds?**\n\n**Opción 1: En línea (Recomendado)**\n1. Visita nuestra sección **TIENDA**\n2. Explora los productos disponibles\n3. Selecciona el producto y cantidad\n4. Agrégalo al carrito\n5. Completa tu información\n6. Elige método de pago\n7. ¡Listo! Recibirás confirmación\n\n**Opción 2: Contacto directo**\n📱 WhatsApp: +57 301 345 6259\n📧 Email: mathmindscol@gmail.com\n☎️ Teléfono: +57 301 345 6259\n\n¿Necesitas ayuda con algún producto específico?"
+      response: () => {
+        return {
+          type: 'message-with-button',
+          content: "🛒 **¿Cómo comprar en Math Minds?**\n\n**Opción 1: En línea (Recomendado)**\n1. Visita nuestra sección **TIENDA**\n2. Explora los productos disponibles\n3. Selecciona el producto y cantidad\n4. Agrégalo al carrito\n5. Completa tu información\n6. Elige método de pago\n7. ¡Listo! Recibirás confirmación\n\n**Opción 2: Contacto directo**\n📱 WhatsApp: +57 301 345 6259\n📧 Email: mathmindscol@gmail.com\n☎️ Teléfono: +57 301 345 6259",
+          button: {
+            text: "🛍️ Ir a la Tienda",
+            url: "productos.html"
+          }
+        };
+      }
     },
 
     compra: {
@@ -622,7 +631,23 @@
     function agregarMensaje(texto, tipo) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `mm-mensaje mm-mensaje-${tipo}`;
-      msgDiv.innerHTML = tipo === 'bot' ? convertirMarkdownSimple(texto) : escapeHtml(texto);
+      
+      if (tipo === 'bot' && typeof texto === 'object' && texto.type === 'message-with-button') {
+        // Mensaje con botón
+        msgDiv.innerHTML = convertirMarkdownSimple(texto.content);
+        const buttonDiv = document.createElement('div');
+        buttonDiv.className = 'mm-mensaje-button-container';
+        const button = document.createElement('a');
+        button.href = texto.button.url;
+        button.className = 'mm-mensaje-button';
+        button.textContent = texto.button.text;
+        buttonDiv.appendChild(button);
+        msgDiv.appendChild(buttonDiv);
+      } else {
+        // Mensaje de texto normal
+        msgDiv.innerHTML = tipo === 'bot' ? convertirMarkdownSimple(texto) : escapeHtml(texto);
+      }
+      
       messagesContainer.appendChild(msgDiv);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }

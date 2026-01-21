@@ -297,3 +297,35 @@
     right: 0;
   }
 }
+/* Estilos para mensajes con botones */
+.mm-mensaje-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.mm-mensaje-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #13d6eb, #0ea5b5);
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 8px rgba(19, 214, 235, 0.3);
+}
+
+.mm-mensaje-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(19, 214, 235, 0.4);
+  background: linear-gradient(135deg, #0ea5b5, #0a8fa5);
+}
+
+.mm-mensaje-button:active {
+  transform: translateY(0);
+}
