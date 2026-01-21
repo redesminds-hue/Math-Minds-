@@ -646,8 +646,14 @@ async function validarYCargarWidget() {
       nativeBtn.style.padding = '12px 18px'; nativeBtn.style.borderRadius='10px'; nativeBtn.style.background='#13d6eb'; nativeBtn.style.color='#000'; nativeBtn.style.border='none'; nativeBtn.style.cursor='pointer';
       nativeBtn.addEventListener('click', (e) => {
         try { e.preventDefault(); } catch(_){}
-        abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast);
+
+        // ✅ abrir ventana SINCRÓNICA (permitida en móvil porque nace del click)
+        const popup = window.open('about:blank', '_blank');
+
+        // si el navegador bloqueó popup, cae a misma pestaña
+        abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast, popup);
       });
+
       container.appendChild(nativeBtn);
     } catch (e) {
       console.error('failed to render native checkout button', e);
@@ -881,7 +887,7 @@ async function abrirPasarelaPago(amountInCents, reference, sEmail, sFirst, sLast
    WEB CHECKOUT (FORM)
    Construye y envía un formulario GET a https://checkout.wompi.co/p/
 ============================================ */
-async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast) {
+async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast, popup) {
   try {
     // Solicitar firma al servidor
     const sigResp = await fetch(`${PAYMENT_SERVER_URL}/api/generate-signature`, {
@@ -898,7 +904,12 @@ async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast)
         });
         const txt = await resp.text(); let data={}; try{ data = txt ? JSON.parse(txt) : {}; }catch(e){ data = { raw: txt }; }
         const checkout = data.checkout_url || (data.data && data.data.checkout_url);
-        if (checkout) { window.open(checkout, '_blank'); return; }
+        if (checkout) {
+          if (popup && !popup.closed) popup.location.href = checkout;
+          else window.location.href = checkout; // fallback misma pestaña
+          return;
+        }
+
       } catch(e) { console.warn('create-transaction fallback failed', e); }
       alert('No fue posible obtener la firma para Web Checkout. Intenta nuevamente.');
       return;
@@ -909,7 +920,7 @@ async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast)
     const form = document.createElement('form');
     form.method = 'GET';
     form.action = 'https://checkout.wompi.co/p/';
-    form.target = '_blank';
+    form.target = '_self';
 
     const add = (name, value) => {
       const i = document.createElement('input');
@@ -921,8 +932,7 @@ async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast)
     add('amount-in-cents', String(amountInCents));
     add('reference', String(reference));
     add('signature:integrity', signature);
-    const safeRedirect = (PAYMENT_SERVER_URL && String(PAYMENT_SERVER_URL).startsWith('http://localhost')) ? 'https://transaction-redirect.wompi.co/check' : (PAYMENT_SERVER_URL + '/transaction-result');
-    add('redirect-url', safeRedirect);
+    add('redirect-url', 'https://mathmindscol.com/pago_exitoso.html');
     add('customer-data:email', sEmail || '');
     add('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
     try { add('customer-data:phone-number', document.getElementById('studentPhone') && document.getElementById('studentPhone').value || ''); } catch(e){}
@@ -941,9 +951,62 @@ async function abrirWebCheckout(amountInCents, reference, sEmail, sFirst, sLast)
       }
     } catch(e) {}
 
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
+    if (popup && !popup.closed) {
+      // Crear el form dentro del popup (Safari-friendly)
+      const pdoc = popup.document;
+      const pform = pdoc.createElement('form');
+      pform.method = 'GET';
+      pform.action = 'https://checkout.wompi.co/p/';
+      pform.target = '_self';
+
+      const padd = (name, value) => {
+        const i = pdoc.createElement('input');
+        i.type = 'hidden';
+        i.name = name;
+        i.value = String(value || '');
+        pform.appendChild(i);
+      };
+
+      padd('public-key', WOMPI_PUBLIC_KEY);
+      padd('currency', WOMPI_CURRENCY);
+      padd('amount-in-cents', String(amountInCents));
+      padd('reference', String(reference));
+      padd('signature:integrity', signature);
+      padd('redirect-url', 'https://mathmindscol.com/pago_exitoso.html');
+      padd('customer-data:email', sEmail || '');
+      padd('customer-data:full-name', `${sFirst || ''} ${sLast || ''}`.trim());
+
+      try { padd('customer-data:phone-number', (document.getElementById('studentPhone')?.value || '')); } catch(e){}
+      try { padd('customer-data:legal-id', (document.getElementById('studentDoc')?.value || '')); } catch(e){}
+      try { padd('customer-data:legal-id-type', 'CC'); } catch(e){}
+
+      // Shipping opcional (igual que antes)
+      try {
+        const shipRequested =
+          (document.getElementById('solicitar-domicilio')?.checked) ||
+          (String(document.getElementById('studentAddress')?.value || '').trim());
+
+        if (shipRequested) {
+          padd('shipping-address:address-line-1', (document.getElementById('studentAddress')?.value || ''));
+          const d = (() => { try { return JSON.parse(localStorage.getItem('datos_entrega')||'{}'); } catch(e){ return {}; } })();
+          padd('shipping-address:country', (d.country || d.pais || 'CO'));
+          padd('shipping-address:city', (d.ciudad || d.city || ''));
+          padd('shipping-address:region', (d.region || d.departamento || ''));
+          padd('shipping-address:phone-number', (document.getElementById('studentPhone')?.value || d.telefono || d.phone || d.movil || ''));
+        }
+      } catch(e) {}
+
+      // Render mínimo por si el popup está en blanco
+      if (!pdoc.body) pdoc.write('<body></body>');
+      pdoc.body.appendChild(pform);
+      pform.submit();
+    } else {
+      document.body.appendChild(form);
+      form.submit();
+      form.remove();
+    }
+
+
   } catch (e) {
     console.error('abrirWebCheckout error', e);
     alert('Error al abrir Web Checkout. Intenta nuevamente.');
