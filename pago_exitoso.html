@@ -653,14 +653,22 @@
 
         if (cart && cart.length > 0) {
           let html = '';
-          cart.forEach(item => {
+          cart.forEach((item, index) => {
             const itemPrice = (item.precio || 0) * (item.cantidad || 1);
             subtotal += itemPrice;
+            const bgColor = index % 2 === 0 ? 'rgba(19, 214, 235, 0.08)' : 'rgba(16, 185, 129, 0.08)';
             html += `
-              <div class="receipt-item">
-                <span class="item-name">${item.nombre || 'Producto'}</span>
-                <span class="item-qty">x${item.cantidad || 1}</span>
-                <span class="item-price">${formatCurrency(itemPrice)}</span>
+              <div class="receipt-item" style="background: ${bgColor}; border-left: 4px solid var(--purple); padding: 12px; margin-bottom: 8px; border-radius: 8px; border-bottom: none;">
+                <div style="margin-bottom: 8px;">
+                  <span class="item-name" style="font-size: 14px; font-weight: 700;">${item.nombre || 'Producto'}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                  <span class="item-qty" style="color: #666; margin: 0;">Cantidad: <strong>${item.cantidad || 1}</strong></span>
+                  <span class="item-price" style="color: var(--success); font-weight: 700; margin: 0;">Precio unitario: ${formatCurrency(item.precio || 0)}</span>
+                </div>
+                <div style="text-align: right; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1);">
+                  <span style="font-size: 13px; font-weight: 700; color: var(--black);">Subtotal: ${formatCurrency(itemPrice)}</span>
+                </div>
               </div>
             `;
           });
@@ -679,8 +687,8 @@
         document.getElementById('summarySubtotal').innerText = formatCurrency(subtotal);
         document.getElementById('summaryTotal').innerText = formatCurrency(totalFinal);
         
-        // Referencia de Wompi (format MM-XXXXX)
-        const refNum = reference.toString().substring(0, 10).toUpperCase();
+        // Referencia de Wompi - COMPLETA
+        const refNum = reference.toString().toUpperCase();
         document.getElementById('receiptNum').innerText = refNum;
         document.getElementById('wompiReference').innerText = refNum;
 
@@ -810,13 +818,18 @@
         <div style="border-top: 2px solid #111; border-bottom: 2px solid #111; padding: 15px 0; margin: 20px 0;">
           <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 15px; color: #111;">DETALLE DE COMPRA</h3>
           
-          ${(window.receiptData?.items || []).map(item => `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
-              <div>
-                <p style="margin: 0; font-weight: 600; color: #111;">${item.nombre || 'Producto'}</p>
-                <p style="margin: 2px 0; color: #666; font-size: 11px;">Cantidad: ${item.cantidad || 1}</p>
+          ${(window.receiptData?.items || []).map((item, index) => `
+            <div style="margin-bottom: 15px; padding: 12px; background: ${index % 2 === 0 ? '#f9f9f9' : '#fff'}; border-radius: 8px; border-left: 3px solid #13d6eba2;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div style="flex: 1;">
+                  <p style="margin: 0; font-weight: 800; color: #111; font-size: 13px;">${item.nombre || 'Producto'}</p>
+                  <p style="margin: 5px 0 0 0; color: #666; font-size: 11px;">Cantidad: <span style="font-weight: 600;">${item.cantidad || 1}</span></p>
+                </div>
               </div>
-              <p style="margin: 0; font-weight: 700; color: #10b981;">$${Math.round((item.precio || 0) * (item.cantidad || 1)).toLocaleString('es-CO')}</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
+                <p style="margin: 0; color: #666; font-size: 11px;">Precio unitario: $${Math.round(item.precio || 0).toLocaleString('es-CO')}</p>
+                <p style="margin: 0; font-weight: 800; color: #10b981; font-size: 13px;">$${Math.round((item.precio || 0) * (item.cantidad || 1)).toLocaleString('es-CO')}</p>
+              </div>
             </div>
           `).join('')}
         </div>
@@ -838,9 +851,9 @@
           </div>
         </div>
 
-        <div style="background: #111; color: #fff; padding: 18px; border-radius: 8px; text-align: center; margin: 25px 0;">
-          <p style="font-size: 10px; color: #ccc; margin: 0 0 8px 0; font-weight: 700; letter-spacing: 2px;">REFERENCIA WOMPI</p>
-          <p style="font-size: 20px; font-weight: 800; letter-spacing: 3px; margin: 0; font-family: 'Courier New', monospace;">${window.receiptData?.reference || 'MM-XXXXX'}</p>
+        <div style="background: #111; color: #fff; padding: 25px 15px; border-radius: 8px; text-align: center; margin: 25px 0; word-break: break-all;">
+          <p style="font-size: 10px; color: #ccc; margin: 0 0 12px 0; font-weight: 700; letter-spacing: 2px;">REFERENCIA WOMPI</p>
+          <p style="font-size: 16px; font-weight: 800; letter-spacing: 1px; margin: 0; font-family: 'Courier New', monospace; line-height: 1.4; word-wrap: break-word;">${window.receiptData?.reference || 'MM-XXXXX'}</p>
         </div>
 
         <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px; line-height: 1.8;">
