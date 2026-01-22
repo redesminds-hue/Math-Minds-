@@ -657,9 +657,11 @@
         // Fallback to empty array
         const cart = rawCart || [];
         const total = Number(localStorage.getItem('total_calc') || 0);
-        // Tomar la referencia real buscando entre los posibles nombres que envía Wompi
+        // Tomar la referencia real: preferir la referencia "congelada" que generó la página de pago
         const qParams = getQueryParams();
-        const reference = qParams.reference || qParams.tx_reference || qParams.transaction_reference || qParams.transaction || qParams.tx || qParams.tx_id || window.__mm_widget_reference || (localStorage.getItem('wompi_reference') || '') || 'MM-' + Date.now();
+        const frozenRef = (localStorage.getItem('wompi_frozen_reference') || '').toString().trim();
+        // Use frozenRef if present (es la referencia original creada al iniciar el checkout). Si no, usar parámetros de URL o widget.
+        const reference = frozenRef || qParams.reference || qParams.tx_reference || qParams.transaction_reference || qParams.transaction || qParams.tx || qParams.tx_id || window.__mm_widget_reference || (localStorage.getItem('wompi_reference') || '') || 'MM-' + Date.now();
         
         // Mostrar productos
         const productsList = document.getElementById('productsList');
