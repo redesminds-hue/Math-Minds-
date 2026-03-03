@@ -688,12 +688,40 @@
 
             if ((!precio || precio === 0) && (bdb && bdb.length > 0)){
               const n = normalizeText(nombre);
+              // prefer matching by colegio/grade if present
+              const targetCol = normalizeText(it.colegio || it.col || it.college || '');
+              const targetGra = normalizeText(it.grado || it.gra || it.grade || '');
               let found = null;
-              for (const r of bdb){
-                const prod = (r.producto || r.title || r.name || '').toString();
-                const np = normalizeText(prod);
-                if (!np) continue;
-                if (np === n || np.includes(n) || n.includes(np)) { found = r; break; }
+              if (targetCol && targetGra) {
+                for (const r of bdb){
+                  const rcol = normalizeText(r.colegio || r.col || '');
+                  const rgra = normalizeText(r.grado || r.gra || r.grade || '');
+                  if (rcol === targetCol && rgra === targetGra) {
+                    found = r;
+                    break;
+                  }
+                }
+              }
+              // fallback to name-based if colegio/grade didn't yield anything
+              if (!found) {
+                for (const r of bdb){
+                  const prod = (r.producto || r.title || r.name || '').toString();
+                  const np = normalizeText(prod);
+                  if (!np) continue;
+                  if (np === n || np.includes(n) || n.includes(np)) {
+                    // if colegio specified, ensure it matches
+                    if (targetCol) {
+                      const rcol = normalizeText(r.colegio || r.col || '');
+                      if (rcol && rcol !== targetCol) continue;
+                    }
+                    if (targetGra) {
+                      const rgra = normalizeText(r.grado || r.gra || r.grade || '');
+                      if (rgra && rgra !== targetGra) continue;
+                    }
+                    found = r;
+                    break;
+                  }
+                }
               }
               if (found){
                 precio = Number(found.costo || found.price || found.valor || found.unit_price || 0) || precio;

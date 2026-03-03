@@ -332,7 +332,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!modal || !content) return;
 
     // Buscar información del producto en baseDeDatos
-    const productData = baseDeDatos ? baseDeDatos.find(p => p.producto.toLowerCase().includes(productName.toLowerCase()) && p.colegio === colegio && p.grado === grado) : null;
+    // Use normalized comparisons for colegio/grado (and producto) to avoid mismatches
+    const productData = baseDeDatos ? baseDeDatos.find(p => {
+      const prodMatch = String(p.producto || '').toLowerCase().includes(String(productName || '').toLowerCase());
+      const colMatch = (() => {
+        if (!colegio) return true; // no colegio filter
+        try { return _norm(p.colegio) === _norm(colegio); } catch(e){ return p.colegio === colegio; }
+      })();
+      const gradoMatch = (() => {
+        if (!grado) return true;
+        try { return _norm(p.grado) === _norm(grado); } catch(e){ return p.grado === grado; }
+      })();
+      return prodMatch && colMatch && gradoMatch;
+    }) : null;
     const actualProductName = productData ? productData.producto : productName;
 
     // Obtener colegios donde se ofrece el producto
@@ -423,10 +435,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Obtener descripción del producto
     const description = getProductDescription(actualProductName);
-    const precio = productData && productData.precio ? `$${productData.precio}` : 'Precio no disponible';
+    // Determine numeric price: prefer explicit precio, else use costo field
+    const precioNumInicial = productData ? (productData.precio || productData.costo || 0) : 0;
     const finalDescription = productData && productData.descripcion ? productData.descripcion : description;
 
-    // Crear contenido del modal
+    // Crear contenido del modal (precio no visible)
     let contentHTML = `
       <div style="position: relative; padding-top: 90px;">
         <img src="${logoSrc}" alt="Logo ${actualProductName}" style="position: absolute; top: 10px; left: 10px; width: 80px; height: auto; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -434,7 +447,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <img src="${imgSrc}" alt="${actualProductName}" width="350" style="display: block; margin: 20px auto 30px auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         <p><strong>Colegio:</strong> ${colegio}</p>
       <p><strong>Grado:</strong> ${grado}</p>
-      <p><strong>Precio:</strong> ${precio}</p>
       <p style="margin-bottom: 20px; line-height: 1.6;">${finalDescription}</p></div>`;
 
     if (colegio === '') {
@@ -469,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label for="quantity">Cantidad:</label>
         <input type="number" id="quantity" min="1" value="1" style="width: 60px; margin-left: 10px; padding: 5px;">
       </div>
-      <button class="btn primary full add-to-cart-modal" data-product="${actualProductName}" data-price="${productData ? productData.precio : 0}" data-colegio="${colegio}" data-grado="${grado}">Añadir al carrito</button>
+      <button class="btn primary full add-to-cart-modal" data-product="${actualProductName}" data-price="${precioNumInicial}" data-colegio="${colegio}" data-grado="${grado}">Añadir al carrito</button>
     `;
 
     content.innerHTML = contentHTML;
@@ -480,14 +492,60 @@ document.addEventListener("DOMContentLoaded", () => {
     if (colegio === '') {
       const modalColegio = document.getElementById('modalColegio');
       const modalGrado = document.getElementById('modalGrado');
+      const addBtn = content.querySelector('.add-to-cart-modal');
+      // disable button until both selectors filled
+      if (addBtn) {
+        addBtn.disabled = true;
+        addBtn.style.opacity = '0.6';
+      }
       if (modalColegio && modalGrado) {
+        // helper to refresh price display and add-to-cart button attributes
+        const updateModalPrice = () => {
+          const selCol = modalColegio.value || colegio || '';
+          const selGra = modalGrado.value || grado || '';
+          let precioNum = precioNumInicial;
+          if (selCol && selGra && baseDeDatos && baseDeDatos.length > 0) {
+            const found = baseDeDatos.find(p => {
+              const prodMatch = (p.producto || '').toLowerCase().includes(actualProductName.toLowerCase());
+              const colMatch = _norm(p.colegio) === _norm(selCol);
+              const graMatch = _norm(p.grado) === _norm(selGra);
+              return prodMatch && colMatch && graMatch;
+            });
+            if (found) {
+              precioNum = found.precio || found.costo || precioNum;
+            }
+          }
+          // priceText calculated for logging or debugging only (not shown to user)
+          const priceText = precioNum ? `$${precioNum}` : 'Precio no disponible';
+          // no visible element to update
+          if (addBtn) {
+            addBtn.dataset.price = precioNum;
+            addBtn.dataset.colegio = selCol;
+            addBtn.dataset.grado = selGra;
+            // enable only when colegio+grado are chosen
+            if (selCol && selGra) {
+              addBtn.disabled = false;
+              addBtn.style.opacity = '';
+            } else {
+              addBtn.disabled = true;
+              addBtn.style.opacity = '0.6';
+            }
+          }
+        };
+
         modalColegio.addEventListener('change', () => {
           const selectedColegio = modalColegio.value;
           if (selectedColegio) {
             // Poblar grados donde se vende el producto en este colegio
             let gradosDisponibles = [];
             if (baseDeDatos) {
-              gradosDisponibles = [...new Set(baseDeDatos.filter(p => p.producto.toLowerCase().includes(actualProductName.toLowerCase()) && p.colegio === selectedColegio).map(p => p.grado))].filter(Boolean);
+              gradosDisponibles = [...new Set(baseDeDatos.filter(p => {
+                    const prodMatch = String(p.producto||'').toLowerCase().includes(actualProductName.toLowerCase());
+                    const colMatch = (()=>{
+                      try{ return _norm(p.colegio) === _norm(selectedColegio); }catch(e){ return p.colegio === selectedColegio; }
+                    })();
+                    return prodMatch && colMatch;
+                  }).map(p => p.grado))].filter(Boolean);
             }
             if (gradosDisponibles.length === 0) {
               // Fallback
@@ -499,7 +557,12 @@ document.addEventListener("DOMContentLoaded", () => {
             modalGrado.innerHTML = '<option value="">Primero selecciona colegio</option>';
             modalGrado.disabled = true;
           }
+          updateModalPrice();
         });
+
+        modalGrado.addEventListener('change', updateModalPrice);
+        // initialize price with any prefilled values
+        updateModalPrice();
       }
     }
   }
@@ -1030,7 +1093,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cartDrawer: document.getElementById('cartDrawer'),
     cartList: document.getElementById('cartList'),
     cartEmpty: document.getElementById('cartEmpty'),
-    cartTotal: document.getElementById('cartTotal'),
     cartCountSpan: document.getElementById('cartCount'),
     cartItemsCount: document.getElementById('cartItemsCount'),
     cartFooter: document.getElementById('cartFooter'),
@@ -1195,10 +1257,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="mini-body" style="max-height:300px; overflow-y:auto;"></div>
           
           <div class="mini-footer" style="padding:15px; border-top:1px solid #eee; background:#fff;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-              <strong>Total:</strong>
-              <strong>$${API.total().toLocaleString()}</strong>
-            </div>
             <button id="btnPagarMini" style="width:100%; background:#13d6eba2; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
               PAGAR AHORA
             </button>
@@ -1279,9 +1337,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const count = API.count();
       const countSpan = CartUI.cartCountSpan; if (countSpan) countSpan.textContent = count;
       const itemsCountEl = CartUI.cartItemsCount; if (itemsCountEl) itemsCountEl.textContent = `(${count} productos)`;
-      
-      // Mostrar el total (aunque sea $0 por ahora)
-      const totalEl = CartUI.cartTotal; if (totalEl) totalEl.textContent = `$${API.total().toLocaleString()}`; 
 
       if (!CartUI.cartList) return; 
 
@@ -1294,11 +1349,6 @@ document.addEventListener("DOMContentLoaded", () => {
           CartUI.cartFooter.style.setProperty('display', 'block', 'important'); 
       }
 
-      // 2. Actualizar el texto del total
-      if (CartUI.cartTotal) {
-          CartUI.cartTotal.textContent = `$${API.total().toLocaleString()}`;
-      }
-      
       // 3. Controlar solo el mensaje de "Carrito Vacío"
       if (API.items.length === 0) {
           if (CartUI.cartEmpty) CartUI.cartEmpty.style.display = 'block';
@@ -1686,8 +1736,9 @@ function renderizarProductos(col, gra, query) {
     btn.type = 'button';
     btn.textContent = 'Añadir al carrito';
     btn.dataset.product = p.producto;
-    // No exponer el precio en la UI; pasar 0 al carrito para evitar mostrar precio
-    btn.dataset.price = 0;
+    // Use actual cost from database so cart can later compute price; still not visible in UI
+    const precioNumero = Number(p.precio || p.costo || 0) || 0;
+    btn.dataset.price = precioNumero;
     // Attach colegio/grado so cart knows item origin
     if (p.colegio) btn.dataset.colegio = p.colegio;
     if (p.grado) btn.dataset.grado = p.grado;
@@ -1857,7 +1908,26 @@ function agregarAlCarrito(nombre, precioRaw, meta) {
     window._mm_last_add.key = key; window._mm_last_add.ts = now;
   }catch(e){}
     // Normalize price (accept numbers or formatted strings)
-    const precioNum = Number(String(precioRaw).replace(/[^0-9.-]+/g, '')) || 0;
+    let precioNum = Number(String(precioRaw).replace(/[^0-9.-]+/g, '')) || 0;
+    // If metadata contains colegio/grado, attempt to look up correct costo in baseDeDatos
+    try{
+      if (meta && meta.colegio && meta.grado && window.baseDeDatos && window.baseDeDatos.length>0){
+        const coleNorm = _norm(meta.colegio);
+        const graNorm = _norm(meta.grado);
+        const nameLower = String(nombre||'').toLowerCase();
+        const found = window.baseDeDatos.find(p => {
+          try{
+            const cMatch = _norm(p.colegio) === coleNorm;
+            const gMatch = _norm(p.grado) === graNorm;
+            const prodMatch = (p.producto||'').toLowerCase().includes(nameLower);
+            return cMatch && gMatch && prodMatch;
+          }catch(e){ return false; }
+        });
+        if (found){
+          precioNum = Number(found.precio || found.costo || precioNum) || precioNum;
+        }
+      }
+    }catch(e){ console.error('price lookup error', e); }
 
     const producto = {
         id: Date.now().toString(),

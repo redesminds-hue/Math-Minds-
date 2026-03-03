@@ -253,8 +253,32 @@ function calcularTotal(carrito, bdb) {
   const norm = (s) => String(s || '').trim().toLowerCase();
 
   const html = carrito.map(item => {
-    const match = bdb.find(r => norm(r.producto) === norm(item.title));
-    const unitPrice = match ? Number(match.costo) : Number(item.price || 0);
+    // Try to match by colegio/grado metadata first (more specific)
+    let match = null;
+    if (item.colegio && item.grado) {
+      const colNorm = norm(item.colegio);
+      const graNorm = norm(item.grado);
+      const nameNorm = norm(item.title);
+      match = bdb.find(r => {
+        try {
+          const rcol = norm(r.colegio || r.col || '');
+          const rgra = norm(r.grado || r.gra || r.grade || '');
+          const rprod = norm(r.producto || r.title || r.name || '');
+          if (rcol === colNorm && rgra === graNorm) {
+            // if product name available, ensure it's relevant too
+            if (!rprod) return true;
+            return rprod.includes(nameNorm) || nameNorm.includes(rprod);
+          }
+          return false;
+        } catch(e){ return false; }
+      });
+    }
+    // fallback to name-only match if nothing found above
+    if (!match) {
+      match = bdb.find(r => norm(r.producto) === norm(item.title));
+    }
+
+    const unitPrice = match ? Number(match.costo || match.precio) : Number(item.price || 0);
     const subtotal = unitPrice * (item.qty || 1);
     total += subtotal;
 
