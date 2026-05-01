@@ -668,6 +668,186 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchSubmit = document.getElementById('searchSubmit');
   const historyList = document.getElementById('searchHistory');
 
+  const profileToggle = document.getElementById('profileToggle');
+  const profileMenu = document.getElementById('profileMenu');
+  const openLoginBtn = document.getElementById('openLoginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const profileUserNameLabel = document.getElementById('profileUserName');
+  const profileUserEmailLabel = document.getElementById('profileUserEmail');
+  const profileMenuLoggedIn = document.querySelector('.profile-menu-logged-in');
+  const profileMenuLoggedOut = document.querySelector('.profile-menu-logged-out');
+  const profileAvatar = profileToggle?.querySelector('.profile-avatar');
+  const profileLabel = profileToggle?.querySelector('.profile-label');
+  const authModal = document.getElementById('authModal');
+  const authForm = document.getElementById('authForm');
+  const authError = document.getElementById('authError');
+
+  const AUTH_STORAGE_KEY = 'mathMindsLoggedUser';
+
+  function normalizeEmail(value){
+    return String(value || '').trim().toLowerCase();
+  }
+
+  function getAuthUsersFromSheet(){
+    const rows = [];
+    if (!Array.isArray(window.baseDeDatos)) return rows;
+
+    window.baseDeDatos.forEach(row => {
+      const email = String(row.email || row.correo || row.correo_electronico || row.usuario || row.Usuario || row['Correo'] || row['Usuario'] || '').trim();
+      const password = String(row.password || row.contraseña || row.pass || row.clave || row['Clave'] || row['Password'] || '').trim();
+      if (!email || !password) return;
+      const name = String(row.nombre || row.name || row['Nombre'] || email.split('@')[0]).trim() || email;
+      rows.push({ email, password, name });
+    });
+
+    return rows.filter((value, index, self) =>
+      index === self.findIndex(item => normalizeEmail(item.email) === normalizeEmail(value.email) && item.password === value.password)
+    );
+  }
+
+  function getRegisteredUsers(){
+    const loaded = getAuthUsersFromSheet();
+    if (loaded.length) return loaded;
+    return [
+      { email: 'profesor@mathminds.com', password: '12345', name: 'Profesor Math' }
+    ];
+  }
+
+  function truncateEmail(email){
+    const normalized = String(email || '');
+    if (normalized.length <= 14) return normalized;
+    const atIndex = normalized.indexOf('@');
+    if (atIndex <= 0) return normalized.slice(0, 10) + '...';
+    const prefix = normalized.slice(0, Math.min(6, atIndex));
+    return `${prefix}...`;
+  }
+
+  function updateAuthUI(user){
+    if (!profileMenu || !profileToggle || !profileMenuLoggedIn || !profileMenuLoggedOut || !profileAvatar || !profileLabel) return;
+    if (user){
+      const initial = String(user.name || user.email || 'U').trim().charAt(0).toUpperCase();
+      const truncated = truncateEmail(user.email || user.name || '');
+      profileAvatar.textContent = initial;
+      profileLabel.textContent = truncated || 'Cuenta';
+      profileToggle.setAttribute('aria-label', `Cuenta de ${user.name || user.email}`);
+      profileMenuLoggedIn.classList.remove('hidden');
+      profileMenuLoggedOut.classList.add('hidden');
+      if (profileUserNameLabel) profileUserNameLabel.textContent = user.name || user.email;
+      if (profileUserEmailLabel) profileUserEmailLabel.textContent = user.email;
+    } else {
+      profileAvatar.textContent = '👤';
+      profileLabel.textContent = 'Ingresar';
+      profileToggle.setAttribute('aria-label', 'Cuenta de usuario');
+      profileMenuLoggedIn.classList.add('hidden');
+      profileMenuLoggedOut.classList.remove('hidden');
+      if (profileUserNameLabel) profileUserNameLabel.textContent = 'Nombre de usuario';
+      if (profileUserEmailLabel) profileUserEmailLabel.textContent = 'correo@mathminds.com';
+    }
+  }
+
+  function setActiveUser(user){
+    if (user){
+      window.currentUser = { email: normalizeEmail(user.email), name: user.name };
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(window.currentUser));
+    } else {
+      window.currentUser = null;
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+    updateAuthUI(user);
+  }
+
+  function restoreAuthState(){
+    try {
+      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (!raw) { setActiveUser(null); return; }
+      const stored = JSON.parse(raw);
+      if (stored && stored.email && stored.name){
+        setActiveUser(stored);
+        return;
+      }
+    } catch (err) {
+      // ignore parse errors and reset
+    }
+    setActiveUser(null);
+  }
+
+  function validateLogin(email, password){
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail || !password){
+      return { ok: false, message: 'Completa ambos campos para continuar.' };
+    }
+    if (!normalizedEmail.endsWith('@mathminds.com')){
+      return { ok: false, message: 'Usa un correo válido @mathminds.com.' };
+    }
+    const user = getRegisteredUsers().find(item => normalizeEmail(item.email) === normalizedEmail && item.password === String(password).trim());
+    if (!user){
+      return { ok: false, message: 'Usuario o contraseña incorrectos. Intenta de nuevo.' };
+    }
+    return { ok: true, user };
+  }
+
+  function closeProfileMenu(){
+    if (!profileMenu || !profileToggle) return;
+    profileMenu.classList.remove('active');
+    profileMenu.setAttribute('aria-hidden', 'true');
+    profileToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  restoreAuthState();
+
+  profileToggle?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (!profileMenu) return;
+    const isOpen = profileMenu.classList.toggle('active');
+    profileToggle.setAttribute('aria-expanded', String(isOpen));
+    profileMenu.setAttribute('aria-hidden', String(!isOpen));
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!profileMenu || !profileToggle) return;
+    const target = event.target;
+    if (profileMenu.contains(target) || target === profileToggle) return;
+    closeProfileMenu();
+  });
+
+  openLoginBtn?.addEventListener('click', () => {
+    if (!authModal) return;
+    if (authError) authError.textContent = '';
+    authForm?.reset();
+    closeProfileMenu();
+    openModal('authModal');
+  });
+
+  logoutBtn?.addEventListener('click', () => {
+    setActiveUser(null);
+    closeProfileMenu();
+    window.location.href = 'index.html';
+  });
+
+  authForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!authForm || !authError) return;
+    const email = authForm.querySelector('#authEmail')?.value || '';
+    const password = authForm.querySelector('#authPassword')?.value || '';
+    const result = validateLogin(email, password);
+    if (!result.ok){
+      authError.textContent = result.message;
+      authError.style.display = 'block';
+      return;
+    }
+    setActiveUser(result.user);
+    authError.textContent = '';
+    closeModal(authModal);
+  });
+
+  authModal?.addEventListener('click', (event) => {
+    if (event.target === authModal){
+      closeModal(authModal);
+    }
+  });
+
+  if (openLoginBtn) openLoginBtn.setAttribute('data-open', 'authModal');
+
   const HISTORY_KEY = 'mm_search_history_v1';
   const HISTORY_MAX = 8;
 
@@ -1417,17 +1597,20 @@ async function inicializarTienda() {
         // Separar por filas y eliminar las vacías
         const filas = datos.split(/\r?\n/).filter(linea => linea.trim() !== "");
         
-        // Mapeo de columnas: 0:Colegio, 1:Grado, 2:Producto, 3:Costo
+        // Mapeo de columnas: 0:Colegio, 1:Grado, 2:Producto, 3:Costo, 6:Email, 7:Contraseña
         baseDeDatos = filas.slice(1).map(fila => {
             const c = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
             return {
                 colegio: c[0]?.replace(/"/g, '').trim(),
                 grado: c[1]?.replace(/"/g, '').trim(),
                 producto: c[2]?.replace(/"/g, '').trim(),
-                costo: parseInt(c[3]?.replace(/[^0-9]/g, "")) || 0
+                costo: parseInt(c[3]?.replace(/[^0-9]/g, "")) || 0,
+                email: c[6]?.replace(/"/g, '').trim(),
+                password: c[7]?.replace(/"/g, '').trim()
             };
         }).filter(p => p.colegio && p.grado);
 
+        window.baseDeDatos = baseDeDatos;
         console.log("Carga completa. Registros:", baseDeDatos.length);
         poblarColegios();
         // Populate PRODUCTS from the loaded baseDeDatos so search works even if products.json was missing

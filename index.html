@@ -83,11 +83,41 @@
 
 </nav>
 
-        <!-- Grouped header controls (search, cart) -->
+        <!-- Grouped header controls (search, cart, user) -->
         <div class="header-controls">
           <!-- desktop search button stays, mobile will show full input -->
           <button id="searchToggle" type="button" class="search-btn" aria-label="Buscar"></button>
           <button id="cartToggle" class="cart-btn" aria-label="Carrito">🛒 <span id="cartCount" class="cart-badge">0</span></button>
+
+          <div class="profile-wrapper">
+            <button id="profileToggle" class="profile-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Cuenta de usuario">
+              <span class="profile-avatar">👤</span>
+              <span class="profile-label">Ingresar</span>
+              <span class="profile-arrow">▾</span>
+            </button>
+
+            <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
+              <div class="profile-menu-logged-out">
+                <button id="openLoginBtn" class="btn secondary profile-menu-item" type="button" role="menuitem">Iniciar sesión</button>
+              </div>
+              <div class="profile-menu-logged-in hidden">
+                <div class="profile-menu-info">
+                  <strong id="profileUserName">Nombre de usuario</strong>
+                  <small id="profileUserEmail">correo@mathminds.com</small>
+                </div>
+                <div class="profile-menu-actions">
+                  <a id="panelLink" href="mi-panel.html" class="profile-menu-link" role="menuitem">
+                    <span class="profile-menu-icon">📋</span>
+                    <span>Mi Panel</span>
+                  </a>
+                  <button id="logoutBtn" class="profile-menu-link profile-menu-logout" type="button" role="menuitem">
+                    <span class="profile-menu-icon">🚪</span>
+                    <span>Cerrar sesión</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -572,6 +602,38 @@
     </div>
   </div>
 
+  <!-- MODAL DE INICIO DE SESIÓN -->
+  <div class="modal-overlay" id="authModal" aria-hidden="true">
+    <div class="modal-box auth-modal-box" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+      <div class="auth-modal-header">
+        <img src="../Multimedia/Logo.png" alt="Math Minds" class="auth-logo" />
+        <h2 id="authModalTitle">Iniciar sesión</h2>
+        <p class="modal-subtitle">Accede con tu cuenta @mathminds.com para continuar.</p>
+      </div>
+
+      <form id="authForm" class="auth-form" novalidate>
+        <div class="form-field">
+          <label for="authEmail">Usuario</label>
+          <input id="authEmail" name="authEmail" type="email" required placeholder="usuario@mathminds.com" autocomplete="username" />
+        </div>
+
+        <div class="form-field">
+          <label for="authPassword">Contraseña</label>
+          <input id="authPassword" name="authPassword" type="password" required placeholder="Contraseña" autocomplete="current-password" />
+        </div>
+
+        <div id="authError" class="auth-error" role="alert" aria-live="assertive"></div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="chatbot.js"></script>
 </body>
 </html>
+
+
