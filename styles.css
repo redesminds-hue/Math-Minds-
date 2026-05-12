@@ -13,6 +13,13 @@ body{
   background:#fff;
 }
 
+@media screen and (min-width: 1025px) {
+  /* En escritorio, aplicar escala aproximada 90% al cargar la página */
+  body {
+    zoom: 0.9.9;
+  }
+}
+
 /* Make images responsive by default to avoid overflow on small screens */
 img{ max-width:100%; height:auto; display:block; }
 
@@ -2614,7 +2621,7 @@ img{ max-width:100%; height:auto; display:block; }
 
   /* Reducimos un poco los logos para que quepa "Material Didáctico" */
   .menu-item img {
-    max-width: 100px; 
+    max-width: 50px; 
     height: auto;
   }
 }
