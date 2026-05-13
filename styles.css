@@ -860,15 +860,15 @@ img{ max-width:100%; height:auto; display:block; }
    CAROUSEL FULL WIDTH
 ========================= */
 .carousel-section{
-  width:100vw;
-  margin-left:calc(50% - 50vw);
-  margin-right:calc(50% - 50vw);
-  height: min(720px, 60vh); /* responsive height */
+  width:112vw;
+  margin-left:calc(1% - 18vw);
+  margin-right:calc(1% - 18vw);
+  height: min(800px, 70vh); /* responsive height */
   background:#d9d9d9;
 
   border-top:2px solid var(--black);
   border-bottom:2px solid var(--black);
-  margin-top:-10px; /* smaller overlap to avoid being covered */
+  margin-top:-30px; /* smaller overlap to avoid being covered */
   position: relative;
   overflow:hidden;
 } 
