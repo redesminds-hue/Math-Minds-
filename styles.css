@@ -16,7 +16,7 @@ body{
 @media screen and (min-width: 1025px) {
   /* En escritorio, aplicar escala aproximada 90% al cargar la página */
   body {
-    zoom: 0.8;
+    zoom: 0.8.9;
   }
 }
 
