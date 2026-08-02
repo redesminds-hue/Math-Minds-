@@ -5,11 +5,153 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1fr;
+    }
+
+    .course-banner {
+      margin-top: 24px;
+      padding: 24px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #ecf8ff 0%, #ffffff 100%);
+      border: 1px solid rgba(14, 165, 233, 0.18);
+      box-shadow: 0 14px 32px rgba(14, 165, 233, 0.08);
+    }
+
+    .course-banner h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      color: #0369a1;
+      text-transform: uppercase;
+    }
+
+    .course-banner p {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .fichas-section {
+      background: #f8fbff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 28px;
+      padding: 28px;
+    }
+
+    .fichas-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 18px;
+    }
+
+    .ficha-card {
+      background: #ffffff;
+      border-radius: 24px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      padding: 24px;
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ficha-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      background: rgba(56, 189, 248, 0.16);
+      color: #0284c7;
+    }
+
+    .ficha-card h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: #0f172a;
+    }
+
+    .ficha-card p {
+      margin: 0;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .card-cta {
+      margin-top: auto;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .card-cta a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 18px;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .card-cta a:hover {
+      transform: translateY(-1px);
+      background: #2563eb;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.14);
+      color: #0369a1;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .panel-text {
+      margin: 0 0 12px;
+      color: #334155;
+      line-height: 1.7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (min-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="page-header">
     <div class="container header-container">
-     
       <div class="header-actions">
         <a href="index.html" class="btn secondary">← Volver al inicio</a>
       </div>
@@ -20,31 +162,51 @@
     <section class="panel-hero">
       <div class="panel-card">
         <img class="panel-logo" src="Multimedia/Logo.png" alt="Math Minds" />
-        <h1>Bienvenido a tu Panel</h1>
-        <p class="panel-subtitle">Accede a tu información de cuenta y a las herramientas de Inteligencia Artificial.</p>
+        <h1 id="panelTitle">Bienvenido a tu Panel</h1>
+        <p class="panel-subtitle" id="panelSubtitle">Accede a tu información de cuenta y a los recursos de Math Minds.</p>
       </div>
     </section>
 
-    <section class="panel-grid">
-      <article class="panel-card">
-        <h2>Información de la Cuenta</h2>
-        <p><strong>Nombre:</strong></p>
-        <p style="margin-bottom: 12px;"><span id="panelNameText">No has iniciado sesión</span></p>
-        <p><strong>Correo:</strong></p>
-        <p style="margin-bottom: 0;"><span id="panelEmailText">---</span></p>
-      </article>
+    <section class="dashboard-grid">
+      <div class="summary-grid">
+        <article class="panel-card">
+          <h2>Información de la Cuenta</h2>
+          <p><strong>Nombre</strong></p>
+          <p class="panel-text" id="panelNameText">No has iniciado sesión</p>
+          <p><strong>Correo electrónico</strong></p>
+          <p class="panel-text" id="panelEmailText">Por favor ingresa desde la página principal</p>
 
-      <article class="panel-card highlight-panel">
-        <h2>Inteligencia Artificial Math Minds</h2>
-        <p>Accede a nuestra nueva IA y comienza a usar herramientas avanzadas. Todas a tu alcance.</p>
-        <a class="btn primary full" href="https://chatgpt.com/g/g-681cb7e6cdc48191a4a7df05c5b66422-math-minds-class-planner" target="_blank" rel="noopener noreferrer" style="margin-top: 16px; display: inline-block;">Acceder IA Math Minds</a>
-      </article>
+          <div id="courseBlock" class="course-banner hidden">
+            <h3>Tu Curso</h3>
+            <p id="courseText">---</p>
+          </div>
+        </article>
+
+        <article class="panel-card highlight-panel">
+          <h2>Panel educativo</h2>
+          <p>Este espacio centraliza tu información y las fichas de trabajo asociadas a tu curso. Navega con seguridad y disfruta de un diseño limpio y adaptado a móviles.</p>
+          <ul class="panel-list" style="margin-top: 18px;">
+            <li>Acceso a recursos personalizados</li>
+            <li>Diseño responsivo para tu dispositivo</li>
+            <li>Filtros automáticos por curso</li>
+          </ul>
+        </article>
+      </div>
+
+      <section class="fichas-section">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+          <div>
+            <h2>Fichas de trabajo</h2>
+            <p id="fichasDescription">Aquí encontrarás las fichas disponibles según tu curso.</p>
+          </div>
+          <span class="status-pill">Buscar</span>
+        </div>
+
+        <div id="fichasMessage" class="panel-text"></div>
+        <div id="fichasGrid" class="fichas-grid"></div>
+      </section>
     </section>
   </main>
-
-  <footer class="panel-footer">
-    <p>Math Minds • Tu plataforma educativa en línea</p>
-  </footer>
 
   <script>
     const authRaw = localStorage.getItem('mathMindsLoggedUser');
@@ -58,71 +220,154 @@
 
     const nameEl = document.getElementById('panelNameText');
     const emailEl = document.getElementById('panelEmailText');
+    const titleEl = document.getElementById('panelTitle');
+    const subtitleEl = document.getElementById('panelSubtitle');
+    const courseBlock = document.getElementById('courseBlock');
+    const courseText = document.getElementById('courseText');
+    const fichasGrid = document.getElementById('fichasGrid');
+    const fichasMessage = document.getElementById('fichasMessage');
+    const fichasDescription = document.getElementById('fichasDescription');
+
+    const fichasDB = [
+      {
+        course: '1A',
+        title: 'Fichas de Aritmética 1A',
+        icon: '📘',
+        description: 'Ejercicios guiados de suma, resta y resolución paso a paso.',
+        link: '#'
+      },
+      {
+        course: '1A',
+        title: 'Fichas de Geometría 1A',
+        icon: '📐',
+        description: 'Actividades visuales para comprender perímetros y figuras básicas.',
+        link: '#'
+      },
+      {
+        course: '1A',
+        title: 'Fichas de Problemas 1A',
+        icon: '🧠',
+        description: 'Retos de razonamiento para consolidar tus habilidades matemáticas.',
+        link: '#'
+      },
+      {
+        course: '1B',
+        title: 'Fichas de Álgebra 1B',
+        icon: '🔢',
+        description: 'Ejercicios introductorios con incógnitas y ecuaciones simples.',
+        link: '#'
+      },
+      {
+        course: '2C',
+        title: 'Fichas de Estadística 2C',
+        icon: '📊',
+        description: 'Prácticas con gráficos, tablas y análisis de datos.',
+        link: '#'
+      }
+    ];
+
+    function renderFichas(course) {
+      fichasGrid.innerHTML = '';
+      const normalizedCourse = String(course || '').trim();
+
+      if (!normalizedCourse) {
+        fichasMessage.textContent = 'No hay curso asignado. Inicia sesión con un usuario que tenga curso para ver las fichas disponibles.';
+        return;
+      }
+
+      const items = fichasDB.filter(item => item.course.toLowerCase() === normalizedCourse.toLowerCase());
+      if (!items.length) {
+        fichasMessage.textContent = `No hay fichas disponibles para el curso ${normalizedCourse}.`;
+        return;
+      }
+
+      fichasMessage.textContent = '';
+      items.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'ficha-card';
+        card.innerHTML = `
+          <div class="ficha-icon">${item.icon}</div>
+          <div>
+            <h3>${item.title}</h3>
+            <p>${item.description}</p>
+          </div>
+          <div class="card-cta">
+            <a href="${item.link}">Ver ficha</a>
+          </div>
+        `;
+        fichasGrid.appendChild(card);
+      });
+    }
 
     if (user && nameEl && emailEl) {
       nameEl.textContent = user.name || 'Usuario';
       emailEl.textContent = user.email || 'Sin correo registrado';
-    } else if (nameEl && emailEl) {
-      nameEl.textContent = 'No has iniciado sesión';
-      emailEl.textContent = 'Por favor ingresa desde la página principal';
+      titleEl.textContent = 'Panel de estudiante';
+      subtitleEl.textContent = 'Descubre tu curso y accede a las fichas de trabajo diseñadas para ti.';
+
+      if (user.course) {
+        courseBlock.classList.remove('hidden');
+        courseText.textContent = user.course;
+        renderFichas(user.course);
+      } else {
+        courseBlock.classList.add('hidden');
+        renderFichas('');
+      }
+    } else {
+      if (titleEl) titleEl.textContent = 'Inicia sesión para acceder';
+      if (subtitleEl) subtitleEl.textContent = 'Debes entrar con tu cuenta para ver el panel y tus fichas de trabajo.';
+      if (nameEl) nameEl.textContent = 'No has iniciado sesión';
+      if (emailEl) emailEl.textContent = 'Por favor ingresa desde la página principal';
+      if (courseBlock) courseBlock.classList.add('hidden');
+      fichasMessage.textContent = 'No puedes ver fichas sin iniciar sesión.';
+      if (fichasGrid) fichasGrid.innerHTML = '';
     }
   </script>
+
   <footer class="footer">
     <div class="footer-slogan">
       <img src="../Multimedia/Footer.png" alt="Math Minds slogan" />
     </div>
 
-  <div class="footer-inner">
-
-    <!-- Columna 1 -->
-    <div class="footer-col footer-brand">
-      <h3>Contáctanos</h3>
-      <p>Estamos listos para ayudarte.</p>
-      <small>© Todos los derechos reservados 2026</small>
-      
-    </div>
-
-    <!-- Columna 2 -->
-    <div class="footer-col footer-links">
-      <h4>Enlaces</h4>
-      <a href="#">Inicio</a>
-      <a href="#" data-modal="modalAleks">ALEKS</a>
-      <a href="#" data-modal="modalReveal">Reveal Math</a>
-      <a href="#" data-modal="modalPrime">Prime</a>
-      <a href="#" data-modal="modalMaterial">Material Didáctico</a>
-      <a href="productos.html">Tienda</a>
-    </div>
-
-    <!-- Columna 3 -->
-    <div class="footer-col footer-contact">
-      <h4>Contacto</h4>
-
-      <div class="footer-row">
-        <img src="../Multimedia/Telefono.png" alt="Teléfono" class="footer-icon" width="20" height="20" />
-        <span>+57 302 365 3719</span>
+    <div class="footer-inner">
+      <div class="footer-col footer-brand">
+        <h3>Contáctanos</h3>
+        <p>Estamos listos para ayudarte.</p>
+        <small>© Todos los derechos reservados 2026</small>
       </div>
 
-      <div class="footer-row">
-        <span class="footer-mail">mathmindscol@gmail.com</span>
+      <div class="footer-col footer-links">
+        <h4>Enlaces</h4>
+        <a href="#">Inicio</a>
+        <a href="#" data-modal="modalAleks">ALEKS</a>
+        <a href="#" data-modal="modalReveal">Reveal Math</a>
+        <a href="#" data-modal="modalPrime">Prime</a>
+        <a href="#" data-modal="modalMaterial">Material Didáctico</a>
+        <a href="productos.html">Tienda</a>
       </div>
 
-      <div class="footer-social">
-        <a href="https://www.instagram.com/mathmindseducation?igsh=MTQ5b3NzM3hkOGo3bA==" target="_blank" rel="noopener">
-          <img src="../Multimedia/Instagram.png" alt="Instagram">
-        </a>
-
-        <a href="https://www.facebook.com/share/16kbhGUz4P/?mibextid=wwXIfr" target="_blank" rel="noopener">
-          <img src="../Multimedia/Facebook.png" alt="Facebook">
-        </a>
-
-        <a href="https://wa.me/+573023653719" target="_blank" rel="noopener">
-          <img src="../Multimedia/whatsapp.png" alt="WhatsApp">
-        </a>
+      <div class="footer-col footer-contact">
+        <h4>Contacto</h4>
+        <div class="footer-row">
+          <img src="../Multimedia/Telefono.png" alt="Teléfono" class="footer-icon" width="20" height="20" />
+          <span>+57 302 365 3719</span>
+        </div>
+        <div class="footer-row">
+          <span class="footer-mail">mathmindscol@gmail.com</span>
+        </div>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/mathmindseducation?igsh=MTQ5b3NzM3hkOGo3bA==" target="_blank" rel="noopener">
+            <img src="../Multimedia/Instagram.png" alt="Instagram">
+          </a>
+          <a href="https://www.facebook.com/share/16kbhGUz4P/?mibextid=wwXIfr" target="_blank" rel="noopener">
+            <img src="../Multimedia/Facebook.png" alt="Facebook">
+          </a>
+          <a href="https://wa.me/+573023653719" target="_blank" rel="noopener">
+            <img src="../Multimedia/whatsapp.png" alt="WhatsApp">
+          </a>
+        </div>
       </div>
     </div>
-
-  </div>
-
-</footer>
+  </footer>
 </body>
 </html>

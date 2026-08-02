@@ -68,6 +68,37 @@ function findRowByReference(sheet, reference) {
   return -1;
 }
 
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function handleLogin(sheet, payload) {
+  const email = normalizeEmail(payload.email || payload.usuario || payload.correo || payload.mail || '');
+  const password = String(payload.password || payload.contraseña || payload.pass || payload.clave || '').trim();
+
+  if (!email || !password) {
+    return jsonResponse({ ok: false, error: 'Faltan correo o contraseña.' });
+  }
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return jsonResponse({ ok: false, error: 'No hay registros disponibles.' });
+  }
+
+  const values = sheet.getRange(2, 7, lastRow - 1, 3).getValues();
+  for (let i = 0; i < values.length; i++) {
+    const rowEmail = normalizeEmail(values[i][0]);
+    const rowPassword = String(values[i][1] || '').trim();
+    const rowCourse = String(values[i][2] || '').trim();
+
+    if (rowEmail && rowEmail === email && rowPassword === password) {
+      return jsonResponse({ ok: true, email: rowEmail, course: rowCourse || null });
+    }
+  }
+
+  return jsonResponse({ ok: false, error: 'Usuario o contraseña incorrectos.' });
+}
+
 /* -------------------- ENDPOINT PRINCIPAL -------------------- */
 
 function doPost(e) {
@@ -90,6 +121,21 @@ function doPost(e) {
       .getScriptProperties()
       .getProperty('SPREADSHEET_ID');
 
+    if (!payload || typeof payload !== 'object') {
+      return jsonResponse({ ok: false, error: 'Payload inválido.' });
+    }
+
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName('Registrations') || ss.insertSheet('Registrations');
+    ensureHeaders(sheet);
+
+    const requestedAction = String(payload.action || payload.type || '').trim().toLowerCase();
+    if (requestedAction === 'login') {
+      return handleLogin(sheet, payload);
+    }
+
+    const now = new Date().toISOString();
+
     if (!SPREADSHEET_ID) {
       return jsonResponse({ ok: false, error: 'Missing SPREADSHEET_ID property' });
     }
@@ -97,6 +143,11 @@ function doPost(e) {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheet = ss.getSheetByName('Registrations') || ss.insertSheet('Registrations');
     ensureHeaders(sheet);
+
+    const requestedAction = String(payload.action || payload.type || '').trim().toLowerCase();
+    if (requestedAction === 'login') {
+      return handleLogin(sheet, payload);
+    }
 
     const now = new Date().toISOString();
 

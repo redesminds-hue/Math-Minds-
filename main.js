@@ -697,7 +697,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = String(row.password || row.contraseña || row.pass || row.clave || row['Clave'] || row['Password'] || '').trim();
       if (!email || !password) return;
       const name = String(row.nombre || row.name || row['Nombre'] || email.split('@')[0]).trim() || email;
-      rows.push({ email, password, name });
+      const course = String(row.course || row.curso || row.grado || row.grade || '').trim();
+      rows.push({ email, password, name, course });
     });
 
     return rows.filter((value, index, self) =>
@@ -747,7 +748,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setActiveUser(user){
     if (user){
-      window.currentUser = { email: normalizeEmail(user.email), name: user.name };
+      window.currentUser = { email: normalizeEmail(user.email), name: user.name, course: user.course || '' };
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(window.currentUser));
     } else {
       window.currentUser = null;
@@ -775,9 +776,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const normalizedEmail = normalizeEmail(email);
     if (!normalizedEmail || !password){
       return { ok: false, message: 'Completa ambos campos para continuar.' };
-    }
-    if (!normalizedEmail.endsWith('@mathminds.com')){
-      return { ok: false, message: 'Usa un correo válido @mathminds.com.' };
     }
     const user = getRegisteredUsers().find(item => normalizeEmail(item.email) === normalizedEmail && item.password === String(password).trim());
     if (!user){
@@ -1606,7 +1604,8 @@ async function inicializarTienda() {
                 producto: c[2]?.replace(/"/g, '').trim(),
                 costo: parseInt(c[3]?.replace(/[^0-9]/g, "")) || 0,
                 email: c[6]?.replace(/"/g, '').trim(),
-                password: c[7]?.replace(/"/g, '').trim()
+                password: c[7]?.replace(/"/g, '').trim(),
+                course: c[8]?.replace(/"/g, '').trim()
             };
         }).filter(p => p.colegio && p.grado);
 
