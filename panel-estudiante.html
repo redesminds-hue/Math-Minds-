@@ -19,10 +19,8 @@
       --primary-dark: #0369a1;
       --primary-light: #e0f2fe;
       --accent: #06b6d4;
-      --accent-purple: #8b5cf6;
       --text-main: #0f172a;
       --text-muted: #64748b;
-      --bg-light: #f8fafc;
       --card-bg: #ffffff;
       --border-color: rgba(2, 132, 199, 0.12);
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
@@ -171,7 +169,6 @@
 
     .btn-nav-logout:hover {
       background: #fca5a5;
-      color: #7f1d1d;
     }
 
     /* Main Container */
@@ -422,7 +419,7 @@
       opacity: 0.92;
     }
 
-    /* Plataformas Educativas Widget */
+    /* Plataformas Widget */
     .platform-card {
       display: flex;
       align-items: center;
@@ -468,7 +465,7 @@
       color: var(--text-muted);
     }
 
-    /* Tasks / Checklist Widget */
+    /* Checklist Widget */
     .task-item {
       display: flex;
       align-items: center;
@@ -516,7 +513,6 @@
       color: var(--text-muted);
     }
 
-    /* Modal de no autenticado */
     .auth-alert-banner {
       display: none;
       background: #fee2e2;
@@ -572,20 +568,20 @@
       <div class="hero-content">
         <div class="hero-tag">✨ Aula Digital Activa</div>
         <h1 id="heroGreeting">¡Bienvenido(a) a tu espacio de aprendizaje!</h1>
-        <p id="heroSubtitle">Aquí encontrarás todas tus fichas de trabajo, ejercicios interactivos y recursos especializados de matemáticas.</p>
+        <p id="heroSubtitle">Aquí encontrarás todas tus fichas de trabajo asignadas por tu profesor.</p>
 
         <div class="hero-stats">
           <div class="hero-stat-card">
             <span>Fichas Asignadas</span>
-            <strong id="totalFichasCount">6</strong>
+            <strong id="totalFichasCount">0</strong>
           </div>
           <div class="hero-stat-card">
-            <span>Módulos Activos</span>
-            <strong>4</strong>
+            <span>Grado / Curso</span>
+            <strong id="studentGradeText">Asignado</strong>
           </div>
           <div class="hero-stat-card">
-            <span>Progreso</span>
-            <strong>85%</strong>
+            <span>Estado</span>
+            <strong style="color: #6ee7b7;">Activo</strong>
           </div>
         </div>
       </div>
@@ -594,102 +590,29 @@
     <!-- Content Grid -->
     <div class="student-grid">
 
-      <!-- Left Column: Fichas y Material Didáctico -->
+      <!-- Left Column: Fichas asignadas dinámicamente -->
       <section>
         <div class="section-card">
           <div class="section-header">
-            <h2>📚 Fichas de Trabajo</h2>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Descarga y practica a tu propio ritmo</span>
+            <h2>📚 Fichas de Trabajo Asignadas</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Fichas aprobadas por tu profesor</span>
           </div>
 
           <!-- Filter Tabs -->
           <div class="filter-tabs" id="filterTabs">
             <button class="tab-btn active" data-filter="all">Todas</button>
-            <button class="tab-btn" data-filter="aritmetica">Aritmética</button>
-            <button class="tab-btn" data-filter="geometria">Geometría</button>
-            <button class="tab-btn" data-filter="algebra">Álgebra</button>
-            <button class="tab-btn" data-filter="problemas">Razonamiento</button>
+            <button class="tab-btn" data-filter="Aritmética">Aritmética</button>
+            <button class="tab-btn" data-filter="Geometría">Geometría</button>
+            <button class="tab-btn" data-filter="Álgebra">Álgebra</button>
+            <button class="tab-btn" data-filter="Lógica">Razonamiento</button>
+            <button class="tab-btn" data-filter="Estadística">Estadística</button>
           </div>
 
-          <!-- Grid of Fichas -->
+          <!-- Grid Dinámico de Fichas -->
           <div class="fichas-grid" id="fichasContainer">
-            <!-- Ficha 1 -->
-            <article class="ficha-card" data-category="aritmetica">
-              <div class="ficha-header">
-                <div class="ficha-icon-box">📘</div>
-                <span class="ficha-badge">Aritmética</span>
-              </div>
-              <div class="ficha-body">
-                <h3>Operaciones con Fracciones</h3>
-                <p>Guía estructurada paso a paso con el método Singapur y representaciones visuales.</p>
-              </div>
-              <a href="#" class="btn-ficha-action" onclick="alert('Abriendo ficha de Fracciones...')">📥 Ver Ficha (PDF)</a>
-            </article>
-
-            <!-- Ficha 2 -->
-            <article class="ficha-card" data-category="geometria">
-              <div class="ficha-header">
-                <div class="ficha-icon-box">📐</div>
-                <span class="ficha-badge">Geometría</span>
-              </div>
-              <div class="ficha-body">
-                <h3>Perímetros y Áreas</h3>
-                <p>Actividades prácticas para cálculo de figuras planas y ejercicios de aplicación real.</p>
-              </div>
-              <a href="#" class="btn-ficha-action" onclick="alert('Abriendo ficha de Geometría...')">📥 Ver Ficha (PDF)</a>
-            </article>
-
-            <!-- Ficha 3 -->
-            <article class="ficha-card" data-category="algebra">
-              <div class="ficha-header">
-                <div class="ficha-icon-box">🔢</div>
-                <span class="ficha-badge">Álgebra</span>
-              </div>
-              <div class="ficha-body">
-                <h3>Ecuaciones de Primer Grado</h3>
-                <p>Resolución de incógnitas con balanzas didácticas y método concreto-pictórico.</p>
-              </div>
-              <a href="#" class="btn-ficha-action" onclick="alert('Abriendo ficha de Álgebra...')">📥 Ver Ficha (PDF)</a>
-            </article>
-
-            <!-- Ficha 4 -->
-            <article class="ficha-card" data-category="problemas">
-              <div class="ficha-header">
-                <div class="ficha-icon-box">🧠</div>
-                <span class="ficha-badge">Razonamiento</span>
-              </div>
-              <div class="ficha-body">
-                <h3>Retos Lógicos y Patrones</h3>
-                <p>Secuencias numéricas, acertijos espaciales y problemas de deducción lógica.</p>
-              </div>
-              <a href="#" class="btn-ficha-action" onclick="alert('Abriendo retos lógicos...')">📥 Ver Ficha (PDF)</a>
-            </article>
-
-            <!-- Ficha 5 -->
-            <article class="ficha-card" data-category="aritmetica">
-              <div class="ficha-header">
-                <div class="ficha-icon-box">➕</div>
-                <span class="ficha-badge">Aritmética</span>
-              </div>
-              <div class="ficha-body">
-                <h3>Multiplicación y División Rápida</h3>
-                <p>Estrategias de cálculo mental aplicadas a situaciones cotidianas.</p>
-              </div>
-              <a href="#" class="btn-ficha-action" onclick="alert('Abriendo ficha de Cálculo...')">📥 Ver Ficha (PDF)</a>
-            </article>
-
-            <!-- Ficha 6 -->
-            <article class="ficha-card" data-category="problemas">
-              <div class="ficha-header">
-                <div class="ficha-icon-box">📊</div>
-                <span class="ficha-badge">Estadística</span>
-              </div>
-              <div class="ficha-body">
-                <h3>Interpretación de Gráficos</h3>
-                <p>Lectura de tablas de frecuencia, diagramas de barras y circulares.</p>
-              </div>
-              <a href="#" class="btn-ficha-action" onclick="alert('Abriendo ficha de Gráficos...')">📥 Ver Ficha (PDF)</a>
-            </article>
+            <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #64748b;">
+              ⏳ Consultando fichas asignadas a tu cuenta...
+            </div>
           </div>
         </div>
       </section>
@@ -730,30 +653,22 @@
         <!-- Tareas de la Semana -->
         <div class="section-card">
           <div class="section-header">
-            <h2>📝 Mis Tareas</h2>
+            <h2>📝 Mis Actividades</h2>
           </div>
 
           <div class="task-item">
             <div class="task-check checked" onclick="this.classList.toggle('checked')">✓</div>
             <div class="task-info">
-              <span>Ficha 1: Fracciones equivalentes</span>
-              <small style="color: #10b981;">Entregado a tiempo</small>
-            </div>
-          </div>
-
-          <div class="task-item">
-            <div class="task-check checked" onclick="this.classList.toggle('checked')">✓</div>
-            <div class="task-info">
-              <span>ALEKS: 15 temas dominados</span>
-              <small style="color: #10b981;">Meta semanal completada</small>
+              <span>ALEKS: Meta semanal completada</span>
+              <small style="color: #10b981;">100% completado</small>
             </div>
           </div>
 
           <div class="task-item">
             <div class="task-check" onclick="this.classList.toggle('checked')"></div>
             <div class="task-info">
-              <span>Ficha 3: Ecuaciones lineales</span>
-              <small style="color: #f59e0b;">Vence en 2 días</small>
+              <span>Completar ficha asignada</span>
+              <small style="color: #f59e0b;">Actividad pendiente</small>
             </div>
           </div>
         </div>
@@ -762,8 +677,10 @@
     </div>
   </main>
 
-  <!-- Script de Sesión y Comportamiento -->
+  <!-- Script de Conexión en Vivo con obtener_fichas.php -->
   <script>
+    let fichasAsignadas = [];
+
     document.addEventListener('DOMContentLoaded', () => {
       const AUTH_KEY = 'mathMindsLoggedUser';
       const rawUser = localStorage.getItem(AUTH_KEY);
@@ -781,6 +698,7 @@
       const heroGreeting = document.getElementById('heroGreeting');
       const unauthAlert = document.getElementById('unauthAlert');
       const logoutBtn = document.getElementById('logoutBtn');
+      const studentGradeText = document.getElementById('studentGradeText');
 
       if (user && user.email) {
         const nombre = user.nombre || user.name || user.email.split('@')[0];
@@ -790,14 +708,22 @@
         navAvatar.textContent = initial;
         navUserName.textContent = nombre;
         navUserEmail.textContent = email;
-        heroGreeting.textContent = `¡Hola, ${nombre}! Bienvenido(a) a tu panel.`;
+        heroGreeting.textContent = `¡Hola, ${nombre}! Bienvenido(a) a tu espacio de aprendizaje.`;
+        if (user.grado) studentGradeText.textContent = user.grado;
+
+        // Cargar fichas reales usando obtener_fichas.php
+        cargarFichasEstudiante(user);
       } else {
         unauthAlert.classList.add('show');
         navUserName.textContent = 'Invitado';
         navUserEmail.textContent = 'No autenticado';
+        document.getElementById('fichasContainer').innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
+            ⚠️ Inicia sesión para ver tus fichas asignadas.
+          </div>
+        `;
       }
 
-      // Logout handler
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem(AUTH_KEY);
         window.location.href = 'index.html';
@@ -805,26 +731,96 @@
 
       // Filter tabs handler
       const filterTabs = document.querySelectorAll('.tab-btn');
-      const fichas = document.querySelectorAll('.ficha-card');
-
       filterTabs.forEach(tab => {
         tab.addEventListener('click', () => {
           filterTabs.forEach(t => t.classList.remove('active'));
           tab.classList.add('active');
 
           const filter = tab.getAttribute('data-filter');
-
-          fichas.forEach(card => {
-            const cat = card.getAttribute('data-category');
-            if (filter === 'all' || cat === filter) {
-              card.style.display = 'flex';
-            } else {
-              card.style.display = 'none';
-            }
-          });
+          renderFichas(filter);
         });
       });
     });
+
+    async function cargarFichasEstudiante(user) {
+      const container = document.getElementById('fichasContainer');
+      const totalCount = document.getElementById('totalFichasCount');
+
+      const url = `obtener_fichas.php?rol=estudiante&usuario_id=${user.id || 0}&email=${encodeURIComponent(user.email || '')}&grado=${encodeURIComponent(user.grado || '')}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.fichas)) {
+          fichasAsignadas = data.fichas;
+          totalCount.textContent = data.fichas.length;
+          renderFichas('all');
+        } else {
+          container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
+              ${data.mensaje || 'No se pudieron cargar tus fichas.'}
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error al obtener fichas:', err);
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #64748b;">
+            ⚠️ No se pudieron obtener las fichas del servidor. Verifica que obtener_fichas.php esté activo.
+          </div>
+        `;
+      }
+    }
+
+    function getAreaIcon(area) {
+      const a = (area || '').toLowerCase();
+      if (a.includes('arit')) return '📘';
+      if (a.includes('geom')) return '📐';
+      if (a.includes('álg') || a.includes('alg')) return '🔢';
+      if (a.includes('lóg') || a.includes('log') || a.includes('razon')) return '🧠';
+      if (a.includes('est') || a.includes('prob')) return '📊';
+      return '📄';
+    }
+
+    function renderFichas(filter = 'all') {
+      const container = document.getElementById('fichasContainer');
+      container.innerHTML = '';
+
+      const filtradas = fichasAsignadas.filter(f => {
+        if (filter === 'all') return true;
+        return (f.area || '').toLowerCase().includes(filter.toLowerCase());
+      });
+
+      if (!filtradas.length) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 36px 20px; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📂</div>
+            <h3 style="color: #0f172a; margin-bottom: 4px;">No hay fichas en esta categoría</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">Tu profesor te habilitará nuevas fichas a medida que avance el curso.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtradas.forEach(f => {
+        const icon = getAreaIcon(f.area);
+        const card = document.createElement('article');
+        card.className = 'ficha-card';
+        card.innerHTML = `
+          <div class="ficha-header">
+            <div class="ficha-icon-box">${icon}</div>
+            <span class="ficha-badge">${f.area || 'Matemáticas'}</span>
+          </div>
+          <div class="ficha-body">
+            <h3>${f.titulo}</h3>
+            <p>${f.descripcion || 'Ficha práctica de matemáticas con metodología CPA.'}</p>
+          </div>
+          <a href="${f.enlace || '#'}" target="_blank" class="btn-ficha-action">📥 Abrir Ficha (PDF / Web)</a>
+        `;
+        container.appendChild(card);
+      });
+    }
   </script>
 </body>
 </html>

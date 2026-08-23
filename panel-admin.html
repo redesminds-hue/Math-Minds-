@@ -268,6 +268,7 @@
       align-items: center;
       gap: 8px;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .nav-tab-item:hover {
@@ -343,6 +344,20 @@
       background: var(--admin-accent-hover);
     }
 
+    .btn-refresh {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-refresh:hover {
+      background: #e2e8f0;
+    }
+
     /* Data Tables */
     .table-responsive {
       overflow-x: auto;
@@ -398,20 +413,40 @@
       border: 1px solid #e9d5ff;
     }
 
-    .btn-table-action {
-      padding: 6px 10px;
+    .badge-grade {
+      background: #f1f5f9;
+      color: #334155;
+      padding: 3px 8px;
       border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .btn-table-action {
+      padding: 6px 12px;
+      border-radius: 8px;
       border: 1px solid #cbd5e1;
       background: #ffffff;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      margin-right: 4px;
     }
 
     .btn-table-action:hover {
       background: #f1f5f9;
       border-color: #94a3b8;
+    }
+
+    .btn-table-action.assign {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #bae6fd;
+    }
+
+    .btn-table-action.assign:hover {
+      background: #bae6fd;
     }
 
     .btn-table-action.delete {
@@ -443,11 +478,13 @@
     .admin-modal-content {
       background: #ffffff;
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       border-radius: 20px;
       padding: 28px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
       animation: modalSlide 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     @keyframes modalSlide {
@@ -479,6 +516,28 @@
 
     .modal-form-input:focus {
       border-color: var(--admin-accent);
+    }
+
+    .checkbox-list-container {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #f8fafc;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.88rem;
+    }
+
+    .checkbox-item:last-child {
+      border-bottom: none;
     }
 
     .modal-actions-footer {
@@ -516,7 +575,7 @@
     <div class="admin-header-box">
       <div class="admin-header-title">
         <h1>📊 Panel de Control General</h1>
-        <p>Supervisa los usuarios registrados en MySQL, gestiona las fichas de trabajo y los recursos de MATH Minds.</p>
+        <p>Administra usuarios reales de MySQL, asigna fichas con acceso personalizado y crea nuevo material educativo.</p>
       </div>
       <div class="db-status-pill">
         <span>🟢 Base de datos MySQL: <strong>mathmind_fichasdb</strong></span>
@@ -528,8 +587,8 @@
       <div class="stat-card">
         <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">👥</div>
         <div class="stat-info">
-          <span>Total Usuarios</span>
-          <strong id="statUsersCount">24</strong>
+          <span>Total Usuarios Reales</span>
+          <strong id="statUsersCount">0</strong>
         </div>
       </div>
 
@@ -537,7 +596,7 @@
         <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">🎓</div>
         <div class="stat-info">
           <span>Estudiantes</span>
-          <strong id="statStudentsCount">22</strong>
+          <strong id="statStudentsCount">0</strong>
         </div>
       </div>
 
@@ -545,108 +604,34 @@
         <div class="stat-icon" style="background: #d1fae5; color: #059669;">📚</div>
         <div class="stat-info">
           <span>Fichas Publicadas</span>
-          <strong id="statFichasCount">18</strong>
+          <strong id="statFichasCount">0</strong>
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-icon" style="background: #fef3c7; color: #d97706;">🏫</div>
         <div class="stat-info">
-          <span>Colegios Vinculados</span>
-          <strong>6</strong>
+          <span>Plataforma</span>
+          <strong>MATH Minds</strong>
         </div>
       </div>
     </div>
 
     <!-- Nav Tabs -->
     <div class="admin-nav-tabs">
-      <button class="nav-tab-item active" onclick="switchTab('tab-fichas', this)">📚 Gestión de Fichas</button>
-      <button class="nav-tab-item" onclick="switchTab('tab-usuarios', this)">👥 Gestión de Usuarios</button>
-      <button class="nav-tab-item" onclick="switchTab('tab-servidor', this)">⚙️ Estado del Servidor & DB</button>
+      <button class="nav-tab-item active" onclick="switchTab('tab-usuarios', this)">👥 Usuarios Reales & Asignación de Fichas</button>
+      <button class="nav-tab-item" onclick="switchTab('tab-fichas', this)">📚 Fichas de Trabajo en Base de Datos</button>
+      <button class="nav-tab-item" onclick="switchTab('tab-servidor', this)">⚙️ Monitor MySQL</button>
     </div>
 
-    <!-- Tab 1: Fichas -->
-    <section id="tab-fichas" class="tab-content-panel">
+    <!-- Tab 1: Usuarios Reales -->
+    <section id="tab-usuarios" class="tab-content-panel">
       <div class="admin-card">
         <div class="admin-card-header">
-          <h2>Fichas de Trabajo Disponibles</h2>
+          <h2>Usuarios Registrados en MySQL (Tabla `usuarios`)</h2>
           <div class="admin-actions-bar">
-            <input type="text" id="searchFichasInput" class="search-input-box" placeholder="Buscar ficha..." onkeyup="filterFichasTable()" />
-            <button class="btn-primary-admin" onclick="openFichaModal()">➕ Nueva Ficha</button>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table class="admin-table" id="fichasTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Título de la Ficha</th>
-                <th>Área / Tema</th>
-                <th>Grado / Curso</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>#F01</strong></td>
-                <td>Operaciones con Fracciones</td>
-                <td><span class="role-badge role-admin">Aritmética</span></td>
-                <td>6to a 8vo</td>
-                <td>2026-08-15</td>
-                <td>
-                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
-                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>#F02</strong></td>
-                <td>Perímetros y Áreas de Polígonos</td>
-                <td><span class="role-badge role-admin">Geometría</span></td>
-                <td>7mo a 9no</td>
-                <td>2026-08-18</td>
-                <td>
-                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
-                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>#F03</strong></td>
-                <td>Ecuaciones Lineales y Balanzas</td>
-                <td><span class="role-badge role-admin">Álgebra</span></td>
-                <td>8vo a 10mo</td>
-                <td>2026-08-20</td>
-                <td>
-                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
-                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>#F04</strong></td>
-                <td>Razonamiento y Patrones Numéricos</td>
-                <td><span class="role-badge role-admin">Lógica</span></td>
-                <td>Todos los grados</td>
-                <td>2026-08-22</td>
-                <td>
-                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
-                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab 2: Usuarios -->
-    <section id="tab-usuarios" class="tab-content-panel" style="display: none;">
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h2>Lista de Usuarios (MySQL - Tabla `usuarios`)</h2>
-          <div class="admin-actions-bar">
-            <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar por nombre o correo..." onkeyup="filterUsersTable()" />
-            <button class="btn-primary-admin" onclick="openUserModal()">➕ Registrar Usuario</button>
+            <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar usuario..." onkeyup="filterUsersTable()" />
+            <button class="btn-refresh" onclick="cargarUsuariosReales()">🔄 Actualizar</button>
           </div>
         </div>
 
@@ -658,30 +643,15 @@
                 <th>Nombre</th>
                 <th>Correo Electrónico</th>
                 <th>Rol</th>
-                <th>Estado</th>
+                <th>Grado / Curso</th>
+                <th>Fichas con Acceso</th>
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="usersTableBody">
               <tr>
-                <td><strong>1</strong></td>
-                <td>Administrador Math</td>
-                <td>admin@mathminds.com</td>
-                <td><span class="role-badge role-admin">Admin</span></td>
-                <td><span style="color: #059669; font-weight: 700;">● Activo</span></td>
-                <td>
-                  <button class="btn-table-action" onclick="alert('Editar permisos...')">✏️ Editar</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>2</strong></td>
-                <td>Estudiante Demo</td>
-                <td>estudiante@mathminds.com</td>
-                <td><span class="role-badge role-estudiante">Estudiante</span></td>
-                <td><span style="color: #059669; font-weight: 700;">● Activo</span></td>
-                <td>
-                  <button class="btn-table-action" onclick="alert('Editar usuario...')">✏️ Editar</button>
-                  <button class="btn-table-action delete" onclick="confirmDeleteUser(this)">🗑️ Eliminar</button>
+                <td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">
+                  ⏳ Cargando usuarios desde la base de datos...
                 </td>
               </tr>
             </tbody>
@@ -690,40 +660,114 @@
       </div>
     </section>
 
-    <!-- Tab 3: Servidor -->
+    <!-- Tab 2: Fichas -->
+    <section id="tab-fichas" class="tab-content-panel" style="display: none;">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Fichas de Trabajo en la Base de Datos</h2>
+          <div class="admin-actions-bar">
+            <input type="text" id="searchFichasInput" class="search-input-box" placeholder="Buscar ficha..." onkeyup="filterFichasTable()" />
+            <button class="btn-primary-admin" onclick="openFichaModal()">➕ Nueva Ficha</button>
+            <button class="btn-refresh" onclick="cargarFichasAdmin()">🔄 Actualizar</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table" id="fichasTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Título de la Ficha</th>
+                <th>Área / Tema</th>
+                <th>Grados Asignables</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="fichasTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">
+                  ⏳ Cargando fichas desde la base de datos...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Monitor -->
     <section id="tab-servidor" class="tab-content-panel" style="display: none;">
       <div class="admin-card">
         <div class="admin-card-header">
-          <h2>Configuración del Servidor y Base de Datos</h2>
+          <h2>Monitor de la Base de Datos y Endpoints</h2>
         </div>
 
-        <div style="display: grid; gap: 16px;">
+        <div style="display: grid; gap: 14px;">
           <p><strong>Base de Datos MySQL:</strong> <code>mathmind_fichasdb</code></p>
-          <p><strong>Usuario de Base de Datos:</strong> <code>mathmind_adminfichas</code></p>
-          <p><strong>Endpoints Activos:</strong></p>
+          <p><strong>Endpoints Activos en cPanel:</strong></p>
           <ul style="padding-left: 20px; color: var(--admin-text-muted); line-height: 1.8;">
-            <li><code>login.php</code>: Validación asíncrona de credenciales con JSON y PDO.</li>
-            <li><code>conexion.php</code>: Módulo PDO con soporte UTF-8 y manejo de errores.</li>
+            <li><code>obtener_usuarios.php</code>: Consulta usuarios reales de la tabla <code>usuarios</code>.</li>
+            <li><code>guardar_usuario_permisos.php</code>: Guarda qué fichas específicas y grado puede ver cada estudiante.</li>
+            <li><code>obtener_fichas.php</code>: Devuelve fichas según permisos y rol.</li>
+            <li><code>guardar_ficha.php</code> / <code>eliminar_ficha.php</code>: Gestión de fichas en MySQL.</li>
           </ul>
 
-          <div style="margin-top: 14px;">
-            <button class="btn-primary-admin" onclick="testServerConnection()">⚡ Probar Conexión con login.php</button>
+          <div style="margin-top: 10px;">
+            <button class="btn-primary-admin" onclick="testServerConnection()">⚡ Probar Conexión con login.php y obtener_usuarios.php</button>
           </div>
-          <div id="testResultBox" style="display: none; padding: 14px; border-radius: 10px; margin-top: 10px; font-family: monospace;"></div>
+          <pre id="testResultBox" style="display: none; padding: 14px; border-radius: 10px; margin-top: 10px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.85rem; overflow-x: auto;"></pre>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- Modal para Agregar Ficha -->
+  <!-- Modal para Asignar Fichas a un Usuario -->
+  <div class="admin-modal-overlay" id="permisosModal">
+    <div class="admin-modal-content">
+      <h3 style="margin-bottom: 8px;">🎯 Asignar Fichas y Grado a Estudiante</h3>
+      <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;" id="modalUserSubtitle">Selecciona a qué fichas tendrá acceso este usuario en su panel.</p>
+
+      <form id="permisosForm" onsubmit="guardarPermisosUsuario(event)">
+        <input type="hidden" id="modalUserId" />
+
+        <div class="modal-form-group">
+          <label for="modalUserGrado">Grado / Curso Asignado</label>
+          <input type="text" id="modalUserGrado" class="modal-form-input" placeholder="Ej: 6to, 7mo, 8vo o Todos" required />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="modalUserRol">Rol del Usuario</label>
+          <select id="modalUserRol" class="modal-form-input">
+            <option value="estudiante">Estudiante</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+
+        <div class="modal-form-group">
+          <label>Seleccionar Fichas con Acceso:</label>
+          <div class="checkbox-list-container" id="modalFichasChecklist">
+            <!-- Checkboxes generados dinámicamente -->
+          </div>
+        </div>
+
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-table-action" onclick="closePermisosModal()">Cancelar</button>
+          <button type="submit" class="btn-primary-admin" id="btnSavePermisos">💾 Guardar Permisos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Nueva Ficha -->
   <div class="admin-modal-overlay" id="fichaModal">
     <div class="admin-modal-content">
-      <h3 style="margin-bottom: 18px;">➕ Publicar Nueva Ficha</h3>
-      <form id="addFichaForm" onsubmit="saveNewFicha(event)">
+      <h3 style="margin-bottom: 18px;">➕ Publicar Nueva Ficha en MySQL</h3>
+      <form id="addFichaForm" onsubmit="crearNuevaFicha(event)">
         <div class="modal-form-group">
           <label for="fichaTitleInput">Título de la Ficha</label>
-          <input type="text" id="fichaTitleInput" class="modal-form-input" required placeholder="Ej: Ficha de Geometría Espacial" />
+          <input type="text" id="fichaTitleInput" class="modal-form-input" required placeholder="Ej: Ficha de Operaciones con Fracciones" />
         </div>
 
         <div class="modal-form-group">
@@ -739,19 +783,32 @@
 
         <div class="modal-form-group">
           <label for="fichaGradeInput">Grados Recomendados</label>
-          <input type="text" id="fichaGradeInput" class="modal-form-input" required placeholder="Ej: 6to a 9no" />
+          <input type="text" id="fichaGradeInput" class="modal-form-input" required placeholder="Ej: 6to a 8vo o Todos" />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="fichaDescInput">Descripción de la Actividad</label>
+          <input type="text" id="fichaDescInput" class="modal-form-input" placeholder="Ej: Guía estructurada con metodología Singapur CPA" />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="fichaLinkInput">Enlace / Archivo de la Ficha (URL o PDF)</label>
+          <input type="text" id="fichaLinkInput" class="modal-form-input" placeholder="Ej: documentos/ficha1.pdf o #" value="#" />
         </div>
 
         <div class="modal-actions-footer">
           <button type="button" class="btn-table-action" onclick="closeFichaModal()">Cancelar</button>
-          <button type="submit" class="btn-primary-admin">Guardar Ficha</button>
+          <button type="submit" class="btn-primary-admin" id="btnCreateFicha">Guardar en Base de Datos</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Script de Control -->
+  <!-- JavaScript de Gestión en Tiempo Real -->
   <script>
+    let globalUsuarios = [];
+    let globalFichas = [];
+
     document.addEventListener('DOMContentLoaded', () => {
       const AUTH_KEY = 'mathMindsLoggedUser';
       const rawUser = localStorage.getItem(AUTH_KEY);
@@ -767,24 +824,268 @@
       const logoutBtn = document.getElementById('adminLogoutBtn');
 
       if (user && user.email) {
-        const nombre = user.nombre || user.name || user.email;
-        adminNameDisplay.textContent = nombre;
-
-        // Comprobación de rol
+        adminNameDisplay.textContent = user.nombre || user.name || user.email;
         if (user.rol && user.rol.toLowerCase() !== 'admin') {
-          alert('Tu usuario no tiene permisos de administrador. Redirigiendo a tu panel de estudiante...');
+          alert('Tu cuenta no tiene permisos de administrador. Redirigiendo...');
           window.location.href = 'panel-estudiante.html';
+          return;
         }
-      } else {
-        alert('Debes iniciar sesión como administrador para acceder a este panel.');
-        window.location.href = 'index.html';
       }
 
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem(AUTH_KEY);
         window.location.href = 'index.html';
       });
+
+      // Cargar datos iniciales
+      cargarFichasAdmin();
+      cargarUsuariosReales();
     });
+
+    // 1. Cargar Usuarios Reales desde MySQL
+    async function cargarUsuariosReales() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">⏳ Consultando usuarios en MySQL...</td></tr>';
+
+      try {
+        const res = await fetch('obtener_usuarios.php');
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.usuarios)) {
+          globalUsuarios = data.usuarios;
+          document.getElementById('statUsersCount').textContent = data.usuarios.length;
+          const students = data.usuarios.filter(u => String(u.rol).toLowerCase() === 'estudiante').length;
+          document.getElementById('statStudentsCount').textContent = students;
+
+          renderUsuariosTable(data.usuarios);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">❌ ${data.mensaje || 'No se pudieron cargar los usuarios.'}</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">❌ Error de conexión al consultar obtener_usuarios.php</td></tr>`;
+      }
+    }
+
+    function renderUsuariosTable(usuarios) {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '';
+
+      if (!usuarios.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">No hay usuarios registrados.</td></tr>';
+        return;
+      }
+
+      usuarios.forEach(user => {
+        const tr = document.createElement('tr');
+        const rolClass = String(user.rol).toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
+        const countFichas = user.fichas_acceso ? user.fichas_acceso.split(',').filter(Boolean).length : (user.grado && user.grado !== 'Sin grado' ? 'Por Grado' : 'Todas');
+
+        tr.innerHTML = `
+          <td><strong>#${user.id}</strong></td>
+          <td><strong>${user.nombre}</strong></td>
+          <td>${user.email}</td>
+          <td><span class="role-badge ${rolClass}">${user.rol}</span></td>
+          <td><span class="badge-grade">${user.grado || 'Sin grado'}</span></td>
+          <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">📁 ${countFichas}</span></td>
+          <td>
+            <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">🎯 Asignar Fichas</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 2. Cargar Fichas Reales desde MySQL
+    async function cargarFichasAdmin() {
+      const tbody = document.getElementById('fichasTableBody');
+      try {
+        const res = await fetch('obtener_fichas.php?rol=admin');
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.fichas)) {
+          globalFichas = data.fichas;
+          document.getElementById('statFichasCount').textContent = data.fichas.length;
+          renderFichasTable(data.fichas);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:#ef4444; text-align:center;">${data.mensaje || 'Error al cargar fichas.'}</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderFichasTable(fichas) {
+      const tbody = document.getElementById('fichasTableBody');
+      tbody.innerHTML = '';
+
+      if (!fichas.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No hay fichas registradas aún. Haz clic en "+ Nueva Ficha" para agregar una.</td></tr>';
+        return;
+      }
+
+      fichas.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>#F0${f.id}</strong></td>
+          <td><strong>${f.titulo}</strong></td>
+          <td><span class="role-badge role-admin">${f.area || 'Aritmética'}</span></td>
+          <td><span class="badge-grade">${f.grado || 'Todos'}</span></td>
+          <td style="font-size:0.85rem; color:#64748b; max-width:280px;">${f.descripcion || 'Sin descripción'}</td>
+          <td>
+            <button class="btn-table-action delete" onclick="eliminarFicha(${f.id}, '${f.titulo}')">🗑️ Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 3. Asignar Fichas y Grado a un Usuario (Modal)
+    function openPermisosModal(userId) {
+      const user = globalUsuarios.find(u => Number(u.id) === Number(userId));
+      if (!user) return;
+
+      document.getElementById('modalUserId').value = user.id;
+      document.getElementById('modalUserSubtitle').textContent = `Configurando acceso para: ${user.nombre} (${user.email})`;
+      document.getElementById('modalUserGrado').value = user.grado === 'Sin grado' ? '' : (user.grado || '');
+      document.getElementById('modalUserRol').value = String(user.rol).toLowerCase();
+
+      const userFichasAcceso = user.fichas_acceso ? user.fichas_acceso.split(',').map(s => s.trim()) : [];
+
+      const checklistContainer = document.getElementById('modalFichasChecklist');
+      checklistContainer.innerHTML = '';
+
+      if (!globalFichas.length) {
+        checklistContainer.innerHTML = '<p style="font-size:0.85rem; color:#64748b;">No hay fichas creadas aún.</p>';
+      } else {
+        globalFichas.forEach(f => {
+          const isChecked = userFichasAcceso.includes(String(f.id));
+          const div = document.createElement('div');
+          div.className = 'checkbox-item';
+          div.innerHTML = `
+            <input type="checkbox" id="check_ficha_${f.id}" value="${f.id}" ${isChecked ? 'checked' : ''} />
+            <label for="check_ficha_${f.id}" style="cursor:pointer; flex:1;">
+              <strong>#F0${f.id} - ${f.titulo}</strong> <small style="color:#64748b;">(${f.area} | ${f.grado})</small>
+            </label>
+          `;
+          checklistContainer.appendChild(div);
+        });
+      }
+
+      document.getElementById('permisosModal').classList.add('active');
+    }
+
+    function closePermisosModal() {
+      document.getElementById('permisosModal').classList.remove('active');
+    }
+
+    async function guardarPermisosUsuario(e) {
+      e.preventDefault();
+      const userId = document.getElementById('modalUserId').value;
+      const grado = document.getElementById('modalUserGrado').value.trim();
+      const rol = document.getElementById('modalUserRol').value;
+
+      // Obtener IDs de fichas seleccionadas
+      const checkboxes = document.querySelectorAll('#modalFichasChecklist input[type="checkbox"]:checked');
+      const fichasIds = Array.from(checkboxes).map(cb => cb.value).join(',');
+
+      const btn = document.getElementById('btnSavePermisos');
+      btn.disabled = true;
+      btn.textContent = 'Guardando en MySQL...';
+
+      try {
+        const res = await fetch('guardar_usuario_permisos.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            usuario_id: userId,
+            grado: grado,
+            fichas_acceso: fichasIds,
+            rol: rol
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.mensaje);
+          closePermisosModal();
+          cargarUsuariosReales();
+        } else {
+          alert('❌ ' + (data.mensaje || 'Error al guardar permisos'));
+        }
+      } catch (err) {
+        alert('Error de conexión al guardar permisos');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Guardar Permisos';
+      }
+    }
+
+    // 4. Crear Nueva Ficha
+    function openFichaModal() {
+      document.getElementById('fichaModal').classList.add('active');
+    }
+
+    function closeFichaModal() {
+      document.getElementById('fichaModal').classList.remove('active');
+    }
+
+    async function crearNuevaFicha(e) {
+      e.preventDefault();
+      const titulo = document.getElementById('fichaTitleInput').value.trim();
+      const area = document.getElementById('fichaAreaInput').value;
+      const grado = document.getElementById('fichaGradeInput').value.trim();
+      const descripcion = document.getElementById('fichaDescInput').value.trim();
+      const enlace = document.getElementById('fichaLinkInput').value.trim();
+
+      const btn = document.getElementById('btnCreateFicha');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      try {
+        const res = await fetch('guardar_ficha.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo, area, grado, descripcion, enlace })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.mensaje);
+          closeFichaModal();
+          document.getElementById('addFichaForm').reset();
+          cargarFichasAdmin();
+        } else {
+          alert('❌ ' + data.mensaje);
+        }
+      } catch (err) {
+        alert('Error de red al guardar la ficha');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Guardar en Base de Datos';
+      }
+    }
+
+    async function eliminarFicha(id, titulo) {
+      if (!confirm(`¿Estás seguro de que deseas eliminar la ficha "${titulo}" de la base de datos?`)) return;
+
+      try {
+        const res = await fetch('eliminar_ficha.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Ficha eliminada.');
+          cargarFichasAdmin();
+        } else {
+          alert('Error: ' + data.mensaje);
+        }
+      } catch (err) {
+        alert('Error al eliminar ficha');
+      }
+    }
 
     // Pestañas
     function switchTab(tabId, tabBtn) {
@@ -796,119 +1097,38 @@
       if (tabBtn) tabBtn.classList.add('active');
     }
 
-    // Filtros de tablas
-    function filterFichasTable() {
-      const query = document.getElementById('searchFichasInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#fichasTable tbody tr');
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
-      });
-    }
-
+    // Filtros de búsqueda
     function filterUsersTable() {
       const query = document.getElementById('searchUserInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#usersTable tbody tr');
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
-      });
+      const filtered = globalUsuarios.filter(u => 
+        (u.nombre && u.nombre.toLowerCase().includes(query)) ||
+        (u.email && u.email.toLowerCase().includes(query)) ||
+        (u.grado && u.grado.toLowerCase().includes(query))
+      );
+      renderUsuariosTable(filtered);
     }
 
-    // Modales y Acciones
-    function openFichaModal() {
-      document.getElementById('fichaModal').classList.add('active');
-    }
-
-    function closeFichaModal() {
-      document.getElementById('fichaModal').classList.remove('active');
-    }
-
-    function saveNewFicha(e) {
-      e.preventDefault();
-      const title = document.getElementById('fichaTitleInput').value.trim();
-      const area = document.getElementById('fichaAreaInput').value;
-      const grade = document.getElementById('fichaGradeInput').value.trim();
-
-      const tbody = document.querySelector('#fichasTable tbody');
-      const newRow = document.createElement('tr');
-      const id = '#F0' + (tbody.children.length + 1);
-      const date = new Date().toISOString().split('T')[0];
-
-      newRow.innerHTML = `
-        <td><strong>${id}</strong></td>
-        <td>${title}</td>
-        <td><span class="role-badge role-admin">${area}</span></td>
-        <td>${grade}</td>
-        <td>${date}</td>
-        <td>
-          <button class="btn-table-action" onclick="alert('Descargando...')">📥 Ver</button>
-          <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
-        </td>
-      `;
-
-      tbody.appendChild(newRow);
-      closeFichaModal();
-      document.getElementById('addFichaForm').reset();
-      alert(`¡Ficha "${title}" publicada correctamente!`);
-    }
-
-    function confirmDeleteFicha(btn) {
-      if (confirm('¿Estás seguro de que deseas eliminar esta ficha?')) {
-        btn.closest('tr').remove();
-      }
-    }
-
-    function confirmDeleteUser(btn) {
-      if (confirm('¿Estás seguro de eliminar este usuario?')) {
-        btn.closest('tr').remove();
-      }
-    }
-
-    function openUserModal() {
-      const name = prompt('Nombre completo del usuario:');
-      if (!name) return;
-      const email = prompt('Correo electrónico:');
-      if (!email) return;
-      const rol = prompt('Rol (admin o estudiante):', 'estudiante');
-
-      const tbody = document.querySelector('#usersTable tbody');
-      const newRow = document.createElement('tr');
-      const id = tbody.children.length + 1;
-      const rolClass = rol.toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
-
-      newRow.innerHTML = `
-        <td><strong>${id}</strong></td>
-        <td>${name}</td>
-        <td>${email}</td>
-        <td><span class="role-badge ${rolClass}">${rol}</span></td>
-        <td><span style="color: #059669; font-weight: 700;">● Activo</span></td>
-        <td>
-          <button class="btn-table-action" onclick="alert('Editar usuario...')">✏️ Editar</button>
-          <button class="btn-table-action delete" onclick="confirmDeleteUser(this)">🗑️ Eliminar</button>
-        </td>
-      `;
-      tbody.appendChild(newRow);
-      alert('Usuario agregado a la vista.');
+    function filterFichasTable() {
+      const query = document.getElementById('searchFichasInput').value.toLowerCase();
+      const filtered = globalFichas.filter(f => 
+        (f.titulo && f.titulo.toLowerCase().includes(query)) ||
+        (f.area && f.area.toLowerCase().includes(query)) ||
+        (f.grado && f.grado.toLowerCase().includes(query))
+      );
+      renderFichasTable(filtered);
     }
 
     async function testServerConnection() {
       const box = document.getElementById('testResultBox');
       box.style.display = 'block';
-      box.style.background = '#f1f5f9';
-      box.style.color = '#0f172a';
-      box.textContent = 'Enviando petición de diagnóstico a login.php...';
+      box.textContent = 'Enviando petición a obtener_usuarios.php y login.php...';
 
       try {
-        const res = await fetch('login.php');
-        const text = await res.text();
-        box.style.background = '#d1fae5';
-        box.style.color = '#065f46';
-        box.textContent = 'Respuesta del servidor:\n' + text;
+        const resUsers = await fetch('obtener_usuarios.php');
+        const textUsers = await resUsers.text();
+        box.textContent = 'Respuesta de obtener_usuarios.php:\n' + textUsers;
       } catch (err) {
-        box.style.background = '#fee2e2';
-        box.style.color = '#991b1b';
-        box.textContent = 'Error al conectar: ' + err.message;
+        box.textContent = 'Error: ' + err.message;
       }
     }
   </script>
