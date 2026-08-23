@@ -1,5 +1,5 @@
 <?php
-// obtener_usuarios.php - Obtener lista de usuarios reales de la base de datos MySQL
+// obtener_usuarios.php - Obtener lista de usuarios y sus fichas desde permisos_fichas
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
@@ -17,33 +17,36 @@ try {
     require_once 'conexion.php';
 
     if (!isset($conexion)) {
-        if (isset($pdo)) $conexion = $pdo;
-        elseif (isset($conn)) $conexion = $conn;
-        elseif (isset($db)) $conexion = $db;
+        if (isset($pdo))
+            $conexion = $pdo;
+        elseif (isset($conn))
+            $conexion = $conn;
+        elseif (isset($db))
+            $conexion = $db;
     }
 
-    // Asegurar que existan las columnas de grado y fichas_acceso en usuarios
+    // Asegurar que exista la columna grado en la tabla usuarios
     try {
         $conexion->exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS grado VARCHAR(100) DEFAULT 'Todos'");
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+    }
 
-    try {
-        $conexion->exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS fichas_acceso VARCHAR(255) DEFAULT ''");
-    } catch (Exception $e) {}
+    // Consultamos los usuarios y unimos las fichas asignadas desde la tabla relacional permisos_fichas
+    // Usamos GROUP_CONCAT para traer todas las fichas separadas por comas (ej: "2,5")
+    $sql = "SELECT u.id, u.nombre, u.email, u.rol, 
+                   COALESCE(u.grado, 'Sin grado') AS grado, 
+                   COALESCE(GROUP_CONCAT(p.ficha_id SEPARATOR ','), '') AS fichas_acceso 
+            FROM usuarios u
+            LEFT JOIN permisos_fichas p ON u.id = p.usuario_id
+            GROUP BY u.id, u.nombre, u.email, u.rol, u.grado
+            ORDER BY u.id ASC";
 
-    // Consultar todos los usuarios reales registrados (sin devolver el password)
-    $sql = "SELECT id, nombre, email, rol, 
-                   COALESCE(grado, 'Sin grado') AS grado, 
-                   COALESCE(fichas_acceso, '') AS fichas_acceso 
-            FROM usuarios 
-            ORDER BY id ASC";
-            
     $stmt = $conexion->query($sql);
     $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
-        "success"  => true,
-        "total"    => count($usuarios),
+        "success" => true,
+        "total" => count($usuarios),
         "usuarios" => $usuarios
     ], JSON_UNESCAPED_UNICODE);
 

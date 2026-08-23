@@ -764,14 +764,19 @@
   <div class="admin-modal-overlay" id="fichaModal">
     <div class="admin-modal-content">
       <h3 style="margin-bottom: 18px;">➕ Publicar Nueva Ficha en MySQL</h3>
-      <form id="addFichaForm" onsubmit="crearNuevaFicha(event)">
+      <form id="addFichaForm">
         <div class="modal-form-group">
           <label for="fichaTitleInput">Título de la Ficha</label>
           <input type="text" id="fichaTitleInput" class="modal-form-input" required placeholder="Ej: Ficha de Operaciones con Fracciones" />
         </div>
 
         <div class="modal-form-group">
-          <label for="fichaAreaInput">Área Temática</label>
+          <label for="fichaGradeInput">Grados Recomendados</label>
+          <input type="text" id="fichaGradeInput" class="modal-form-input" required placeholder="Ej: 6to, 7mo, 8vo o Todos" value="Todos" />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="fichaAreaInput">Área Temática (Opcional)</label>
           <select id="fichaAreaInput" class="modal-form-input">
             <option value="Aritmética">Aritmética</option>
             <option value="Geometría">Geometría</option>
@@ -782,23 +787,18 @@
         </div>
 
         <div class="modal-form-group">
-          <label for="fichaGradeInput">Grados Recomendados</label>
-          <input type="text" id="fichaGradeInput" class="modal-form-input" required placeholder="Ej: 6to a 8vo o Todos" />
-        </div>
-
-        <div class="modal-form-group">
           <label for="fichaDescInput">Descripción de la Actividad</label>
           <input type="text" id="fichaDescInput" class="modal-form-input" placeholder="Ej: Guía estructurada con metodología Singapur CPA" />
         </div>
 
         <div class="modal-form-group">
-          <label for="fichaLinkInput">Enlace / Archivo de la Ficha (URL o PDF)</label>
-          <input type="text" id="fichaLinkInput" class="modal-form-input" placeholder="Ej: documentos/ficha1.pdf o #" value="#" />
+          <label for="fichaRutaInput">Ruta o Enlace del Archivo (PDF o URL)</label>
+          <input type="text" id="fichaRutaInput" class="modal-form-input" placeholder="Ej: documentos/ficha1.pdf o https://..." value="#" />
         </div>
 
         <div class="modal-actions-footer">
           <button type="button" class="btn-table-action" onclick="closeFichaModal()">Cancelar</button>
-          <button type="submit" class="btn-primary-admin" id="btnCreateFicha">Guardar en Base de Datos</button>
+          <button type="submit" class="btn-primary-admin" id="btnCreateFicha">💾 Guardar en Base de Datos</button>
         </div>
       </form>
     </div>
@@ -1031,40 +1031,92 @@
     }
 
     async function crearNuevaFicha(e) {
-      e.preventDefault();
-      const titulo = document.getElementById('fichaTitleInput').value.trim();
-      const area = document.getElementById('fichaAreaInput').value;
-      const grado = document.getElementById('fichaGradeInput').value.trim();
-      const descripcion = document.getElementById('fichaDescInput').value.trim();
-      const enlace = document.getElementById('fichaLinkInput').value.trim();
+      if (e) e.preventDefault();
+
+      const titulo = document.getElementById('fichaTitleInput')?.value.trim() || '';
+      const grado = document.getElementById('fichaGradeInput')?.value.trim() || 'Todos';
+      const area = document.getElementById('fichaAreaInput')?.value || 'Aritmética';
+      const descripcion = document.getElementById('fichaDescInput')?.value.trim() || '';
+      const ruta_archivo = (document.getElementById('fichaRutaInput')?.value || document.getElementById('fichaLinkInput')?.value || '#').trim();
+
+      if (!titulo) {
+        alert('Por favor ingresa el título de la ficha.');
+        return;
+      }
 
       const btn = document.getElementById('btnCreateFicha');
-      btn.disabled = true;
-      btn.textContent = 'Guardando...';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Guardando en MySQL...';
+      }
+
+      console.group('📄 [Admin] Creando Ficha en MySQL');
+      console.log('📤 Enviando datos a guardar_ficha.php:', {
+        titulo: titulo,
+        grado: grado,
+        descripcion: descripcion,
+        ruta_archivo: ruta_archivo,
+        area: area
+      });
 
       try {
         const res = await fetch('guardar_ficha.php', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ titulo, area, grado, descripcion, enlace })
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            titulo: titulo,
+            grado: grado,
+            descripcion: descripcion,
+            ruta_archivo: ruta_archivo,
+            enlace: ruta_archivo,
+            area: area
+          })
         });
 
-        const data = await res.json();
+        console.log('📡 HTTP Status:', res.status, res.statusText);
+        const textResponse = await res.text();
+        console.log('📥 Respuesta cruda del servidor:', textResponse);
+
+        let data = null;
+        try {
+          data = JSON.parse(textResponse);
+        } catch (errParse) {
+          console.error('❌ El servidor no devolvió JSON válido:', textResponse);
+          alert('Error en el servidor al guardar la ficha:\n' + textResponse);
+          return;
+        }
+
+        console.log('📦 JSON procesado:', data);
+
         if (data.success) {
-          alert('✅ ' + data.mensaje);
+          console.log('✅ Ficha creada correctamente con ID:', data.ficha_id);
+          alert('✅ ' + (data.mensaje || 'Ficha creada correctamente.'));
           closeFichaModal();
-          document.getElementById('addFichaForm').reset();
+          const form = document.getElementById('addFichaForm');
+          if (form) form.reset();
+          // Recargar tabla de fichas
           cargarFichasAdmin();
         } else {
-          alert('❌ ' + data.mensaje);
+          console.warn('⚠️ Error devuelto por guardar_ficha.php:', data.mensaje);
+          alert('❌ ' + (data.mensaje || 'No se pudo guardar la ficha.'));
         }
       } catch (err) {
-        alert('Error de red al guardar la ficha');
+        console.error('❌ Error de red / fetch:', err);
+        alert('Error al conectar con guardar_ficha.php. Verifica tu conexión.');
       } finally {
-        btn.disabled = false;
-        btn.textContent = 'Guardar en Base de Datos';
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '💾 Guardar en Base de Datos';
+        }
+        console.groupEnd();
       }
     }
+
+    // Vincular listener directamente al formulario
+    document.getElementById('addFichaForm')?.addEventListener('submit', crearNuevaFicha);
 
     async function eliminarFicha(id, titulo) {
       if (!confirm(`¿Estás seguro de que deseas eliminar la ficha "${titulo}" de la base de datos?`)) return;

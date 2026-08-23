@@ -1,5 +1,5 @@
 <?php
-// guardar_usuario_permisos.php - Actualizar el grado y fichas asignadas a un usuario
+// guardar_usuario_permisos.php - Sincroniza los permisos de un usuario de forma limpia
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
@@ -17,9 +17,12 @@ try {
     require_once 'conexion.php';
 
     if (!isset($conexion)) {
-        if (isset($pdo)) $conexion = $pdo;
-        elseif (isset($conn)) $conexion = $conn;
-        elseif (isset($db)) $conexion = $db;
+        if (isset($pdo))
+            $conexion = $pdo;
+        elseif (isset($conn))
+            $conexion = $conn;
+        elseif (isset($db))
+            $conexion = $db;
     }
 
     $inputJSON = file_get_contents('php://input');
@@ -29,10 +32,14 @@ try {
         $data = $_POST;
     }
 
-    $usuario_id    = isset($data['usuario_id']) ? intval($data['usuario_id']) : 0;
-    $grado         = isset($data['grado']) ? trim($data['grado']) : '';
-    $fichas_acceso = isset($data['fichas_acceso']) ? trim($data['fichas_acceso']) : '';
-    $rol           = isset($data['rol']) ? strtolower(trim($data['rol'])) : '';
+    // Capturamos el ID del usuario
+    $usuario_id = 0;
+    if (isset($data['usuario_id']))
+        $usuario_id = intval($data['usuario_id']);
+    elseif (isset($data['id_usuario']))
+        $usuario_id = intval($data['id_usuario']);
+    elseif (isset($data['id']))
+        $usuario_id = intval($data['id']);
 
     if ($usuario_id <= 0) {
         echo json_encode([
@@ -42,38 +49,48 @@ try {
         exit;
     }
 
-    // Asegurar columnas
-    try { $conexion->exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS grado VARCHAR(100) DEFAULT 'Todos'"); } catch (Exception $e) {}
-    try { $conexion->exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS fichas_acceso VARCHAR(255) DEFAULT ''"); } catch (Exception $e) {}
+    // 1. PASO CLAVE: Borramos todos los permisos anteriores de este usuario para empezar limpios
+    $stmtDelete = $conexion->prepare("DELETE FROM permisos_fichas WHERE usuario_id = :usuario_id");
+    $stmtDelete->execute([':usuario_id' => $usuario_id]);
 
-    // Actualizar usuario
-    if (!empty($rol)) {
-        $stmt = $conexion->prepare("UPDATE usuarios SET grado = :grado, fichas_acceso = :fichas, rol = :rol WHERE id = :id");
-        $stmt->execute([
-            ':grado'  => $grado,
-            ':fichas' => $fichas_acceso,
-            ':rol'    => $rol,
-            ':id'     => $usuario_id
-        ]);
-    } else {
-        $stmt = $conexion->prepare("UPDATE usuarios SET grado = :grado, fichas_acceso = :fichas WHERE id = :id");
-        $stmt->execute([
-            ':grado'  => $grado,
-            ':fichas' => $fichas_acceso,
-            ':id'     => $usuario_id
-        ]);
+    // 2. Capturamos las fichas seleccionadas (puede venir como un array o como un valor único)
+    $fichasSeleccionadas = [];
+    if (isset($data['fichas_acceso'])) {
+        if (is_array($data['fichas_acceso'])) {
+            $fichasSeleccionadas = $data['fichas_acceso'];
+        } else {
+            // Si viene como string separado por comas o un solo número
+            $fichasSeleccionadas = explode(',', $data['fichas_acceso']);
+        }
+    } elseif (isset($data['ficha_id'])) {
+        $fichasSeleccionadas = [$data['ficha_id']];
+    }
+
+    // 3. Insertamos las nuevas fichas que el admin marcó (si dejó alguna seleccionada)
+    if (!empty($fichasSeleccionadas)) {
+        $stmtInsert = $conexion->prepare("INSERT INTO permisos_fichas (usuario_id, ficha_id) VALUES (:usuario_id, :ficha_id)");
+
+        foreach ($fichasSeleccionadas as $ficha_id) {
+            $ficha_id = intval(trim($ficha_id));
+            if ($ficha_id > 0) {
+                $stmtInsert->execute([
+                    ':usuario_id' => $usuario_id,
+                    ':ficha_id' => $ficha_id
+                ]);
+            }
+        }
     }
 
     echo json_encode([
         "success" => true,
-        "mensaje" => "Permisos de fichas y grado actualizados correctamente para el usuario."
+        "mensaje" => "Permisos actualizados correctamente en la base de datos."
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
     http_response_code(200);
     echo json_encode([
         "success" => false,
-        "mensaje" => "Error al guardar los permisos: " . $e->getMessage()
+        "mensaje" => "Error al actualizar los permisos: " . $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
 ?>
