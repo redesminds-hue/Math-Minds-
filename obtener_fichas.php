@@ -15,8 +15,16 @@ try {
         $stmt->execute();
         $fichas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
-        // Estudiante: SOLO ve las fichas que tienen un registro explícito en permisos_fichas
+        $gradoEstudiante = $grado;
         if ($usuario_id > 0) {
+            // Consultar el grado real del estudiante en la base de datos
+            $stmtUser = $conexion->prepare("SELECT grado FROM usuarios WHERE id = :uid LIMIT 1");
+            $stmtUser->execute([':uid' => $usuario_id]);
+            $userRow = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            if ($userRow && !empty($userRow['grado'])) {
+                $gradoEstudiante = trim($userRow['grado']);
+            }
+
             $sql = "SELECT f.* FROM fichas f
                     INNER JOIN permisos_fichas p ON f.id = p.ficha_id
                     WHERE p.usuario_id = :usuario_id
@@ -33,7 +41,8 @@ try {
 
     echo json_encode([
         "success" => true,
-        "fichas" => $fichas
+        "grado"   => $gradoEstudiante ?? $grado,
+        "fichas"  => $fichas
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $e) {

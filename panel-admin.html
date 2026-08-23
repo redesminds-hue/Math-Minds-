@@ -733,8 +733,8 @@
         <input type="hidden" id="modalUserId" />
 
         <div class="modal-form-group">
-          <label for="modalUserGrado">Grado / Curso Asignado</label>
-          <input type="text" id="modalUserGrado" class="modal-form-input" placeholder="Ej: 6to, 7mo, 8vo o Todos" required />
+          <label for="modalUserGrado">Grado / Curso del Estudiante</label>
+          <input type="text" id="modalUserGrado" class="modal-form-input" placeholder="Ej: 1ro, 2do, 6to, Primero, etc." required />
         </div>
 
         <div class="modal-form-group">
@@ -879,14 +879,20 @@
       usuarios.forEach(user => {
         const tr = document.createElement('tr');
         const rolClass = String(user.rol).toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
-        const countFichas = user.fichas_acceso ? user.fichas_acceso.split(',').filter(Boolean).length : (user.grado && user.grado !== 'Sin grado' ? 'Por Grado' : 'Todas');
+        const countFichas = user.fichas_acceso ? user.fichas_acceso.split(',').filter(Boolean).length : 0;
+        
+        // Validación condicional del grado: solo muestra badge si existe y no está vacío
+        const gradoLimpio = (user.grado || '').trim();
+        const gradoHtml = (gradoLimpio && gradoLimpio !== 'Sin grado') 
+          ? `<span class="badge-grade">${gradoLimpio}</span>` 
+          : '';
 
         tr.innerHTML = `
           <td><strong>#${user.id}</strong></td>
           <td><strong>${user.nombre}</strong></td>
           <td>${user.email}</td>
           <td><span class="role-badge ${rolClass}">${user.rol}</span></td>
-          <td><span class="badge-grade">${user.grado || 'Sin grado'}</span></td>
+          <td>${gradoHtml}</td>
           <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">📁 ${countFichas}</span></td>
           <td>
             <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">🎯 Asignar Fichas</button>

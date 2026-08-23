@@ -725,7 +725,7 @@
           </div>
           <div class="hero-stat-card">
             <span>Grado / Curso</span>
-            <strong id="studentGradeText">Asignado</strong>
+            <strong id="studentGradeText">-</strong>
           </div>
           <div class="hero-stat-card">
             <span>Estado</span>
@@ -743,7 +743,7 @@
         <div class="section-card">
           <div class="section-header">
             <h2>📚 Fichas de Trabajo Asignadas</h2>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Fichas aprobadas por tu profesor</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Fichas aprobadas por MATHMINDS.EDU</span>
           </div>
 
           <!-- Buscador de fichas -->
@@ -844,6 +844,12 @@
           // Guardar todas las fichas globalmente para filtrado local
           fichasAsignadas = data.fichas;
           totalCount.textContent = data.fichas.length;
+
+          // Mostrar grado real del estudiante (obtenido directamente de MySQL)
+          const gradoFinal = (data.grado || user.grado || '').trim();
+          if (gradoFinal && gradoFinal !== 'Asignado' && gradoFinal !== 'Sin grado') {
+            document.getElementById('studentGradeText').textContent = gradoFinal;
+          }
 
           // Generar botones de filtro dinámicos según los tipos únicos en la BD
           generarFiltrosDinamicos(fichasAsignadas);
