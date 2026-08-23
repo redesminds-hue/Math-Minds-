@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,8 +10,10 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 
   <style>
@@ -264,17 +267,11 @@
       font-weight: 700;
     }
 
-    /* Layout Grid */
+    /* Layout Grid: una sola columna, fichas a pantalla completa */
     .student-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 28px;
-    }
-
-    @media (min-width: 1024px) {
-      .student-grid {
-        grid-template-columns: 1fr 340px;
-      }
     }
 
     /* Section Cards */
@@ -327,7 +324,8 @@
       transition: all 0.2s ease;
     }
 
-    .tab-btn:hover, .tab-btn.active {
+    .tab-btn:hover,
+    .tab-btn.active {
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
@@ -480,6 +478,93 @@
       color: #64748b;
     }
 
+    /* Buscador de fichas */
+    .fichas-search-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .fichas-search-wrapper .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    #buscadorFichas {
+      width: 100%;
+      padding: 11px 16px 11px 40px;
+      border-radius: 14px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    #buscadorFichas:focus {
+      border-color: #0284c7;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    #buscadorFichas::placeholder {
+      color: #94a3b8;
+    }
+
+    .search-results-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .search-results-label.visible {
+      display: block;
+    }
+
+    /* Botón de descarga en tarjeta */
+    .btn-descargar-ficha {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: #f0f9ff;
+      border: 1.5px solid #bae6fd;
+      color: #0369a1;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-descargar-ficha:hover {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-descargar-ficha:active {
+      transform: translateY(0);
+    }
+
+    .btn-descargar-ficha.descargando {
+      opacity: 0.65;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
     /* Plataformas Widget */
     .platform-card {
       display: flex;
@@ -511,7 +596,7 @@
       align-items: center;
       justify-content: center;
       font-size: 1.4rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
 
     .platform-info h4 {
@@ -591,6 +676,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Top Navbar -->
@@ -621,7 +707,8 @@
 
     <!-- Aviso si no está logueado -->
     <div id="unauthAlert" class="auth-alert-banner">
-      ⚠️ No has iniciado sesión o tu sesión expiró. <a href="index.html" style="color: #b91c1c; text-decoration: underline;">Haz clic aquí para iniciar sesión</a>.
+      ⚠️ No has iniciado sesión o tu sesión expiró. <a href="index.html"
+        style="color: #b91c1c; text-decoration: underline;">Haz clic aquí para iniciar sesión</a>.
     </div>
 
     <!-- Hero Section -->
@@ -659,6 +746,16 @@
             <span style="font-size: 0.85rem; color: var(--text-muted);">Fichas aprobadas por tu profesor</span>
           </div>
 
+          <!-- Buscador de fichas -->
+          <div class="fichas-search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="search" id="buscadorFichas" placeholder="Buscar ficha por nombre..." autocomplete="off"
+              aria-label="Buscar fichas" />
+          </div>
+
+          <!-- Etiqueta de resultados de búsqueda -->
+          <p class="search-results-label" id="searchResultsLabel"></p>
+
           <!-- Filter Tabs (generados dinámicamente desde la BD) -->
           <div class="filter-tabs" id="contenedor-filtros">
             <button class="tab-btn active" data-filter="all">Todas</button>
@@ -672,63 +769,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Right Column: Plataformas y Tareas -->
-      <aside>
-        <!-- Plataformas Asociadas -->
-        <div class="section-card">
-          <div class="section-header">
-            <h2>🚀 Plataformas</h2>
-          </div>
-
-          <a href="https://www.aleks.com" target="_blank" class="platform-card">
-            <div class="platform-icon">🤖</div>
-            <div class="platform-info">
-              <h4>ALEKS McGraw Hill</h4>
-              <p>Aprendizaje adaptativo con IA</p>
-            </div>
-          </a>
-
-          <a href="#" class="platform-card" onclick="alert('Accediendo al módulo de Reveal Math...')">
-            <div class="platform-icon">📖</div>
-            <div class="platform-info">
-              <h4>Reveal Math</h4>
-              <p>Libros interactivos digitales</p>
-            </div>
-          </a>
-
-          <a href="#" class="platform-card" onclick="alert('Accediendo al módulo Prime...')">
-            <div class="platform-icon">🌟</div>
-            <div class="platform-info">
-              <h4>Prime Mathematics</h4>
-              <p>Metodología Singapur CPA</p>
-            </div>
-          </a>
-        </div>
-
-        <!-- Tareas de la Semana -->
-        <div class="section-card">
-          <div class="section-header">
-            <h2>📝 Mis Actividades</h2>
-          </div>
-
-          <div class="task-item">
-            <div class="task-check checked" onclick="this.classList.toggle('checked')">✓</div>
-            <div class="task-info">
-              <span>ALEKS: Meta semanal completada</span>
-              <small style="color: #10b981;">100% completado</small>
-            </div>
-          </div>
-
-          <div class="task-item">
-            <div class="task-check" onclick="this.classList.toggle('checked')"></div>
-            <div class="task-info">
-              <span>Completar ficha asignada</span>
-              <small style="color: #f59e0b;">Actividad pendiente</small>
-            </div>
-          </div>
-        </div>
-      </aside>
 
     </div>
   </main>
@@ -749,30 +789,30 @@
         user = null;
       }
 
-      const navAvatar       = document.getElementById('navAvatar');
-      const navUserName     = document.getElementById('navUserName');
-      const navUserEmail    = document.getElementById('navUserEmail');
-      const heroGreeting    = document.getElementById('heroGreeting');
-      const unauthAlert     = document.getElementById('unauthAlert');
-      const logoutBtn       = document.getElementById('logoutBtn');
+      const navAvatar = document.getElementById('navAvatar');
+      const navUserName = document.getElementById('navUserName');
+      const navUserEmail = document.getElementById('navUserEmail');
+      const heroGreeting = document.getElementById('heroGreeting');
+      const unauthAlert = document.getElementById('unauthAlert');
+      const logoutBtn = document.getElementById('logoutBtn');
       const studentGradeText = document.getElementById('studentGradeText');
 
       if (user && user.email) {
-        const nombre  = user.nombre || user.name || user.email.split('@')[0];
-        const email   = user.email;
+        const nombre = user.nombre || user.name || user.email.split('@')[0];
+        const email = user.email;
         const initial = nombre.trim().charAt(0).toUpperCase();
 
-        navAvatar.textContent     = initial;
-        navUserName.textContent   = nombre;
-        navUserEmail.textContent  = email;
-        heroGreeting.textContent  = `¡Hola, ${nombre}! Bienvenido(a) a tu espacio de aprendizaje.`;
+        navAvatar.textContent = initial;
+        navUserName.textContent = nombre;
+        navUserEmail.textContent = email;
+        heroGreeting.textContent = `¡Hola, ${nombre}! Bienvenido(a) a tu espacio de aprendizaje.`;
         if (user.grado) studentGradeText.textContent = user.grado;
 
         // Cargar fichas reales usando obtener_fichas.php
         cargarFichasEstudiante(user);
       } else {
         unauthAlert.classList.add('show');
-        navUserName.textContent  = 'Invitado';
+        navUserName.textContent = 'Invitado';
         navUserEmail.textContent = 'No autenticado';
         document.getElementById('fichasContainer').innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
@@ -791,13 +831,13 @@
     // 1. CARGA DE FICHAS DESDE EL SERVIDOR
     // ─────────────────────────────────────────────────────────────────────────
     async function cargarFichasEstudiante(user) {
-      const container  = document.getElementById('fichasContainer');
+      const container = document.getElementById('fichasContainer');
       const totalCount = document.getElementById('totalFichasCount');
 
       const url = `obtener_fichas.php?rol=estudiante&usuario_id=${user.id || 0}&email=${encodeURIComponent(user.email || '')}&grado=${encodeURIComponent(user.grado || '')}`;
 
       try {
-        const res  = await fetch(url);
+        const res = await fetch(url);
         const data = await res.json();
 
         if (data.success && Array.isArray(data.fichas)) {
@@ -808,8 +848,17 @@
           // Generar botones de filtro dinámicos según los tipos únicos en la BD
           generarFiltrosDinamicos(fichasAsignadas);
 
+          // Activar el buscador en tiempo real
+          const buscador = document.getElementById('buscadorFichas');
+          buscador.addEventListener('input', () => {
+            const texto = buscador.value.trim();
+            const filtroActivo = document.querySelector('#contenedor-filtros .tab-btn.active');
+            const tipoActivo = filtroActivo ? filtroActivo.getAttribute('data-filter') : 'all';
+            renderFichas(tipoActivo, texto);
+          });
+
           // Renderizar todas las fichas por defecto
-          renderFichas('all');
+          renderFichas('all', '');
         } else {
           container.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
@@ -866,8 +915,12 @@
         contenedor.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        // Filtrar y renderizar fichas según el tipo seleccionado
-        renderFichas(btn.getAttribute('data-filter'));
+        // Al cambiar de filtro, limpiar el buscador y renderizar
+        const buscador = document.getElementById('buscadorFichas');
+        buscador.value = '';
+        document.getElementById('searchResultsLabel').classList.remove('visible');
+
+        renderFichas(btn.getAttribute('data-filter'), '');
       });
     }
 
@@ -876,32 +929,50 @@
     // ─────────────────────────────────────────────────────────────────────────
     function getTipoIcon(tipo) {
       const t = (tipo || '').toLowerCase().trim();
-      if (t.includes('cierre'))      return '🏁';
-      if (t.includes('clase 2'))     return '📗';
-      if (t.includes('clase'))       return '📘';
-      if (t.includes('evaluac'))     return '📝';
-      if (t.includes('tarea'))       return '✏️';
+      if (t.includes('cierre')) return '🏁';
+      if (t.includes('clase 2')) return '📗';
+      if (t.includes('clase')) return '📘';
+      if (t.includes('evaluac')) return '📝';
+      if (t.includes('tarea')) return '✏️';
       if (t.includes('práctica') || t.includes('practica')) return '🔧';
-      if (t.includes('proyecto'))    return '🚀';
-      if (t.includes('quiz'))        return '❓';
-      if (t.includes('examen'))      return '📋';
+      if (t.includes('proyecto')) return '🚀';
+      if (t.includes('quiz')) return '❓';
+      if (t.includes('examen')) return '📋';
       if (t.includes('laboratorio')) return '🔬';
-      if (t.includes('lectura'))     return '📖';
+      if (t.includes('lectura')) return '📖';
       return '📄';
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // 4. RENDERIZADO DE TARJETAS ESTILO GOOGLE DRIVE
     // ─────────────────────────────────────────────────────────────────────────
-    function renderFichas(filter = 'all') {
+    function renderFichas(filter = 'all', busqueda = '') {
       const container = document.getElementById('fichasContainer');
+      const resultsLabel = document.getElementById('searchResultsLabel');
       container.innerHTML = '';
 
-      // Filtrar localmente por `tipo` (coincidencia exacta, insensible a mayúsculas)
+      const textoBusqueda = busqueda.trim().toLowerCase();
+
+      // Filtrar por tipo Y por texto de búsqueda simultaneamente
       const filtradas = fichasAsignadas.filter(f => {
-        if (filter === 'all') return true;
-        return (f.tipo || '').trim().toLowerCase() === filter.trim().toLowerCase();
+        const coincideTipo = filter === 'all'
+          ? true
+          : (f.tipo || '').trim().toLowerCase() === filter.trim().toLowerCase();
+
+        const coincideTexto = textoBusqueda === ''
+          ? true
+          : (f.titulo || '').toLowerCase().includes(textoBusqueda);
+
+        return coincideTipo && coincideTexto;
       });
+
+      // Mostrar etiqueta de resultados solo si hay texto de búsqueda
+      if (textoBusqueda) {
+        resultsLabel.textContent = `🔍 ${filtradas.length} resultado${filtradas.length !== 1 ? 's' : ''} para “${busqueda.trim()}”`;
+        resultsLabel.classList.add('visible');
+      } else {
+        resultsLabel.classList.remove('visible');
+      }
 
       if (!filtradas.length) {
         container.innerHTML = `
@@ -916,11 +987,11 @@
       }
 
       filtradas.forEach(f => {
-        const tipo       = (f.tipo || '').trim();
-        const icon       = getTipoIcon(tipo);
-        const titulo     = (f.titulo || 'Ficha sin título').trim();
-        const grado      = (f.grado  || 'General').trim();
-        const desc       = (f.descripcion || '').trim();
+        const tipo = (f.tipo || '').trim();
+        const icon = getTipoIcon(tipo);
+        const titulo = (f.titulo || 'Ficha sin título').trim();
+        const grado = (f.grado || 'General').trim();
+        const desc = (f.descripcion || '').trim();
 
         // URL segura: usa ver_archivo.php?id= cuando existe un ID de ficha
         const urlArchivo = f.id
@@ -928,11 +999,11 @@
           : ((f.ruta_archivo || f.enlace || '#').trim());
 
         const card = document.createElement('a');
-        card.href      = urlArchivo;
-        card.target    = '_blank';
-        card.rel       = 'noopener noreferrer';
+        card.href = urlArchivo;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
         card.className = 'tarjeta-drive';
-        card.title     = `${titulo}${tipo ? ' · ' + tipo : ''}${grado ? ' (' + grado + ')' : ''}${desc ? ' | ' + desc : ''}`;
+        card.title = `${titulo}${tipo ? ' · ' + tipo : ''}${grado ? ' (' + grado + ')' : ''}${desc ? ' | ' + desc : ''}`;
 
         card.innerHTML = `
           <div class="tarjeta-drive-header">
@@ -955,12 +1026,69 @@
           <div class="tarjeta-drive-footer">
             <span class="tarjeta-drive-badge">${tipo || 'Ficha'}</span>
             <span class="tarjeta-drive-grade">${grado}</span>
+            <button
+              class="btn-descargar-ficha"
+              title="Descargar ficha"
+              onclick="event.preventDefault(); event.stopPropagation(); descargarFicha('${urlArchivo}', '${titulo.replace(/'/g, "\\'")}')"
+            >⬇ Descargar</button>
           </div>
         `;
 
         container.appendChild(card);
       });
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 5. DESCARGA DE FICHA (fetch + Blob para forzar descarga real)
+    // ─────────────────────────────────────────────────────────────────────────
+    async function descargarFicha(url, nombre) {
+      // Encontrar el botón que disparó la acción
+      const btn = document.querySelector(`[onclick*="${CSS.escape(url)}"]`);
+
+      try {
+        if (btn) {
+          btn.classList.add('descargando');
+          btn.textContent = '⏳ Descargando...';
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const blob = await response.blob();
+
+        // Determinar extensión según el Content-Type real
+        const contentType = response.headers.get('Content-Type') || '';
+        let ext = '';
+        if (contentType.includes('pdf')) ext = '.pdf';
+        else if (contentType.includes('png')) ext = '.png';
+        else if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = '.jpg';
+        else if (contentType.includes('gif')) ext = '.gif';
+        else if (contentType.includes('webp')) ext = '.webp';
+
+        // Nombre de archivo limpio
+        const nombreArchivo = (nombre || 'ficha').replace(/[\\/:*?"<>|]/g, '_') + ext;
+
+        // Crear enlace temporal y disparar descarga
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = nombreArchivo;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+
+      } catch (err) {
+        console.error('Error al descargar la ficha:', err);
+        alert('No se pudo descargar la ficha. Intenta abrirla y guardarla manualmente.');
+      } finally {
+        if (btn) {
+          btn.classList.remove('descargando');
+          btn.innerHTML = '⬇ Descargar';
+        }
+      }
+    }
   </script>
 </body>
+
 </html>

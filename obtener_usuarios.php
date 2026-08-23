@@ -1,5 +1,5 @@
 <?php
-// obtener_usuarios.php - Obtener lista de usuarios y sus fichas desde permisos_fichas
+// obtener_usuarios.php - Obtiene usuarios, sus fichas y su grado exacto
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
@@ -25,16 +25,9 @@ try {
             $conexion = $db;
     }
 
-    // Asegurar que exista la columna grado en la tabla usuarios
-    try {
-        $conexion->exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS grado VARCHAR(100) DEFAULT 'Todos'");
-    } catch (Exception $e) {
-    }
-
-    // Consultamos los usuarios y unimos las fichas asignadas desde la tabla relacional permisos_fichas
-    // Usamos GROUP_CONCAT para traer todas las fichas separadas por comas (ej: "2,5")
+    // Consultamos los usuarios trayendo su grado real y agrupando sus fichas de la tabla relacional
     $sql = "SELECT u.id, u.nombre, u.email, u.rol, 
-                   COALESCE(u.grado, 'Sin grado') AS grado, 
+                   COALESCE(u.grado, '') AS grado, 
                    COALESCE(GROUP_CONCAT(p.ficha_id SEPARATOR ','), '') AS fichas_acceso 
             FROM usuarios u
             LEFT JOIN permisos_fichas p ON u.id = p.usuario_id
