@@ -333,90 +333,151 @@
       border-color: var(--primary);
     }
 
-    /* Fichas Cards Grid */
+    /* Cuadrícula estilo Google Drive */
     .fichas-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
     }
 
-    .ficha-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 20px;
+    .tarjeta-drive {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 14px;
-      transition: all 0.25s ease;
-      box-shadow: var(--shadow-sm);
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      position: relative;
     }
 
-    .ficha-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-      border-color: #bae6fd;
+    .tarjeta-drive:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -6px rgba(2, 132, 199, 0.18), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+      border-color: #0284c7;
     }
 
-    .ficha-header {
+    .tarjeta-drive-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
     }
 
-    .ficha-icon-box {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      background: #e0f2fe;
+    .tarjeta-drive-type-icon {
+      font-size: 1.15rem;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
     }
 
-    .ficha-badge {
-      font-size: 0.72rem;
+    .tarjeta-drive-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      margin: 0;
+    }
+
+    .tarjeta-drive-preview {
+      height: 130px;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background-color 0.2s ease;
+    }
+
+    .tarjeta-drive:hover .tarjeta-drive-preview {
+      background: #f0f9ff;
+    }
+
+    .tarjeta-drive-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.22s ease;
+    }
+
+    .tarjeta-drive:hover .tarjeta-drive-thumbnail {
+      transform: scale(1.04);
+    }
+
+    .tarjeta-drive-preview-icon {
+      font-size: 3.2rem;
+      opacity: 0.88;
+      transition: transform 0.22s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tarjeta-drive:hover .tarjeta-drive-preview-icon {
+      transform: scale(1.1);
+    }
+
+    .tarjeta-drive-preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 132, 199, 0.8);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .tarjeta-drive:hover .tarjeta-drive-preview-overlay {
+      opacity: 1;
+    }
+
+    .tarjeta-drive-preview-overlay span {
+      color: #ffffff;
       font-weight: 700;
+      font-size: 0.88rem;
+      padding: 6px 14px;
+      background: rgba(15, 23, 42, 0.45);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .tarjeta-drive-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #ffffff;
+      font-size: 0.78rem;
+    }
+
+    .tarjeta-drive-badge {
+      font-weight: 700;
+      color: #0369a1;
+      background: #e0f2fe;
       padding: 3px 8px;
       border-radius: 6px;
-      background: #f1f5f9;
-      color: #475569;
+      max-width: 110px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .ficha-body h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .ficha-body p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .btn-ficha-action {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: #ffffff;
-      text-decoration: none;
+    .tarjeta-drive-grade {
       font-weight: 600;
-      font-size: 0.88rem;
-      border-radius: 10px;
-      transition: opacity 0.2s;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn-ficha-action:hover {
-      opacity: 0.92;
+      color: #64748b;
     }
 
     /* Plataformas Widget */
@@ -598,14 +659,9 @@
             <span style="font-size: 0.85rem; color: var(--text-muted);">Fichas aprobadas por tu profesor</span>
           </div>
 
-          <!-- Filter Tabs -->
-          <div class="filter-tabs" id="filterTabs">
+          <!-- Filter Tabs (generados dinámicamente desde la BD) -->
+          <div class="filter-tabs" id="contenedor-filtros">
             <button class="tab-btn active" data-filter="all">Todas</button>
-            <button class="tab-btn" data-filter="Aritmética">Aritmética</button>
-            <button class="tab-btn" data-filter="Geometría">Geometría</button>
-            <button class="tab-btn" data-filter="Álgebra">Álgebra</button>
-            <button class="tab-btn" data-filter="Lógica">Razonamiento</button>
-            <button class="tab-btn" data-filter="Estadística">Estadística</button>
           </div>
 
           <!-- Grid Dinámico de Fichas -->
@@ -679,6 +735,7 @@
 
   <!-- Script de Conexión en Vivo con obtener_fichas.php -->
   <script>
+    // Variable global: almacena TODAS las fichas cargadas desde la BD
     let fichasAsignadas = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -692,30 +749,30 @@
         user = null;
       }
 
-      const navAvatar = document.getElementById('navAvatar');
-      const navUserName = document.getElementById('navUserName');
-      const navUserEmail = document.getElementById('navUserEmail');
-      const heroGreeting = document.getElementById('heroGreeting');
-      const unauthAlert = document.getElementById('unauthAlert');
-      const logoutBtn = document.getElementById('logoutBtn');
+      const navAvatar       = document.getElementById('navAvatar');
+      const navUserName     = document.getElementById('navUserName');
+      const navUserEmail    = document.getElementById('navUserEmail');
+      const heroGreeting    = document.getElementById('heroGreeting');
+      const unauthAlert     = document.getElementById('unauthAlert');
+      const logoutBtn       = document.getElementById('logoutBtn');
       const studentGradeText = document.getElementById('studentGradeText');
 
       if (user && user.email) {
-        const nombre = user.nombre || user.name || user.email.split('@')[0];
-        const email = user.email;
+        const nombre  = user.nombre || user.name || user.email.split('@')[0];
+        const email   = user.email;
         const initial = nombre.trim().charAt(0).toUpperCase();
 
-        navAvatar.textContent = initial;
-        navUserName.textContent = nombre;
-        navUserEmail.textContent = email;
-        heroGreeting.textContent = `¡Hola, ${nombre}! Bienvenido(a) a tu espacio de aprendizaje.`;
+        navAvatar.textContent     = initial;
+        navUserName.textContent   = nombre;
+        navUserEmail.textContent  = email;
+        heroGreeting.textContent  = `¡Hola, ${nombre}! Bienvenido(a) a tu espacio de aprendizaje.`;
         if (user.grado) studentGradeText.textContent = user.grado;
 
         // Cargar fichas reales usando obtener_fichas.php
         cargarFichasEstudiante(user);
       } else {
         unauthAlert.classList.add('show');
-        navUserName.textContent = 'Invitado';
+        navUserName.textContent  = 'Invitado';
         navUserEmail.textContent = 'No autenticado';
         document.getElementById('fichasContainer').innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
@@ -728,33 +785,30 @@
         localStorage.removeItem(AUTH_KEY);
         window.location.href = 'index.html';
       });
-
-      // Filter tabs handler
-      const filterTabs = document.querySelectorAll('.tab-btn');
-      filterTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          filterTabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-
-          const filter = tab.getAttribute('data-filter');
-          renderFichas(filter);
-        });
-      });
     });
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. CARGA DE FICHAS DESDE EL SERVIDOR
+    // ─────────────────────────────────────────────────────────────────────────
     async function cargarFichasEstudiante(user) {
-      const container = document.getElementById('fichasContainer');
+      const container  = document.getElementById('fichasContainer');
       const totalCount = document.getElementById('totalFichasCount');
 
       const url = `obtener_fichas.php?rol=estudiante&usuario_id=${user.id || 0}&email=${encodeURIComponent(user.email || '')}&grado=${encodeURIComponent(user.grado || '')}`;
 
       try {
-        const res = await fetch(url);
+        const res  = await fetch(url);
         const data = await res.json();
 
         if (data.success && Array.isArray(data.fichas)) {
+          // Guardar todas las fichas globalmente para filtrado local
           fichasAsignadas = data.fichas;
           totalCount.textContent = data.fichas.length;
+
+          // Generar botones de filtro dinámicos según los tipos únicos en la BD
+          generarFiltrosDinamicos(fichasAsignadas);
+
+          // Renderizar todas las fichas por defecto
           renderFichas('all');
         } else {
           container.innerHTML = `
@@ -773,28 +827,86 @@
       }
     }
 
-    function getAreaIcon(area) {
-      const a = (area || '').toLowerCase();
-      if (a.includes('arit')) return '📘';
-      if (a.includes('geom')) return '📐';
-      if (a.includes('álg') || a.includes('alg')) return '🔢';
-      if (a.includes('lóg') || a.includes('log') || a.includes('razon')) return '🧠';
-      if (a.includes('est') || a.includes('prob')) return '📊';
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. GENERACIÓN DINÁMICA DE FILTROS DESDE LA COLUMNA `tipo` DE LA BD
+    // ─────────────────────────────────────────────────────────────────────────
+    function generarFiltrosDinamicos(fichas) {
+      const contenedor = document.getElementById('contenedor-filtros');
+
+      // Limpiar el contenedor (elimina cualquier botón previo)
+      contenedor.innerHTML = '';
+
+      // Botón "Todas" activo por defecto
+      const btnTodas = document.createElement('button');
+      btnTodas.className = 'tab-btn active';
+      btnTodas.setAttribute('data-filter', 'all');
+      btnTodas.textContent = 'Todas';
+      contenedor.appendChild(btnTodas);
+
+      // Extraer tipos únicos desde la columna `tipo`, eliminando valores vacíos/nulos
+      const tiposUnicos = [...new Set(
+        fichas.map(f => (f.tipo || '').trim()).filter(Boolean)
+      )].sort();
+
+      // Crear un botón por cada tipo único encontrado
+      tiposUnicos.forEach(tipo => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn';
+        btn.setAttribute('data-filter', tipo);
+        btn.textContent = tipo;
+        contenedor.appendChild(btn);
+      });
+
+      // Delegar los clics a todos los botones del contenedor
+      contenedor.addEventListener('click', (e) => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+
+        // Actualizar clase activa
+        contenedor.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Filtrar y renderizar fichas según el tipo seleccionado
+        renderFichas(btn.getAttribute('data-filter'));
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. ÍCONO SEGÚN EL TIPO DE FICHA (columna `tipo` de la BD)
+    // ─────────────────────────────────────────────────────────────────────────
+    function getTipoIcon(tipo) {
+      const t = (tipo || '').toLowerCase().trim();
+      if (t.includes('cierre'))      return '🏁';
+      if (t.includes('clase 2'))     return '📗';
+      if (t.includes('clase'))       return '📘';
+      if (t.includes('evaluac'))     return '📝';
+      if (t.includes('tarea'))       return '✏️';
+      if (t.includes('práctica') || t.includes('practica')) return '🔧';
+      if (t.includes('proyecto'))    return '🚀';
+      if (t.includes('quiz'))        return '❓';
+      if (t.includes('examen'))      return '📋';
+      if (t.includes('laboratorio')) return '🔬';
+      if (t.includes('lectura'))     return '📖';
       return '📄';
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. RENDERIZADO DE TARJETAS ESTILO GOOGLE DRIVE
+    // ─────────────────────────────────────────────────────────────────────────
     function renderFichas(filter = 'all') {
       const container = document.getElementById('fichasContainer');
       container.innerHTML = '';
 
+      // Filtrar localmente por `tipo` (coincidencia exacta, insensible a mayúsculas)
       const filtradas = fichasAsignadas.filter(f => {
         if (filter === 'all') return true;
-        return (f.area || '').toLowerCase().includes(filter.toLowerCase());
+        return (f.tipo || '').trim().toLowerCase() === filter.trim().toLowerCase();
       });
 
       if (!filtradas.length) {
         container.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 36px 20px; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1;">
+          <div style="grid-column: 1/-1; text-align: center; padding: 36px 20px;
+                      background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1;">
             <div style="font-size: 2rem; margin-bottom: 8px;">📂</div>
             <h3 style="color: #0f172a; margin-bottom: 4px;">No hay fichas en esta categoría</h3>
             <p style="color: #64748b; font-size: 0.9rem;">Tu profesor te habilitará nuevas fichas a medida que avance el curso.</p>
@@ -804,20 +916,48 @@
       }
 
       filtradas.forEach(f => {
-        const icon = getAreaIcon(f.area);
-        const card = document.createElement('article');
-        card.className = 'ficha-card';
+        const tipo       = (f.tipo || '').trim();
+        const icon       = getTipoIcon(tipo);
+        const titulo     = (f.titulo || 'Ficha sin título').trim();
+        const grado      = (f.grado  || 'General').trim();
+        const desc       = (f.descripcion || '').trim();
+
+        // URL segura: usa ver_archivo.php?id= cuando existe un ID de ficha
+        const urlArchivo = f.id
+          ? `ver_archivo.php?id=${f.id}`
+          : ((f.ruta_archivo || f.enlace || '#').trim());
+
+        const card = document.createElement('a');
+        card.href      = urlArchivo;
+        card.target    = '_blank';
+        card.rel       = 'noopener noreferrer';
+        card.className = 'tarjeta-drive';
+        card.title     = `${titulo}${tipo ? ' · ' + tipo : ''}${grado ? ' (' + grado + ')' : ''}${desc ? ' | ' + desc : ''}`;
+
         card.innerHTML = `
-          <div class="ficha-header">
-            <div class="ficha-icon-box">${icon}</div>
-            <span class="ficha-badge">${f.area || 'Matemáticas'}</span>
+          <div class="tarjeta-drive-header">
+            <span class="tarjeta-drive-type-icon">${icon}</span>
+            <h3 class="tarjeta-drive-title">${titulo}</h3>
           </div>
-          <div class="ficha-body">
-            <h3>${f.titulo}</h3>
-            <p>${f.descripcion || 'Ficha práctica de matemáticas con metodología CPA.'}</p>
+          <div class="tarjeta-drive-preview">
+            <img
+              src="${urlArchivo}"
+              alt="Vista previa de ${titulo}"
+              class="tarjeta-drive-thumbnail"
+              loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div class="tarjeta-drive-preview-icon" style="display:none;">${icon}</div>
+            <div class="tarjeta-drive-preview-overlay">
+              <span>Abrir Ficha ↗</span>
+            </div>
           </div>
-          <a href="${f.enlace || '#'}" target="_blank" class="btn-ficha-action">📥 Abrir Ficha (PDF / Web)</a>
+          <div class="tarjeta-drive-footer">
+            <span class="tarjeta-drive-badge">${tipo || 'Ficha'}</span>
+            <span class="tarjeta-drive-grade">${grado}</span>
+          </div>
         `;
+
         container.appendChild(card);
       });
     }

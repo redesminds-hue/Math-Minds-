@@ -926,6 +926,7 @@
 
       fichas.forEach(f => {
         const tr = document.createElement('tr');
+        const urlArchivo = f.id ? `ver_archivo.php?id=${f.id}` : ((f.ruta_archivo || f.enlace || '#').trim());
         tr.innerHTML = `
           <td><strong>#F0${f.id}</strong></td>
           <td><strong>${f.titulo}</strong></td>
@@ -933,6 +934,7 @@
           <td><span class="badge-grade">${f.grado || 'Todos'}</span></td>
           <td style="font-size:0.85rem; color:#64748b; max-width:280px;">${f.descripcion || 'Sin descripción'}</td>
           <td>
+            <a href="${urlArchivo}" target="_blank" class="btn-table-action" style="margin-right: 6px; text-decoration: none;">👁️ Ver</a>
             <button class="btn-table-action delete" onclick="eliminarFicha(${f.id}, '${f.titulo}')">🗑️ Eliminar</button>
           </td>
         `;
