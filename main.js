@@ -678,40 +678,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileMenuLoggedOut = document.querySelector('.profile-menu-logged-out');
   const profileAvatar = profileToggle?.querySelector('.profile-avatar');
   const profileLabel = profileToggle?.querySelector('.profile-label');
+  const panelLink = document.getElementById('panelLink');
+
   const authModal = document.getElementById('authModal');
   const authForm = document.getElementById('authForm');
-  const authError = document.getElementById('authError');
+  const authAlert = document.getElementById('authAlert');
+  const authEmailInput = document.getElementById('authEmail');
+  const authPasswordInput = document.getElementById('authPassword');
+  const authSubmitBtn = document.getElementById('authSubmitBtn');
+  const authSpinner = document.getElementById('authSpinner');
+  const authSubmitText = document.getElementById('authSubmitText');
+  const toggleAuthPassword = document.getElementById('toggleAuthPassword');
 
   const AUTH_STORAGE_KEY = 'mathMindsLoggedUser';
 
   function normalizeEmail(value){
     return String(value || '').trim().toLowerCase();
-  }
-
-  function getAuthUsersFromSheet(){
-    const rows = [];
-    if (!Array.isArray(window.baseDeDatos)) return rows;
-
-    window.baseDeDatos.forEach(row => {
-      const email = String(row.email || row.correo || row.correo_electronico || row.usuario || row.Usuario || row['Correo'] || row['Usuario'] || '').trim();
-      const password = String(row.password || row.contraseña || row.pass || row.clave || row['Clave'] || row['Password'] || '').trim();
-      if (!email || !password) return;
-      const name = String(row.nombre || row.name || row['Nombre'] || email.split('@')[0]).trim() || email;
-      const course = String(row.course || row.curso || row.grado || row.grade || '').trim();
-      rows.push({ email, password, name, course });
-    });
-
-    return rows.filter((value, index, self) =>
-      index === self.findIndex(item => normalizeEmail(item.email) === normalizeEmail(value.email) && item.password === value.password)
-    );
-  }
-
-  function getRegisteredUsers(){
-    const loaded = getAuthUsersFromSheet();
-    if (loaded.length) return loaded;
-    return [
-      { email: 'profesor@mathminds.com', password: '12345', name: 'Profesor Math' }
-    ];
   }
 
   function truncateEmail(email){
@@ -726,15 +708,28 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateAuthUI(user){
     if (!profileMenu || !profileToggle || !profileMenuLoggedIn || !profileMenuLoggedOut || !profileAvatar || !profileLabel) return;
     if (user){
-      const initial = String(user.name || user.email || 'U').trim().charAt(0).toUpperCase();
-      const truncated = truncateEmail(user.email || user.name || '');
+      const userName = user.nombre || user.name || user.email || 'Usuario';
+      const initial = String(userName).trim().charAt(0).toUpperCase();
+      const truncated = truncateEmail(userName);
       profileAvatar.textContent = initial;
       profileLabel.textContent = truncated || 'Cuenta';
-      profileToggle.setAttribute('aria-label', `Cuenta de ${user.name || user.email}`);
+      profileToggle.setAttribute('aria-label', `Cuenta de ${userName}`);
       profileMenuLoggedIn.classList.remove('hidden');
       profileMenuLoggedOut.classList.add('hidden');
-      if (profileUserNameLabel) profileUserNameLabel.textContent = user.name || user.email;
+      if (profileUserNameLabel) profileUserNameLabel.textContent = userName;
       if (profileUserEmailLabel) profileUserEmailLabel.textContent = user.email;
+
+      // Actualizar enlace del panel según el rol del usuario
+      if (panelLink) {
+        const rol = String(user.rol || '').toLowerCase().trim();
+        if (rol === 'admin') {
+          panelLink.href = 'panel-admin.html';
+        } else if (rol === 'estudiante') {
+          panelLink.href = 'panel-estudiante.html';
+        } else {
+          panelLink.href = 'mi-panel.html';
+        }
+      }
     } else {
       profileAvatar.textContent = '👤';
       profileLabel.textContent = 'Ingresar';
@@ -743,13 +738,22 @@ document.addEventListener("DOMContentLoaded", () => {
       profileMenuLoggedOut.classList.remove('hidden');
       if (profileUserNameLabel) profileUserNameLabel.textContent = 'Nombre de usuario';
       if (profileUserEmailLabel) profileUserEmailLabel.textContent = 'correo@mathminds.com';
+      if (panelLink) panelLink.href = 'mi-panel.html';
     }
   }
 
   function setActiveUser(user){
     if (user){
-      window.currentUser = { email: normalizeEmail(user.email), name: user.name, course: user.course || '' };
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(window.currentUser));
+      const normalizedUser = {
+        id: user.id || null,
+        email: normalizeEmail(user.email),
+        nombre: user.nombre || user.name || user.email.split('@')[0],
+        name: user.nombre || user.name || user.email.split('@')[0],
+        rol: String(user.rol || 'estudiante').toLowerCase().trim(),
+        course: user.course || ''
+      };
+      window.currentUser = normalizedUser;
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(normalizedUser));
     } else {
       window.currentUser = null;
       localStorage.removeItem(AUTH_STORAGE_KEY);
@@ -762,7 +766,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const raw = localStorage.getItem(AUTH_STORAGE_KEY);
       if (!raw) { setActiveUser(null); return; }
       const stored = JSON.parse(raw);
-      if (stored && stored.email && stored.name){
+      if (stored && stored.email){
         setActiveUser(stored);
         return;
       }
@@ -772,16 +776,24 @@ document.addEventListener("DOMContentLoaded", () => {
     setActiveUser(null);
   }
 
-  function validateLogin(email, password){
-    const normalizedEmail = normalizeEmail(email);
-    if (!normalizedEmail || !password){
-      return { ok: false, message: 'Completa ambos campos para continuar.' };
-    }
-    const user = getRegisteredUsers().find(item => normalizeEmail(item.email) === normalizedEmail && item.password === String(password).trim());
-    if (!user){
-      return { ok: false, message: 'Usuario o contraseña incorrectos. Intenta de nuevo.' };
-    }
-    return { ok: true, user };
+  function showAuthAlert(message, type = 'error') {
+    if (!authAlert) return;
+    authAlert.className = `auth-alert ${type}`;
+    authAlert.textContent = message;
+    authAlert.style.display = 'block';
+  }
+
+  function hideAuthAlert() {
+    if (!authAlert) return;
+    authAlert.className = 'auth-alert';
+    authAlert.textContent = '';
+    authAlert.style.display = 'none';
+  }
+
+  function setAuthLoading(isLoading) {
+    if (authSubmitBtn) authSubmitBtn.disabled = isLoading;
+    if (authSpinner) authSpinner.style.display = isLoading ? 'inline-block' : 'none';
+    if (authSubmitText) authSubmitText.textContent = isLoading ? 'Verificando...' : 'Entrar';
   }
 
   function closeProfileMenu(){
@@ -810,10 +822,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   openLoginBtn?.addEventListener('click', () => {
     if (!authModal) return;
-    if (authError) authError.textContent = '';
+    hideAuthAlert();
     authForm?.reset();
+    if (authPasswordInput) authPasswordInput.type = 'password';
+    if (toggleAuthPassword) toggleAuthPassword.textContent = '👁️';
     closeProfileMenu();
     openModal('authModal');
+  });
+
+  toggleAuthPassword?.addEventListener('click', () => {
+    if (!authPasswordInput) return;
+    const isPass = authPasswordInput.type === 'password';
+    authPasswordInput.type = isPass ? 'text' : 'password';
+    toggleAuthPassword.textContent = isPass ? '🙈' : '👁️';
   });
 
   logoutBtn?.addEventListener('click', () => {
@@ -822,21 +843,121 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = 'index.html';
   });
 
-  authForm?.addEventListener('submit', (event) => {
+  authForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!authForm || !authError) return;
-    const email = authForm.querySelector('#authEmail')?.value || '';
-    const password = authForm.querySelector('#authPassword')?.value || '';
-    const result = validateLogin(email, password);
-    if (!result.ok){
-      authError.textContent = result.message;
-      authError.style.display = 'block';
+    if (!authForm) return;
+    hideAuthAlert();
+
+    const email = authEmailInput?.value.trim() || '';
+    const password = authPasswordInput?.value.trim() || '';
+
+    if (!email || !password){
+      showAuthAlert('Por favor completa todos los campos para continuar.', 'error');
       return;
     }
-    setActiveUser(result.user);
-    authError.textContent = '';
-    closeModal(authModal);
+
+    setAuthLoading(true);
+
+    console.group('🔐 [MATH Minds] Intento de Conexión y Login');
+    console.log('%c📤 Enviando credenciales a login.php...', 'color: #0284c7; font-weight: bold;', {
+      email: email,
+      caracteresPassword: password.length
+    });
+
+    try {
+      const response = await fetch('login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      console.log('%c📡 Estado de respuesta del servidor (HTTP Status):', 'color: #0284c7;', response.status, response.statusText);
+
+      const responseText = await response.text();
+      let data = null;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('%c❌ ERROR: login.php no devolvió un JSON válido. Respuesta recibida del servidor/PHP:', 'color: #ef4444; font-weight: bold;', responseText);
+        showAuthAlert('Error en el servidor al procesar la base de datos. Revisa la consola (F12).', 'error');
+        setAuthLoading(false);
+        console.groupEnd();
+        return;
+      }
+
+      console.log('%c📦 Datos JSON devueltos por el backend:', 'color: #0284c7; font-weight: bold;', data);
+
+      if (data.success) {
+        const nombre = data.nombre || (data.user && data.user.nombre) || email.split('@')[0];
+        const rol = String(data.rol || (data.user && data.user.rol) || 'estudiante').toLowerCase().trim();
+        const id = data.id || (data.user && data.user.id) || null;
+        const mensajeServidor = data.mensaje || data.message || 'Bienvenido';
+
+        console.log('%c✅ ¡CONEXIÓN A LA BASE DE DATOS Y AUTENTICACIÓN EXITOSA!', 'color: #10b981; font-weight: bold; font-size: 13px;');
+        console.log(`👤 Usuario: %c${nombre}%c | Rol detectado: %c${rol}%c | Mensaje: %c${mensajeServidor}`,
+          'color: #0284c7; font-weight: bold;', '',
+          'color: #10b981; font-weight: bold;', '',
+          'color: #64748b;'
+        );
+
+        // Guardar sesión del usuario
+        setActiveUser({ id, email, nombre, rol });
+
+        // Saludo con el nombre del usuario
+        showAuthAlert(`¡Bienvenido(a), ${nombre}! Redirigiendo a tu panel...`, 'success');
+
+        const destino = rol === 'admin' ? 'panel-admin.html' : (rol === 'estudiante' ? 'panel-estudiante.html' : 'mi-panel.html');
+        console.log(`🧭 Redirigiendo en 1.2s a: %c${destino}`, 'color: #0284c7; font-weight: bold;');
+        console.groupEnd();
+
+        setTimeout(() => {
+          closeModal(authModal);
+          window.location.href = destino;
+        }, 1200);
+
+      } else {
+        const errorMsg = data.mensaje || data.message || 'Usuario o contraseña incorrectos.';
+        console.warn('%c⚠️ Conexión con base de datos establecida, pero el servidor rechazó el acceso:', 'color: #f59e0b; font-weight: bold;', errorMsg);
+        console.groupEnd();
+        showAuthAlert(errorMsg, 'error');
+        setAuthLoading(false);
+      }
+
+    } catch (err) {
+      console.error('%c❌ Error crítico de red o conexión al intentar contactar con login.php:', 'color: #ef4444; font-weight: bold;', err);
+      console.groupEnd();
+      showAuthAlert('Error al conectar con el servidor. Verifica que login.php y conexion.php estén en tu servidor.', 'error');
+      setAuthLoading(false);
+    }
   });
+
+  // Función global para verificar la conexión con la base de datos desde la consola (F12)
+  window.probarConexionDB = async function() {
+    console.group('🔍 [MATH Minds] Test de Conexión a la Base de Datos');
+    console.log('📡 Enviando ping a login.php...');
+    try {
+      const res = await fetch('login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'test@ping.com', password: 'ping' })
+      });
+      const text = await res.text();
+      console.log('HTTP Status:', res.status);
+      try {
+        const json = JSON.parse(text);
+        console.log('%c✅ login.php respondió en formato JSON:', 'color:#10b981; font-weight:bold;', json);
+      } catch (e) {
+        console.warn('%c⚠️ login.php respondió, pero NO es JSON (posible error PHP):', 'color:#f59e0b; font-weight:bold;', text);
+      }
+    } catch (e) {
+      console.error('%c❌ No se pudo alcanzar login.php:', 'color:#ef4444; font-weight:bold;', e);
+    }
+    console.groupEnd();
+  };
 
   authModal?.addEventListener('click', (event) => {
     if (event.target === authModal){

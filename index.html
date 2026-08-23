@@ -609,24 +609,33 @@
       <div class="auth-modal-header">
         <img src="../Multimedia/Logo.png" alt="Math Minds" class="auth-logo" />
         <h2 id="authModalTitle">Iniciar sesión</h2>
-        <p class="modal-subtitle">Accede con tu correo electrónico para continuar.</p>
+        <p class="modal-subtitle">Accede con tus credenciales a la plataforma.</p>
       </div>
+
+      <!-- Alertas dinámicas (error / éxito) -->
+      <div id="authAlert" class="auth-alert" role="alert" aria-live="assertive" style="display: none;"></div>
 
       <form id="authForm" class="auth-form" novalidate>
         <div class="form-field">
-          <label for="authEmail">Usuario</label>
-          <input id="authEmail" name="authEmail" type="email" required placeholder="usuario@correo.com" autocomplete="username" />
+          <label for="authEmail">Correo Electrónico</label>
+          <div class="input-wrapper">
+            <input id="authEmail" name="authEmail" type="email" required placeholder="usuario@correo.com" autocomplete="username" />
+          </div>
         </div>
 
         <div class="form-field">
           <label for="authPassword">Contraseña</label>
-          <input id="authPassword" name="authPassword" type="password" required placeholder="Contraseña" autocomplete="current-password" />
+          <div class="input-wrapper">
+            <input id="authPassword" name="authPassword" type="password" required placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" id="toggleAuthPassword" class="toggle-password-btn" aria-label="Mostrar u ocultar contraseña">👁️</button>
+          </div>
         </div>
 
-        <div id="authError" class="auth-error" role="alert" aria-live="assertive"></div>
-
-        <div class="modal-actions">
-          <button type="submit" class="btn primary">Entrar</button>
+        <div class="modal-actions" style="margin-top: 10px;">
+          <button type="submit" id="authSubmitBtn" class="btn primary full">
+            <span class="auth-spinner" id="authSpinner" style="display: none;"></span>
+            <span id="authSubmitText">Entrar</span>
+          </button>
         </div>
       </form>
     </div>
