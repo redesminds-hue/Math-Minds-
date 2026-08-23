@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Administración | MATH Minds</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    :root {
+      --admin-primary: #0f172a;
+      --admin-accent: #0284c7;
+      --admin-accent-hover: #0369a1;
+      --admin-success: #10b981;
+      --admin-warning: #f59e0b;
+      --admin-danger: #ef4444;
+      --admin-bg: #f8fafc;
+      --admin-card: #ffffff;
+      --admin-border: #e2e8f0;
+      --admin-text: #0f172a;
+      --admin-text-muted: #64748b;
+      --admin-radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--admin-bg);
+      color: var(--admin-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .admin-navbar {
+      background: #0f172a;
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-nav-container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-admin {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .brand-logo-img {
+      height: 44px;
+      width: auto;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .admin-shield-badge {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      color: #0f172a;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .admin-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-user-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    .btn-admin-view-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-admin-view-site:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-admin-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-admin-logout:hover {
+      background: #fca5a5;
+    }
+
+    /* Main Container */
+    .admin-layout {
+      max-width: 1380px;
+      margin: 28px auto;
+      padding: 0 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Hero Header */
+    .admin-header-box {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      margin-bottom: 28px;
+    }
+
+    .admin-header-title h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--admin-text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-header-title p {
+      font-size: 0.92rem;
+      color: var(--admin-text-muted);
+      margin-top: 4px;
+    }
+
+    .db-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: #d1fae5;
+      color: #065f46;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid #a7f3d0;
+    }
+
+    /* Stat Cards */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-border);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    .stat-info span {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--admin-text-muted);
+      text-transform: uppercase;
+    }
+
+    .stat-info strong {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--admin-text);
+      line-height: 1.2;
+    }
+
+    /* Tabs Navigation */
+    .admin-nav-tabs {
+      display: flex;
+      gap: 12px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .nav-tab-item {
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--admin-text-muted);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab-item:hover {
+      color: var(--admin-accent);
+    }
+
+    .nav-tab-item.active {
+      color: var(--admin-accent);
+      border-bottom-color: var(--admin-accent);
+    }
+
+    /* Content Cards */
+    .admin-card {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius);
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      margin-bottom: 28px;
+    }
+
+    .admin-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .admin-card-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--admin-text);
+    }
+
+    .admin-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-box {
+      padding: 9px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      width: 240px;
+      outline: none;
+    }
+
+    .search-input-box:focus {
+      border-color: var(--admin-accent);
+    }
+
+    .btn-primary-admin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: var(--admin-accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary-admin:hover {
+      background: var(--admin-accent-hover);
+    }
+
+    /* Data Tables */
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .admin-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      padding: 14px 16px;
+      border-bottom: 2px solid #e2e8f0;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .admin-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--admin-text);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .role-admin {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .role-estudiante {
+      background: #f3e8ff;
+      color: #7e22ce;
+      border: 1px solid #e9d5ff;
+    }
+
+    .btn-table-action {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-table-action:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .btn-table-action.delete {
+      color: #ef4444;
+      border-color: #fecaca;
+    }
+
+    .btn-table-action.delete:hover {
+      background: #fee2e2;
+    }
+
+    /* Modal Form */
+    .admin-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .admin-modal-overlay.active {
+      display: flex;
+    }
+
+    .admin-modal-content {
+      background: #ffffff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      animation: modalSlide 0.3s ease;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .modal-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--admin-text);
+    }
+
+    .modal-form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .modal-form-input:focus {
+      border-color: var(--admin-accent);
+    }
+
+    .modal-actions-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Navbar -->
+  <header class="admin-navbar">
+    <div class="admin-nav-container">
+      <a href="index.html" class="brand-admin">
+        <img src="Multimedia/Logo.png" alt="Math Minds" class="brand-logo-img" />
+        <span class="admin-shield-badge">Administrador</span>
+      </a>
+
+      <div class="admin-controls">
+        <div class="admin-user-tag">
+          <span>👤 <strong id="adminNameDisplay">Admin</strong></span>
+        </div>
+        <a href="index.html" class="btn-admin-view-site">🌐 Ver Sitio Web</a>
+        <button id="adminLogoutBtn" class="btn-admin-logout" type="button">🚪 Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Admin Main Layout -->
+  <main class="admin-layout">
+
+    <!-- Header Hero Box -->
+    <div class="admin-header-box">
+      <div class="admin-header-title">
+        <h1>📊 Panel de Control General</h1>
+        <p>Supervisa los usuarios registrados en MySQL, gestiona las fichas de trabajo y los recursos de MATH Minds.</p>
+      </div>
+      <div class="db-status-pill">
+        <span>🟢 Base de datos MySQL: <strong>mathmind_fichasdb</strong></span>
+      </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="admin-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">👥</div>
+        <div class="stat-info">
+          <span>Total Usuarios</span>
+          <strong id="statUsersCount">24</strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">🎓</div>
+        <div class="stat-info">
+          <span>Estudiantes</span>
+          <strong id="statStudentsCount">22</strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #059669;">📚</div>
+        <div class="stat-info">
+          <span>Fichas Publicadas</span>
+          <strong id="statFichasCount">18</strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">🏫</div>
+        <div class="stat-info">
+          <span>Colegios Vinculados</span>
+          <strong>6</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav Tabs -->
+    <div class="admin-nav-tabs">
+      <button class="nav-tab-item active" onclick="switchTab('tab-fichas', this)">📚 Gestión de Fichas</button>
+      <button class="nav-tab-item" onclick="switchTab('tab-usuarios', this)">👥 Gestión de Usuarios</button>
+      <button class="nav-tab-item" onclick="switchTab('tab-servidor', this)">⚙️ Estado del Servidor & DB</button>
+    </div>
+
+    <!-- Tab 1: Fichas -->
+    <section id="tab-fichas" class="tab-content-panel">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Fichas de Trabajo Disponibles</h2>
+          <div class="admin-actions-bar">
+            <input type="text" id="searchFichasInput" class="search-input-box" placeholder="Buscar ficha..." onkeyup="filterFichasTable()" />
+            <button class="btn-primary-admin" onclick="openFichaModal()">➕ Nueva Ficha</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table" id="fichasTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Título de la Ficha</th>
+                <th>Área / Tema</th>
+                <th>Grado / Curso</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>#F01</strong></td>
+                <td>Operaciones con Fracciones</td>
+                <td><span class="role-badge role-admin">Aritmética</span></td>
+                <td>6to a 8vo</td>
+                <td>2026-08-15</td>
+                <td>
+                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
+                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#F02</strong></td>
+                <td>Perímetros y Áreas de Polígonos</td>
+                <td><span class="role-badge role-admin">Geometría</span></td>
+                <td>7mo a 9no</td>
+                <td>2026-08-18</td>
+                <td>
+                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
+                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#F03</strong></td>
+                <td>Ecuaciones Lineales y Balanzas</td>
+                <td><span class="role-badge role-admin">Álgebra</span></td>
+                <td>8vo a 10mo</td>
+                <td>2026-08-20</td>
+                <td>
+                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
+                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#F04</strong></td>
+                <td>Razonamiento y Patrones Numéricos</td>
+                <td><span class="role-badge role-admin">Lógica</span></td>
+                <td>Todos los grados</td>
+                <td>2026-08-22</td>
+                <td>
+                  <button class="btn-table-action" onclick="alert('Descargando archivo...')">📥 Ver</button>
+                  <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Usuarios -->
+    <section id="tab-usuarios" class="tab-content-panel" style="display: none;">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Lista de Usuarios (MySQL - Tabla `usuarios`)</h2>
+          <div class="admin-actions-bar">
+            <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar por nombre o correo..." onkeyup="filterUsersTable()" />
+            <button class="btn-primary-admin" onclick="openUserModal()">➕ Registrar Usuario</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table" id="usersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo Electrónico</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>Administrador Math</td>
+                <td>admin@mathminds.com</td>
+                <td><span class="role-badge role-admin">Admin</span></td>
+                <td><span style="color: #059669; font-weight: 700;">● Activo</span></td>
+                <td>
+                  <button class="btn-table-action" onclick="alert('Editar permisos...')">✏️ Editar</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>Estudiante Demo</td>
+                <td>estudiante@mathminds.com</td>
+                <td><span class="role-badge role-estudiante">Estudiante</span></td>
+                <td><span style="color: #059669; font-weight: 700;">● Activo</span></td>
+                <td>
+                  <button class="btn-table-action" onclick="alert('Editar usuario...')">✏️ Editar</button>
+                  <button class="btn-table-action delete" onclick="confirmDeleteUser(this)">🗑️ Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Servidor -->
+    <section id="tab-servidor" class="tab-content-panel" style="display: none;">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Configuración del Servidor y Base de Datos</h2>
+        </div>
+
+        <div style="display: grid; gap: 16px;">
+          <p><strong>Base de Datos MySQL:</strong> <code>mathmind_fichasdb</code></p>
+          <p><strong>Usuario de Base de Datos:</strong> <code>mathmind_adminfichas</code></p>
+          <p><strong>Endpoints Activos:</strong></p>
+          <ul style="padding-left: 20px; color: var(--admin-text-muted); line-height: 1.8;">
+            <li><code>login.php</code>: Validación asíncrona de credenciales con JSON y PDO.</li>
+            <li><code>conexion.php</code>: Módulo PDO con soporte UTF-8 y manejo de errores.</li>
+          </ul>
+
+          <div style="margin-top: 14px;">
+            <button class="btn-primary-admin" onclick="testServerConnection()">⚡ Probar Conexión con login.php</button>
+          </div>
+          <div id="testResultBox" style="display: none; padding: 14px; border-radius: 10px; margin-top: 10px; font-family: monospace;"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal para Agregar Ficha -->
+  <div class="admin-modal-overlay" id="fichaModal">
+    <div class="admin-modal-content">
+      <h3 style="margin-bottom: 18px;">➕ Publicar Nueva Ficha</h3>
+      <form id="addFichaForm" onsubmit="saveNewFicha(event)">
+        <div class="modal-form-group">
+          <label for="fichaTitleInput">Título de la Ficha</label>
+          <input type="text" id="fichaTitleInput" class="modal-form-input" required placeholder="Ej: Ficha de Geometría Espacial" />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="fichaAreaInput">Área Temática</label>
+          <select id="fichaAreaInput" class="modal-form-input">
+            <option value="Aritmética">Aritmética</option>
+            <option value="Geometría">Geometría</option>
+            <option value="Álgebra">Álgebra</option>
+            <option value="Lógica">Razonamiento Lógico</option>
+            <option value="Estadística">Estadística</option>
+          </select>
+        </div>
+
+        <div class="modal-form-group">
+          <label for="fichaGradeInput">Grados Recomendados</label>
+          <input type="text" id="fichaGradeInput" class="modal-form-input" required placeholder="Ej: 6to a 9no" />
+        </div>
+
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-table-action" onclick="closeFichaModal()">Cancelar</button>
+          <button type="submit" class="btn-primary-admin">Guardar Ficha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script de Control -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const AUTH_KEY = 'mathMindsLoggedUser';
+      const rawUser = localStorage.getItem(AUTH_KEY);
+      let user = null;
+
+      try {
+        user = rawUser ? JSON.parse(rawUser) : null;
+      } catch (e) {
+        user = null;
+      }
+
+      const adminNameDisplay = document.getElementById('adminNameDisplay');
+      const logoutBtn = document.getElementById('adminLogoutBtn');
+
+      if (user && user.email) {
+        const nombre = user.nombre || user.name || user.email;
+        adminNameDisplay.textContent = nombre;
+
+        // Comprobación de rol
+        if (user.rol && user.rol.toLowerCase() !== 'admin') {
+          alert('Tu usuario no tiene permisos de administrador. Redirigiendo a tu panel de estudiante...');
+          window.location.href = 'panel-estudiante.html';
+        }
+      } else {
+        alert('Debes iniciar sesión como administrador para acceder a este panel.');
+        window.location.href = 'index.html';
+      }
+
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem(AUTH_KEY);
+        window.location.href = 'index.html';
+      });
+    });
+
+    // Pestañas
+    function switchTab(tabId, tabBtn) {
+      document.querySelectorAll('.tab-content-panel').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-tab-item').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById(tabId);
+      if (target) target.style.display = 'block';
+      if (tabBtn) tabBtn.classList.add('active');
+    }
+
+    // Filtros de tablas
+    function filterFichasTable() {
+      const query = document.getElementById('searchFichasInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#fichasTable tbody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    function filterUsersTable() {
+      const query = document.getElementById('searchUserInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#usersTable tbody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Modales y Acciones
+    function openFichaModal() {
+      document.getElementById('fichaModal').classList.add('active');
+    }
+
+    function closeFichaModal() {
+      document.getElementById('fichaModal').classList.remove('active');
+    }
+
+    function saveNewFicha(e) {
+      e.preventDefault();
+      const title = document.getElementById('fichaTitleInput').value.trim();
+      const area = document.getElementById('fichaAreaInput').value;
+      const grade = document.getElementById('fichaGradeInput').value.trim();
+
+      const tbody = document.querySelector('#fichasTable tbody');
+      const newRow = document.createElement('tr');
+      const id = '#F0' + (tbody.children.length + 1);
+      const date = new Date().toISOString().split('T')[0];
+
+      newRow.innerHTML = `
+        <td><strong>${id}</strong></td>
+        <td>${title}</td>
+        <td><span class="role-badge role-admin">${area}</span></td>
+        <td>${grade}</td>
+        <td>${date}</td>
+        <td>
+          <button class="btn-table-action" onclick="alert('Descargando...')">📥 Ver</button>
+          <button class="btn-table-action delete" onclick="confirmDeleteFicha(this)">🗑️ Eliminar</button>
+        </td>
+      `;
+
+      tbody.appendChild(newRow);
+      closeFichaModal();
+      document.getElementById('addFichaForm').reset();
+      alert(`¡Ficha "${title}" publicada correctamente!`);
+    }
+
+    function confirmDeleteFicha(btn) {
+      if (confirm('¿Estás seguro de que deseas eliminar esta ficha?')) {
+        btn.closest('tr').remove();
+      }
+    }
+
+    function confirmDeleteUser(btn) {
+      if (confirm('¿Estás seguro de eliminar este usuario?')) {
+        btn.closest('tr').remove();
+      }
+    }
+
+    function openUserModal() {
+      const name = prompt('Nombre completo del usuario:');
+      if (!name) return;
+      const email = prompt('Correo electrónico:');
+      if (!email) return;
+      const rol = prompt('Rol (admin o estudiante):', 'estudiante');
+
+      const tbody = document.querySelector('#usersTable tbody');
+      const newRow = document.createElement('tr');
+      const id = tbody.children.length + 1;
+      const rolClass = rol.toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
+
+      newRow.innerHTML = `
+        <td><strong>${id}</strong></td>
+        <td>${name}</td>
+        <td>${email}</td>
+        <td><span class="role-badge ${rolClass}">${rol}</span></td>
+        <td><span style="color: #059669; font-weight: 700;">● Activo</span></td>
+        <td>
+          <button class="btn-table-action" onclick="alert('Editar usuario...')">✏️ Editar</button>
+          <button class="btn-table-action delete" onclick="confirmDeleteUser(this)">🗑️ Eliminar</button>
+        </td>
+      `;
+      tbody.appendChild(newRow);
+      alert('Usuario agregado a la vista.');
+    }
+
+    async function testServerConnection() {
+      const box = document.getElementById('testResultBox');
+      box.style.display = 'block';
+      box.style.background = '#f1f5f9';
+      box.style.color = '#0f172a';
+      box.textContent = 'Enviando petición de diagnóstico a login.php...';
+
+      try {
+        const res = await fetch('login.php');
+        const text = await res.text();
+        box.style.background = '#d1fae5';
+        box.style.color = '#065f46';
+        box.textContent = 'Respuesta del servidor:\n' + text;
+      } catch (err) {
+        box.style.background = '#fee2e2';
+        box.style.color = '#991b1b';
+        box.textContent = 'Error al conectar: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
