@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,8 +10,10 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 
   <style>
@@ -488,8 +491,15 @@
     }
 
     @keyframes modalSlide {
-      from { transform: translateY(15px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .modal-form-group {
@@ -548,6 +558,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Admin Navbar -->
@@ -560,10 +571,10 @@
 
       <div class="admin-controls">
         <div class="admin-user-tag">
-          <span>👤 <strong id="adminNameDisplay">Admin</strong></span>
+          <span><strong id="adminNameDisplay">Admin</strong></span>
         </div>
-        <a href="index.html" class="btn-admin-view-site">🌐 Ver Sitio Web</a>
-        <button id="adminLogoutBtn" class="btn-admin-logout" type="button">🚪 Cerrar sesión</button>
+        <a href="index.html" class="btn-admin-view-site">Ver Sitio Web</a>
+        <button id="adminLogoutBtn" class="btn-admin-logout" type="button">Cerrar sesión</button>
       </div>
     </div>
   </header>
@@ -574,8 +585,9 @@
     <!-- Header Hero Box -->
     <div class="admin-header-box">
       <div class="admin-header-title">
-        <h1>📊 Panel de Control General</h1>
-        <p>Administra usuarios reales de MySQL, asigna fichas con acceso personalizado y crea nuevo material educativo.</p>
+        <h1>Panel de Control General</h1>
+        <p>Administra usuarios registrados en MySQL, asigna fichas con acceso personalizado y gestiona el material
+          educativo.</p>
       </div>
       <div class="db-status-pill">
         <span>🟢 Base de datos MySQL: <strong>mathmind_fichasdb</strong></span>
@@ -585,15 +597,29 @@
     <!-- Quick Stats Grid -->
     <div class="admin-stats-grid">
       <div class="stat-card">
-        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">👥</div>
+        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
         <div class="stat-info">
-          <span>Total Usuarios Reales</span>
+          <span>Total Usuarios</span>
           <strong id="statUsersCount">0</strong>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">🎓</div>
+        <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
         <div class="stat-info">
           <span>Estudiantes</span>
           <strong id="statStudentsCount">0</strong>
@@ -601,7 +627,13 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon" style="background: #d1fae5; color: #059669;">📚</div>
+        <div class="stat-icon" style="background: #d1fae5; color: #059669;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
         <div class="stat-info">
           <span>Fichas Publicadas</span>
           <strong id="statFichasCount">0</strong>
@@ -609,7 +641,14 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">🏫</div>
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
         <div class="stat-info">
           <span>Plataforma</span>
           <strong>MATH Minds</strong>
@@ -619,19 +658,21 @@
 
     <!-- Nav Tabs -->
     <div class="admin-nav-tabs">
-      <button class="nav-tab-item active" onclick="switchTab('tab-usuarios', this)">👥 Usuarios Reales & Asignación de Fichas</button>
-      <button class="nav-tab-item" onclick="switchTab('tab-fichas', this)">📚 Fichas de Trabajo en Base de Datos</button>
-      <button class="nav-tab-item" onclick="switchTab('tab-servidor', this)">⚙️ Monitor MySQL</button>
+      <button class="nav-tab-item active" onclick="switchTab('tab-usuarios', this)">Usuarios y Asignación de
+        Fichas</button>
+      <button class="nav-tab-item" onclick="switchTab('tab-fichas', this)">Fichas de Trabajo</button>
+      <button class="nav-tab-item" onclick="switchTab('tab-servidor', this)">Monitor MySQL</button>
     </div>
 
     <!-- Tab 1: Usuarios Reales -->
     <section id="tab-usuarios" class="tab-content-panel">
       <div class="admin-card">
         <div class="admin-card-header">
-          <h2>Usuarios Registrados en MySQL (Tabla `usuarios`)</h2>
+          <h2>Usuarios Registrados en MySQL</h2>
           <div class="admin-actions-bar">
-            <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar usuario..." onkeyup="filterUsersTable()" />
-            <button class="btn-refresh" onclick="cargarUsuariosReales()">🔄 Actualizar</button>
+            <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar usuario..."
+              onkeyup="filterUsersTable()" />
+            <button class="btn-refresh" onclick="cargarUsuariosReales()">Actualizar</button>
           </div>
         </div>
 
@@ -644,14 +685,14 @@
                 <th>Correo Electrónico</th>
                 <th>Rol</th>
                 <th>Grado / Curso</th>
-                <th>Fichas con Acceso</th>
+                <th>Fichas Asignadas</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="usersTableBody">
               <tr>
                 <td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">
-                  ⏳ Cargando usuarios desde la base de datos...
+                  Cargando usuarios desde la base de datos...
                 </td>
               </tr>
             </tbody>
@@ -664,11 +705,12 @@
     <section id="tab-fichas" class="tab-content-panel" style="display: none;">
       <div class="admin-card">
         <div class="admin-card-header">
-          <h2>Fichas de Trabajo en la Base de Datos</h2>
+          <h2>Fichas de Trabajo en Base de Datos</h2>
           <div class="admin-actions-bar">
-            <input type="text" id="searchFichasInput" class="search-input-box" placeholder="Buscar ficha..." onkeyup="filterFichasTable()" />
-            <button class="btn-primary-admin" onclick="openFichaModal()">➕ Nueva Ficha</button>
-            <button class="btn-refresh" onclick="cargarFichasAdmin()">🔄 Actualizar</button>
+            <input type="text" id="searchFichasInput" class="search-input-box" placeholder="Buscar ficha..."
+              onkeyup="filterFichasTable()" />
+            <button class="btn-primary-admin" onclick="openFichaModal()">+ Nueva Ficha</button>
+            <button class="btn-refresh" onclick="cargarFichasAdmin()">Actualizar</button>
           </div>
         </div>
 
@@ -687,7 +729,7 @@
             <tbody id="fichasTableBody">
               <tr>
                 <td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">
-                  ⏳ Cargando fichas desde la base de datos...
+                  Cargando fichas desde la base de datos...
                 </td>
               </tr>
             </tbody>
@@ -705,18 +747,19 @@
 
         <div style="display: grid; gap: 14px;">
           <p><strong>Base de Datos MySQL:</strong> <code>mathmind_fichasdb</code></p>
-          <p><strong>Endpoints Activos en cPanel:</strong></p>
+          <p><strong>Endpoints Activos:</strong></p>
           <ul style="padding-left: 20px; color: var(--admin-text-muted); line-height: 1.8;">
-            <li><code>obtener_usuarios.php</code>: Consulta usuarios reales de la tabla <code>usuarios</code>.</li>
-            <li><code>guardar_usuario_permisos.php</code>: Guarda qué fichas específicas y grado puede ver cada estudiante.</li>
+            <li><code>obtener_usuarios.php</code>: Consulta usuarios de la tabla <code>usuarios</code>.</li>
+            <li><code>guardar_usuario_permisos.php</code>: Guarda fichas específicas y grado de cada estudiante.</li>
             <li><code>obtener_fichas.php</code>: Devuelve fichas según permisos y rol.</li>
             <li><code>guardar_ficha.php</code> / <code>eliminar_ficha.php</code>: Gestión de fichas en MySQL.</li>
           </ul>
 
           <div style="margin-top: 10px;">
-            <button class="btn-primary-admin" onclick="testServerConnection()">⚡ Probar Conexión con login.php y obtener_usuarios.php</button>
+            <button class="btn-primary-admin" onclick="testServerConnection()">Probar Conexión con Endpoints</button>
           </div>
-          <pre id="testResultBox" style="display: none; padding: 14px; border-radius: 10px; margin-top: 10px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.85rem; overflow-x: auto;"></pre>
+          <pre id="testResultBox"
+            style="display: none; padding: 14px; border-radius: 10px; margin-top: 10px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.85rem; overflow-x: auto;"></pre>
         </div>
       </div>
     </section>
@@ -726,15 +769,17 @@
   <!-- Modal para Asignar Fichas a un Usuario -->
   <div class="admin-modal-overlay" id="permisosModal">
     <div class="admin-modal-content">
-      <h3 style="margin-bottom: 8px;">🎯 Asignar Fichas y Grado a Estudiante</h3>
-      <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;" id="modalUserSubtitle">Selecciona a qué fichas tendrá acceso este usuario en su panel.</p>
+      <h3 style="margin-bottom: 8px;">Asignar Fichas y Grado a Estudiante</h3>
+      <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;" id="modalUserSubtitle">Selecciona a qué fichas
+        tendrá acceso este usuario en su panel.</p>
 
       <form id="permisosForm" onsubmit="guardarPermisosUsuario(event)">
         <input type="hidden" id="modalUserId" />
 
         <div class="modal-form-group">
           <label for="modalUserGrado">Grado / Curso del Estudiante</label>
-          <input type="text" id="modalUserGrado" class="modal-form-input" placeholder="Ej: 1ro, 2do, 6to, Primero, etc." required />
+          <input type="text" id="modalUserGrado" class="modal-form-input" placeholder="Ej: 1ro, 2do, 6to, Primero, etc."
+            required />
         </div>
 
         <div class="modal-form-group">
@@ -754,7 +799,7 @@
 
         <div class="modal-actions-footer">
           <button type="button" class="btn-table-action" onclick="closePermisosModal()">Cancelar</button>
-          <button type="submit" class="btn-primary-admin" id="btnSavePermisos">💾 Guardar Permisos</button>
+          <button type="submit" class="btn-primary-admin" id="btnSavePermisos">Guardar Permisos</button>
         </div>
       </form>
     </div>
@@ -763,16 +808,18 @@
   <!-- Modal para Crear Nueva Ficha -->
   <div class="admin-modal-overlay" id="fichaModal">
     <div class="admin-modal-content">
-      <h3 style="margin-bottom: 18px;">➕ Publicar Nueva Ficha en MySQL</h3>
+      <h3 style="margin-bottom: 18px;">Publicar Nueva Ficha en MySQL</h3>
       <form id="addFichaForm">
         <div class="modal-form-group">
           <label for="fichaTitleInput">Título de la Ficha</label>
-          <input type="text" id="fichaTitleInput" class="modal-form-input" required placeholder="Ej: Ficha de Operaciones con Fracciones" />
+          <input type="text" id="fichaTitleInput" class="modal-form-input" required
+            placeholder="Ej: Ficha de Operaciones con Fracciones" />
         </div>
 
         <div class="modal-form-group">
           <label for="fichaGradeInput">Grados Recomendados</label>
-          <input type="text" id="fichaGradeInput" class="modal-form-input" required placeholder="Ej: 6to, 7mo, 8vo o Todos" value="Todos" />
+          <input type="text" id="fichaGradeInput" class="modal-form-input" required
+            placeholder="Ej: 6to, 7mo, 8vo o Todos" value="Todos" />
         </div>
 
         <div class="modal-form-group">
@@ -788,17 +835,19 @@
 
         <div class="modal-form-group">
           <label for="fichaDescInput">Descripción de la Actividad</label>
-          <input type="text" id="fichaDescInput" class="modal-form-input" placeholder="Ej: Guía estructurada con metodología Singapur CPA" />
+          <input type="text" id="fichaDescInput" class="modal-form-input"
+            placeholder="Ej: Guía estructurada con metodología Singapur CPA" />
         </div>
 
         <div class="modal-form-group">
           <label for="fichaRutaInput">Ruta o Enlace del Archivo (PDF o URL)</label>
-          <input type="text" id="fichaRutaInput" class="modal-form-input" placeholder="Ej: documentos/ficha1.pdf o https://..." value="#" />
+          <input type="text" id="fichaRutaInput" class="modal-form-input"
+            placeholder="Ej: documentos/ficha1.pdf o https://..." value="#" />
         </div>
 
         <div class="modal-actions-footer">
           <button type="button" class="btn-table-action" onclick="closeFichaModal()">Cancelar</button>
-          <button type="submit" class="btn-primary-admin" id="btnCreateFicha">💾 Guardar en Base de Datos</button>
+          <button type="submit" class="btn-primary-admin" id="btnCreateFicha">Guardar en Base de Datos</button>
         </div>
       </form>
     </div>
@@ -845,7 +894,7 @@
     // 1. Cargar Usuarios Reales desde MySQL
     async function cargarUsuariosReales() {
       const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">⏳ Consultando usuarios en MySQL...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Consultando usuarios en MySQL...</td></tr>';
 
       try {
         const res = await fetch('obtener_usuarios.php');
@@ -859,11 +908,11 @@
 
           renderUsuariosTable(data.usuarios);
         } else {
-          tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">❌ ${data.mensaje || 'No se pudieron cargar los usuarios.'}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">${data.mensaje || 'No se pudieron cargar los usuarios.'}</td></tr>`;
         }
       } catch (err) {
         console.error(err);
-        tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">❌ Error de conexión al consultar obtener_usuarios.php</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="color:#ef4444; text-align:center; padding:20px;">Error de conexión al consultar obtener_usuarios.php</td></tr>`;
       }
     }
 
@@ -880,11 +929,11 @@
         const tr = document.createElement('tr');
         const rolClass = String(user.rol).toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
         const countFichas = user.fichas_acceso ? user.fichas_acceso.split(',').filter(Boolean).length : 0;
-        
+
         // Validación condicional del grado: solo muestra badge si existe y no está vacío
         const gradoLimpio = (user.grado || '').trim();
-        const gradoHtml = (gradoLimpio && gradoLimpio !== 'Sin grado') 
-          ? `<span class="badge-grade">${gradoLimpio}</span>` 
+        const gradoHtml = (gradoLimpio && gradoLimpio !== 'Sin grado')
+          ? `<span class="badge-grade">${gradoLimpio}</span>`
           : '';
 
         tr.innerHTML = `
@@ -893,9 +942,9 @@
           <td>${user.email}</td>
           <td><span class="role-badge ${rolClass}">${user.rol}</span></td>
           <td>${gradoHtml}</td>
-          <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">📁 ${countFichas}</span></td>
+          <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">${countFichas}</span></td>
           <td>
-            <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">🎯 Asignar Fichas</button>
+            <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">Asignar Fichas</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -940,8 +989,8 @@
           <td><span class="badge-grade">${f.grado || 'Todos'}</span></td>
           <td style="font-size:0.85rem; color:#64748b; max-width:280px;">${f.descripcion || 'Sin descripción'}</td>
           <td>
-            <a href="${urlArchivo}" target="_blank" class="btn-table-action" style="margin-right: 6px; text-decoration: none;">👁️ Ver</a>
-            <button class="btn-table-action delete" onclick="eliminarFicha(${f.id}, '${f.titulo}')">🗑️ Eliminar</button>
+            <a href="${urlArchivo}" target="_blank" class="btn-table-action" style="margin-right: 6px; text-decoration: none;">Ver</a>
+            <button class="btn-table-action delete" onclick="eliminarFicha(${f.id}, '${f.titulo}')">Eliminar</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1015,17 +1064,17 @@
 
         const data = await res.json();
         if (data.success) {
-          alert('✅ ' + data.mensaje);
+          alert(data.mensaje);
           closePermisosModal();
           cargarUsuariosReales();
         } else {
-          alert('❌ ' + (data.mensaje || 'Error al guardar permisos'));
+          alert(data.mensaje || 'Error al guardar permisos');
         }
       } catch (err) {
         alert('Error de conexión al guardar permisos');
       } finally {
         btn.disabled = false;
-        btn.textContent = '💾 Guardar Permisos';
+        btn.textContent = 'Guardar Permisos';
       }
     }
 
@@ -1058,15 +1107,6 @@
         btn.textContent = 'Guardando en MySQL...';
       }
 
-      console.group('📄 [Admin] Creando Ficha en MySQL');
-      console.log('📤 Enviando datos a guardar_ficha.php:', {
-        titulo: titulo,
-        grado: grado,
-        descripcion: descripcion,
-        ruta_archivo: ruta_archivo,
-        area: area
-      });
-
       try {
         const res = await fetch('guardar_ficha.php', {
           method: 'POST',
@@ -1084,42 +1124,32 @@
           })
         });
 
-        console.log('📡 HTTP Status:', res.status, res.statusText);
         const textResponse = await res.text();
-        console.log('📥 Respuesta cruda del servidor:', textResponse);
 
         let data = null;
         try {
           data = JSON.parse(textResponse);
         } catch (errParse) {
-          console.error('❌ El servidor no devolvió JSON válido:', textResponse);
           alert('Error en el servidor al guardar la ficha:\n' + textResponse);
           return;
         }
 
-        console.log('📦 JSON procesado:', data);
-
         if (data.success) {
-          console.log('✅ Ficha creada correctamente con ID:', data.ficha_id);
-          alert('✅ ' + (data.mensaje || 'Ficha creada correctamente.'));
+          alert(data.mensaje || 'Ficha creada correctamente.');
           closeFichaModal();
           const form = document.getElementById('addFichaForm');
           if (form) form.reset();
-          // Recargar tabla de fichas
           cargarFichasAdmin();
         } else {
-          console.warn('⚠️ Error devuelto por guardar_ficha.php:', data.mensaje);
-          alert('❌ ' + (data.mensaje || 'No se pudo guardar la ficha.'));
+          alert(data.mensaje || 'No se pudo guardar la ficha.');
         }
       } catch (err) {
-        console.error('❌ Error de red / fetch:', err);
         alert('Error al conectar con guardar_ficha.php. Verifica tu conexión.');
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = '💾 Guardar en Base de Datos';
+          btn.textContent = 'Guardar en Base de Datos';
         }
-        console.groupEnd();
       }
     }
 
@@ -1160,7 +1190,7 @@
     // Filtros de búsqueda
     function filterUsersTable() {
       const query = document.getElementById('searchUserInput').value.toLowerCase();
-      const filtered = globalUsuarios.filter(u => 
+      const filtered = globalUsuarios.filter(u =>
         (u.nombre && u.nombre.toLowerCase().includes(query)) ||
         (u.email && u.email.toLowerCase().includes(query)) ||
         (u.grado && u.grado.toLowerCase().includes(query))
@@ -1170,7 +1200,7 @@
 
     function filterFichasTable() {
       const query = document.getElementById('searchFichasInput').value.toLowerCase();
-      const filtered = globalFichas.filter(f => 
+      const filtered = globalFichas.filter(f =>
         (f.titulo && f.titulo.toLowerCase().includes(query)) ||
         (f.area && f.area.toLowerCase().includes(query)) ||
         (f.grado && f.grado.toLowerCase().includes(query))
@@ -1193,4 +1223,5 @@
     }
   </script>
 </body>
+
 </html>
