@@ -550,6 +550,52 @@
       border-bottom: none;
     }
 
+    .btn-select-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-select-all:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      transform: translateY(-1px);
+    }
+
+    .btn-deselect-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-deselect-all:hover {
+      background: #fee2e2;
+      color: #ef4444;
+      border-color: #fecaca;
+      transform: translateY(-1px);
+    }
+
     .modal-actions-footer {
       display: flex;
       justify-content: flex-end;
@@ -791,7 +837,17 @@
         </div>
 
         <div class="modal-form-group">
-          <label>Seleccionar Fichas con Acceso:</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <label style="margin-bottom: 0;">Seleccionar Fichas con Acceso:</label>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="btn-select-all" onclick="seleccionarTodasFichas(true)" title="Marcar todas las fichas disponibles">
+                ✅ Asignar todas las fichas
+              </button>
+              <button type="button" class="btn-deselect-all" onclick="seleccionarTodasFichas(false)" title="Desmarcar todas">
+                ❌ Desmarcar
+              </button>
+            </div>
+          </div>
           <div class="checkbox-list-container" id="modalFichasChecklist">
             <!-- Checkboxes generados dinámicamente -->
           </div>
@@ -1034,6 +1090,13 @@
 
     function closePermisosModal() {
       document.getElementById('permisosModal').classList.remove('active');
+    }
+
+    function seleccionarTodasFichas(marcar = true) {
+      const checkboxes = document.querySelectorAll('#modalFichasChecklist input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        cb.checked = marcar;
+      });
     }
 
     async function guardarPermisosUsuario(e) {

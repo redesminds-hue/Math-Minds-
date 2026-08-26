@@ -338,6 +338,172 @@
       gap: 20px;
     }
 
+    /* Navegación y Carpetas */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .folder-nav-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 10px 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      flex-wrap: wrap;
+    }
+
+    .folder-breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #0284c7;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      font-family: inherit;
+    }
+
+    .breadcrumb-item:hover {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .breadcrumb-item.active {
+      color: #0f172a;
+      font-weight: 700;
+      cursor: default;
+      background: transparent;
+    }
+
+    .breadcrumb-sep {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .btn-back-folder {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #334155;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-back-folder:hover {
+      background: #f1f5f9;
+      border-color: #0284c7;
+      color: #0284c7;
+      transform: translateX(-2px);
+    }
+
+    /* Carpetas Cards */
+    .folder-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+      position: relative;
+      user-select: none;
+    }
+
+    .folder-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -6px rgba(2, 132, 199, 0.18), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+      border-color: #0284c7;
+      background: #f8fafc;
+    }
+
+    .folder-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+      transition: transform 0.22s ease;
+    }
+
+    .folder-card:hover .folder-icon-wrapper {
+      transform: scale(1.08);
+    }
+
+    .folder-card.lang-es .folder-icon-wrapper {
+      background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+    }
+
+    .folder-card.lang-en .folder-icon-wrapper {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    }
+
+    .folder-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .folder-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .folder-card-meta {
+      font-size: 0.8rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .folder-card-arrow {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .folder-card:hover .folder-card-arrow {
+      color: #0284c7;
+      transform: translateX(4px);
+    }
+
     .tarjeta-drive {
       display: flex;
       flex-direction: column;
@@ -749,20 +915,30 @@
           <!-- Buscador de fichas -->
           <div class="fichas-search-wrapper">
             <span class="search-icon">🔍</span>
-            <input type="search" id="buscadorFichas" placeholder="Buscar ficha por nombre..." autocomplete="off"
+            <input type="search" id="buscadorFichas" placeholder="Buscar ficha por nombre, tema o tipo..." autocomplete="off"
               aria-label="Buscar fichas" />
           </div>
 
           <!-- Etiqueta de resultados de búsqueda -->
           <p class="search-results-label" id="searchResultsLabel"></p>
 
-          <!-- Filter Tabs (generados dinámicamente desde la BD) -->
-          <div class="filter-tabs" id="contenedor-filtros">
+          <!-- Barra de Navegación de Carpetas (Breadcrumbs + Botón Volver) -->
+          <div class="folder-nav-header" id="folderNavHeader">
+            <div class="folder-breadcrumbs" id="folderBreadcrumbs">
+              <span class="breadcrumb-item active">📁 Carpetas</span>
+            </div>
+            <button type="button" id="btnVolverCarpeta" class="btn-back-folder" style="display: none;" onclick="volverAtras()">
+              ⬅ Volver
+            </button>
+          </div>
+
+          <!-- Filter Tabs (generados dinámicamente según el contenido actual) -->
+          <div class="filter-tabs" id="contenedor-filtros" style="display: none;">
             <button class="tab-btn active" data-filter="all">Todas</button>
           </div>
 
-          <!-- Grid Dinámico de Fichas -->
-          <div class="fichas-grid" id="fichasContainer">
+          <!-- Grid Dinámico (Carpetas o Fichas) -->
+          <div id="fichasContainer" class="folder-grid">
             <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #64748b;">
               ⏳ Consultando fichas asignadas a tu cuenta...
             </div>
@@ -775,8 +951,11 @@
 
   <!-- Script de Conexión en Vivo con obtener_fichas.php -->
   <script>
-    // Variable global: almacena TODAS las fichas cargadas desde la BD
+    // Variables globales de estado
     let fichasAsignadas = [];
+    let currentCarpeta = null;    // null = nivel raíz (Carpetas) | string = nombre carpeta
+    let currentIdioma = null;     // null = nivel selector de idioma | 'es' | 'en'
+    let currentTipoFiltro = 'all'; // filtro de tipo dentro de la carpeta
 
     document.addEventListener('DOMContentLoaded', () => {
       const AUTH_KEY = 'mathMindsLoggedUser';
@@ -825,6 +1004,12 @@
         localStorage.removeItem(AUTH_KEY);
         window.location.href = 'index.html';
       });
+
+      // Configurar evento de buscador
+      const buscador = document.getElementById('buscadorFichas');
+      buscador.addEventListener('input', () => {
+        renderVista();
+      });
     });
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -841,7 +1026,7 @@
         const data = await res.json();
 
         if (data.success && Array.isArray(data.fichas)) {
-          // Guardar todas las fichas globalmente para filtrado local
+          // Guardar todas las fichas globalmente
           fichasAsignadas = data.fichas;
           totalCount.textContent = data.fichas.length;
 
@@ -851,20 +1036,8 @@
             document.getElementById('studentGradeText').textContent = gradoFinal;
           }
 
-          // Generar botones de filtro dinámicos según los tipos únicos en la BD
-          generarFiltrosDinamicos(fichasAsignadas);
-
-          // Activar el buscador en tiempo real
-          const buscador = document.getElementById('buscadorFichas');
-          buscador.addEventListener('input', () => {
-            const texto = buscador.value.trim();
-            const filtroActivo = document.querySelector('#contenedor-filtros .tab-btn.active');
-            const tipoActivo = filtroActivo ? filtroActivo.getAttribute('data-filter') : 'all';
-            renderFichas(tipoActivo, texto);
-          });
-
-          // Renderizar todas las fichas por defecto
-          renderFichas('all', '');
+          // Iniciar en la vista principal de carpetas
+          irACarpetas();
         } else {
           container.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
@@ -883,172 +1056,604 @@
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 2. GENERACIÓN DINÁMICA DE FILTROS DESDE LA COLUMNA `tipo` DE LA BD
+    // 2. EXTRACCIÓN Y LIMPIEZA DE NOMBRES DE CARPETAS Y TIPOS
     // ─────────────────────────────────────────────────────────────────────────
-    function generarFiltrosDinamicos(fichas) {
-      const contenedor = document.getElementById('contenedor-filtros');
+    // Limpia palabras de tipo (clase, clase 2, cierre, evaluacion, class, class 2, closing, evaluation)
+    // para obtener un nombre de carpeta limpio y único por tema.
+    function limpiarNombreCarpeta(texto) {
+      if (!texto) return 'General';
+      let s = String(texto).trim();
 
-      // Limpiar el contenedor (elimina cualquier botón previo)
-      contenedor.innerHTML = '';
+      // 1. Eliminar palabras de tipo (español e inglés)
+      s = s.replace(/\b(clase\s*2|class\s*2|clase|class|cierre|closing|evaluaci[oó]n|evaluation|tarea|homework|quiz|test|examen)\b/gi, '');
 
-      // Botón "Todas" activo por defecto
-      const btnTodas = document.createElement('button');
-      btnTodas.className = 'tab-btn active';
-      btnTodas.setAttribute('data-filter', 'all');
-      btnTodas.textContent = 'Todas';
-      contenedor.appendChild(btnTodas);
+      // 2. Limpiar paréntesis o corchetes vacíos resultantes () o []
+      s = s.replace(/\(\s*\)/g, '').replace(/\[\s*\]/g, '');
 
-      // Extraer tipos únicos desde la columna `tipo`, eliminando valores vacíos/nulos
-      const tiposUnicos = [...new Set(
-        fichas.map(f => (f.tipo || '').trim()).filter(Boolean)
-      )].sort();
+      // 3. Limpiar separadores sobrantes al inicio o al final (- , : , | , / , _ , .)
+      s = s.replace(/^[\s\-–—:|/_,.()\[\]]+|[\s\-–—:|/_,.()\[\]]+$/g, '');
 
-      // Crear un botón por cada tipo único encontrado
-      tiposUnicos.forEach(tipo => {
-        const btn = document.createElement('button');
-        btn.className = 'tab-btn';
-        btn.setAttribute('data-filter', tipo);
-        btn.textContent = tipo;
-        contenedor.appendChild(btn);
-      });
+      // 4. Reducir espacios múltiples
+      s = s.replace(/\s+/g, ' ').trim();
 
-      // Delegar los clics a todos los botones del contenedor
-      contenedor.addEventListener('click', (e) => {
-        const btn = e.target.closest('.tab-btn');
-        if (!btn) return;
-
-        // Actualizar clase activa
-        contenedor.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        // Al cambiar de filtro, limpiar el buscador y renderizar
-        const buscador = document.getElementById('buscadorFichas');
-        buscador.value = '';
-        document.getElementById('searchResultsLabel').classList.remove('visible');
-
-        renderFichas(btn.getAttribute('data-filter'), '');
-      });
+      return s || 'General';
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 3. ÍCONO SEGÚN EL TIPO DE FICHA (columna `tipo` de la BD)
-    // ─────────────────────────────────────────────────────────────────────────
-    function getTipoIcon(tipo) {
-      const t = (tipo || '').toLowerCase().trim();
-      if (t.includes('cierre')) return '🏁';
-      if (t.includes('clase 2')) return '📗';
-      if (t.includes('clase')) return '📘';
-      if (t.includes('evaluac')) return '📝';
-      if (t.includes('tarea')) return '✏️';
-      if (t.includes('práctica') || t.includes('practica')) return '🔧';
-      if (t.includes('proyecto')) return '🚀';
-      if (t.includes('quiz')) return '❓';
-      if (t.includes('examen')) return '📋';
-      if (t.includes('laboratorio')) return '🔬';
-      if (t.includes('lectura')) return '📖';
-      return '📄';
-    }
+    // Obtiene el nombre de la carpeta de una ficha (desde columna carpeta o desde el título limpio)
+    function obtenerNombreCarpeta(f) {
+      if (!f) return 'General';
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 4. RENDERIZADO DE TARJETAS ESTILO GOOGLE DRIVE
-    // ─────────────────────────────────────────────────────────────────────────
-    function renderFichas(filter = 'all', busqueda = '') {
-      const container = document.getElementById('fichasContainer');
-      const resultsLabel = document.getElementById('searchResultsLabel');
-      container.innerHTML = '';
-
-      const textoBusqueda = busqueda.trim().toLowerCase();
-
-      // Filtrar por tipo Y por texto de búsqueda simultaneamente
-      const filtradas = fichasAsignadas.filter(f => {
-        const coincideTipo = filter === 'all'
-          ? true
-          : (f.tipo || '').trim().toLowerCase() === filter.trim().toLowerCase();
-
-        const coincideTexto = textoBusqueda === ''
-          ? true
-          : (f.titulo || '').toLowerCase().includes(textoBusqueda);
-
-        return coincideTipo && coincideTexto;
-      });
-
-      // Mostrar etiqueta de resultados solo si hay texto de búsqueda
-      if (textoBusqueda) {
-        resultsLabel.textContent = `🔍 ${filtradas.length} resultado${filtradas.length !== 1 ? 's' : ''} para “${busqueda.trim()}”`;
-        resultsLabel.classList.add('visible');
-      } else {
-        resultsLabel.classList.remove('visible');
+      // 1. Si tiene columna carpeta y tiene texto válido
+      if (f.carpeta && f.carpeta.trim()) {
+        const limpia = limpiarNombreCarpeta(f.carpeta);
+        if (limpia && limpia.toLowerCase() !== 'general') {
+          return limpia;
+        }
       }
 
-      if (!filtradas.length) {
+      // 2. Extraer del título de la ficha eliminando el tipo
+      if (f.titulo && f.titulo.trim()) {
+        const limpia = limpiarNombreCarpeta(f.titulo);
+        if (limpia) return limpia;
+      }
+
+      return 'General';
+    }
+
+    // Detecta el tipo específico y el idioma de una ficha a partir de su tipo y/o título
+    function detectarTipoYIdioma(f) {
+      if (!f) return { tipo: 'Ficha', idioma: 'es' };
+
+      const textoCompleto = `${f.tipo || ''} ${f.titulo || ''}`.toLowerCase().trim();
+      const t = textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // 1. Inglés (class 2, closing, evaluation, class, etc.)
+      if (t.includes('class 2') || t.includes('class2')) {
+        return { tipo: 'Class 2', idioma: 'en' };
+      }
+      if (t.includes('closing')) {
+        return { tipo: 'Closing', idioma: 'en' };
+      }
+      if (t.includes('evaluation')) {
+        return { tipo: 'Evaluation', idioma: 'en' };
+      }
+      if (t.includes('class')) {
+        return { tipo: 'Class', idioma: 'en' };
+      }
+      if (t.includes('homework') || t.includes('quiz') || t.includes('test')) {
+        return { tipo: (f.tipo && f.tipo.trim()) || 'Activity', idioma: 'en' };
+      }
+
+      // 2. Español (clase 2, cierre, evaluacion, clase, etc.)
+      if (t.includes('clase 2') || t.includes('clase2')) {
+        return { tipo: 'Clase 2', idioma: 'es' };
+      }
+      if (t.includes('cierre')) {
+        return { tipo: 'Cierre', idioma: 'es' };
+      }
+      if (t.includes('evaluacion')) {
+        return { tipo: 'Evaluación', idioma: 'es' };
+      }
+      if (t.includes('clase')) {
+        return { tipo: 'Clase', idioma: 'es' };
+      }
+      if (t.includes('tarea') || t.includes('practica') || t.includes('proyecto')) {
+        return { tipo: (f.tipo && f.tipo.trim()) || 'Actividad', idioma: 'es' };
+      }
+
+      // 3. Fallback
+      const tipoFinal = (f.tipo && f.tipo.trim()) ? f.tipo.trim() : 'Ficha';
+      const idiomaFinal = (tipoFinal.toLowerCase().includes('class') || tipoFinal.toLowerCase().includes('evaluation') || tipoFinal.toLowerCase().includes('closing')) ? 'en' : 'es';
+
+      return { tipo: tipoFinal, idioma: idiomaFinal };
+    }
+
+    function getIdiomaFicha(f) {
+      if (typeof f === 'string') {
+        const info = detectarTipoYIdioma({ tipo: f, titulo: '' });
+        return info.idioma;
+      }
+      return detectarTipoYIdioma(f).idioma;
+    }
+
+    function getTipoFicha(f) {
+      if (typeof f === 'string') return f;
+      return detectarTipoYIdioma(f).tipo;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. NAVEGACIÓN Y CONTROLADOR DE VISTAS
+    // ─────────────────────────────────────────────────────────────────────────
+    function irACarpetas() {
+      currentCarpeta = null;
+      currentIdioma = null;
+      currentTipoFiltro = 'all';
+      renderVista();
+    }
+
+    function abrirCarpeta(nombreCarpeta) {
+      currentCarpeta = nombreCarpeta;
+      currentIdioma = null;
+      currentTipoFiltro = 'all';
+      renderVista();
+    }
+
+    function abrirIdioma(idioma) {
+      currentIdioma = idioma;
+      currentTipoFiltro = 'all';
+      renderVista();
+    }
+
+    function volverAtras() {
+      const buscador = document.getElementById('buscadorFichas');
+      if (buscador && buscador.value.trim() !== '') {
+        buscador.value = '';
+        renderVista();
+        return;
+      }
+
+      if (currentIdioma !== null) {
+        currentIdioma = null;
+        currentTipoFiltro = 'all';
+        renderVista();
+      } else if (currentCarpeta !== null) {
+        currentCarpeta = null;
+        currentIdioma = null;
+        currentTipoFiltro = 'all';
+        renderVista();
+      }
+    }
+
+    function renderVista() {
+      const buscador = document.getElementById('buscadorFichas');
+      const textoBusqueda = buscador ? buscador.value.trim() : '';
+
+      if (textoBusqueda !== '') {
+        renderBusqueda(textoBusqueda);
+        return;
+      }
+
+      document.getElementById('searchResultsLabel').classList.remove('visible');
+
+      if (currentCarpeta === null) {
+        renderCarpetasPrincipales();
+      } else if (currentIdioma === null) {
+        renderSubcarpetasIdioma(currentCarpeta);
+      } else {
+        renderFichasDeIdioma(currentCarpeta, currentIdioma, currentTipoFiltro);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. VISTA 1: CARPETAS PRINCIPALES
+    // ─────────────────────────────────────────────────────────────────────────
+    function renderCarpetasPrincipales() {
+      const container = document.getElementById('fichasContainer');
+      const breadcrumbs = document.getElementById('folderBreadcrumbs');
+      const btnVolver = document.getElementById('btnVolverCarpeta');
+      const contenedorFiltros = document.getElementById('contenedor-filtros');
+
+      btnVolver.style.display = 'none';
+      contenedorFiltros.style.display = 'none';
+      container.className = 'folder-grid';
+      container.innerHTML = '';
+
+      breadcrumbs.innerHTML = `<span class="breadcrumb-item active">📁 Todas las Carpetas</span>`;
+
+      if (!fichasAsignadas.length) {
         container.innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 36px 20px;
                       background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1;">
-            <div style="font-size: 2rem; margin-bottom: 8px;">📂</div>
-            <h3 style="color: #0f172a; margin-bottom: 4px;">No hay fichas en esta categoría</h3>
-            <p style="color: #64748b; font-size: 0.9rem;">Tu profesor te habilitará nuevas fichas a medida que avance el curso.</p>
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">📂</div>
+            <h3 style="color: #0f172a; margin-bottom: 4px;">No tienes carpetas ni fichas asignadas</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">Tu profesor te habilitará nuevas fichas y temas pronto.</p>
           </div>
         `;
         return;
       }
 
-      filtradas.forEach(f => {
-        const tipo = (f.tipo || '').trim();
-        const icon = getTipoIcon(tipo);
-        const titulo = (f.titulo || 'Ficha sin título').trim();
-        const grado = (f.grado || 'General').trim();
-        const desc = (f.descripcion || '').trim();
+      // Agrupar fichas por nombre de carpeta obtenido limpiamente
+      const carpetasMap = {};
+      fichasAsignadas.forEach(f => {
+        const nombre = obtenerNombreCarpeta(f);
+        if (!carpetasMap[nombre]) {
+          carpetasMap[nombre] = { nombre, total: 0, es: 0, en: 0 };
+        }
+        carpetasMap[nombre].total++;
+        if (getIdiomaFicha(f) === 'es') {
+          carpetasMap[nombre].es++;
+        } else {
+          carpetasMap[nombre].en++;
+        }
+      });
 
-        // URL segura: usa ver_archivo.php?id= cuando existe un ID de ficha
-        const urlArchivo = f.id
-          ? `ver_archivo.php?id=${f.id}`
-          : ((f.ruta_archivo || f.enlace || '#').trim());
+      // Ordenamiento numérico natural (1, 2, 3... 10)
+      const listaCarpetas = Object.values(carpetasMap).sort((a, b) => {
+        const numA = (a.nombre.match(/\d+/) || [])[0];
+        const numB = (b.nombre.match(/\d+/) || [])[0];
 
-        const card = document.createElement('a');
-        card.href = urlArchivo;
-        card.target = '_blank';
-        card.rel = 'noopener noreferrer';
-        card.className = 'tarjeta-drive';
-        card.title = `${titulo}${tipo ? ' · ' + tipo : ''}${grado ? ' (' + grado + ')' : ''}${desc ? ' | ' + desc : ''}`;
+        if (numA !== undefined && numB !== undefined) {
+          const intA = parseInt(numA, 10);
+          const intB = parseInt(numB, 10);
+          if (intA !== intB) return intA - intB;
+        } else if (numA !== undefined && numB === undefined) {
+          return -1;
+        } else if (numA === undefined && numB !== undefined) {
+          return 1;
+        }
+
+        return a.nombre.localeCompare(b.nombre, undefined, { numeric: true, sensitivity: 'base' });
+      });
+
+      listaCarpetas.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'folder-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.title = `Abrir carpeta: ${c.nombre}`;
+
+        const nombreEscapado = c.nombre.replace(/'/g, "\\'");
 
         card.innerHTML = `
-          <div class="tarjeta-drive-header">
-            <span class="tarjeta-drive-type-icon">${icon}</span>
-            <h3 class="tarjeta-drive-title">${titulo}</h3>
-          </div>
-          <div class="tarjeta-drive-preview">
-            <img
-              src="${urlArchivo}"
-              alt="Vista previa de ${titulo}"
-              class="tarjeta-drive-thumbnail"
-              loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-            />
-            <div class="tarjeta-drive-preview-icon" style="display:none;">${icon}</div>
-            <div class="tarjeta-drive-preview-overlay">
-              <span>Abrir Ficha ↗</span>
+          <div class="folder-icon-wrapper">📁</div>
+          <div class="folder-card-body">
+            <h3 class="folder-card-title">${c.nombre}</h3>
+            <div class="folder-card-meta">
+              <span>📚 ${c.total} ficha${c.total !== 1 ? 's' : ''}</span>
+              <span>·</span>
+              <span>🇪🇸 ${c.es}</span>
+              <span>·</span>
+              <span>🇺🇸 ${c.en}</span>
             </div>
           </div>
-          <div class="tarjeta-drive-footer">
-            <span class="tarjeta-drive-badge">${tipo || 'Ficha'}</span>
-            <span class="tarjeta-drive-grade">${grado}</span>
-            <button
-              class="btn-descargar-ficha"
-              title="Descargar ficha"
-              onclick="event.preventDefault(); event.stopPropagation(); descargarFicha('${urlArchivo}', '${titulo.replace(/'/g, "\\'")}')"
-            >⬇ Descargar</button>
-          </div>
+          <span class="folder-card-arrow">➜</span>
         `;
+
+        card.addEventListener('click', () => abrirCarpeta(c.nombre));
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            abrirCarpeta(c.nombre);
+          }
+        });
 
         container.appendChild(card);
       });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 5. DESCARGA DE FICHA (fetch + Blob para forzar descarga real)
+    // 5. VISTA 2: SUBCARPETAS DE IDIOMA (Español / Inglés)
+    // ─────────────────────────────────────────────────────────────────────────
+    function renderSubcarpetasIdioma(nombreCarpeta) {
+      const container = document.getElementById('fichasContainer');
+      const breadcrumbs = document.getElementById('folderBreadcrumbs');
+      const btnVolver = document.getElementById('btnVolverCarpeta');
+      const contenedorFiltros = document.getElementById('contenedor-filtros');
+
+      btnVolver.style.display = 'inline-flex';
+      btnVolver.innerHTML = '⬅ Volver a Carpetas';
+      contenedorFiltros.style.display = 'none';
+      container.className = 'folder-grid';
+      container.innerHTML = '';
+
+      breadcrumbs.innerHTML = `
+        <button type="button" class="breadcrumb-item" onclick="irACarpetas()">📁 Carpetas</button>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-item active">📂 ${nombreCarpeta}</span>
+      `;
+
+      // Fichas dentro de esta carpeta
+      const fichasCarpeta = fichasAsignadas.filter(f => {
+        return obtenerNombreCarpeta(f) === nombreCarpeta;
+      });
+
+      let countEs = 0;
+      let countEn = 0;
+      fichasCarpeta.forEach(f => {
+        if (getIdiomaFicha(f) === 'es') countEs++;
+        else countEn++;
+      });
+
+      // Carpeta Español
+      const cardEs = document.createElement('div');
+      cardEs.className = 'folder-card lang-es';
+      cardEs.setAttribute('role', 'button');
+      cardEs.setAttribute('tabindex', '0');
+      cardEs.title = 'Abrir fichas en Español (Clase, Cierre, Evaluación)';
+      cardEs.innerHTML = `
+        <div class="folder-icon-wrapper">🇪🇸</div>
+        <div class="folder-card-body">
+          <h3 class="folder-card-title">Español</h3>
+          <div class="folder-card-meta">
+            <span>Clase, Cierre, Evaluación</span>
+            <span>·</span>
+            <strong>${countEs} ficha${countEs !== 1 ? 's' : ''}</strong>
+          </div>
+        </div>
+        <span class="folder-card-arrow">➜</span>
+      `;
+      cardEs.addEventListener('click', () => abrirIdioma('es'));
+      cardEs.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          abrirIdioma('es');
+        }
+      });
+      container.appendChild(cardEs);
+
+      // Carpeta Inglés
+      const cardEn = document.createElement('div');
+      cardEn.className = 'folder-card lang-en';
+      cardEn.setAttribute('role', 'button');
+      cardEn.setAttribute('tabindex', '0');
+      cardEn.title = 'Open English Worksheets (Class, Closing, Evaluation)';
+      cardEn.innerHTML = `
+        <div class="folder-icon-wrapper">🇺🇸</div>
+        <div class="folder-card-body">
+          <h3 class="folder-card-title">Inglés</h3>
+          <div class="folder-card-meta">
+            <span>Class, Closing, Evaluation</span>
+            <span>·</span>
+            <strong>${countEn} worksheet${countEn !== 1 ? 's' : ''}</strong>
+          </div>
+        </div>
+        <span class="folder-card-arrow">➜</span>
+      `;
+      cardEn.addEventListener('click', () => abrirIdioma('en'));
+      cardEn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          abrirIdioma('en');
+        }
+      });
+      container.appendChild(cardEn);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 6. VISTA 3: FICHAS DENTRO DEL IDIOMA CON SU DISEÑO ORIGINAL
+    // ─────────────────────────────────────────────────────────────────────────
+    function renderFichasDeIdioma(nombreCarpeta, idioma, filterTipo = 'all') {
+      const container = document.getElementById('fichasContainer');
+      const breadcrumbs = document.getElementById('folderBreadcrumbs');
+      const btnVolver = document.getElementById('btnVolverCarpeta');
+      const contenedorFiltros = document.getElementById('contenedor-filtros');
+
+      btnVolver.style.display = 'inline-flex';
+      btnVolver.innerHTML = '⬅ Volver a Idiomas';
+      container.className = 'fichas-grid';
+      container.innerHTML = '';
+
+      const labelIdioma = idioma === 'es' ? '🇪🇸 Español' : '🇺🇸 Inglés';
+      const nombreEscapado = nombreCarpeta.replace(/'/g, "\\'");
+
+      breadcrumbs.innerHTML = `
+        <button type="button" class="breadcrumb-item" onclick="irACarpetas()">📁 Carpetas</button>
+        <span class="breadcrumb-sep">/</span>
+        <button type="button" class="breadcrumb-item" onclick="abrirCarpeta('${nombreEscapado}')">📂 ${nombreCarpeta}</button>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-item active">${labelIdioma}</span>
+      `;
+
+      // Obtener fichas del idioma y carpeta especificados
+      const todasFichasDeIdioma = fichasAsignadas.filter(f => {
+        return obtenerNombreCarpeta(f) === nombreCarpeta && getIdiomaFicha(f) === idioma;
+      });
+
+      // Generar filtros dinámicos basados en los tipos presentes en esta subcarpeta
+      generarFiltrosDeSubcarpeta(todasFichasDeIdioma, filterTipo);
+
+      // Filtrar según el botón de tipo seleccionado
+      const filtradas = todasFichasDeIdioma.filter(f => {
+        if (filterTipo === 'all') return true;
+        const tipoFicha = getTipoFicha(f);
+        return tipoFicha.toLowerCase() === filterTipo.trim().toLowerCase();
+      });
+
+      // Ordenar fichas numéricamente
+      filtradas.sort((a, b) => {
+        const numA = ((a.titulo || '').match(/\d+/) || [])[0];
+        const numB = ((b.titulo || '').match(/\d+/) || [])[0];
+        if (numA !== undefined && numB !== undefined) {
+          const intA = parseInt(numA, 10);
+          const intB = parseInt(numB, 10);
+          if (intA !== intB) return intA - intB;
+        } else if (numA !== undefined && numB === undefined) {
+          return -1;
+        } else if (numA === undefined && numB !== undefined) {
+          return 1;
+        }
+        return (a.titulo || '').localeCompare(b.titulo || '', undefined, { numeric: true, sensitivity: 'base' });
+      });
+
+      if (!filtradas.length) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 36px 20px;
+                      background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📂</div>
+            <h3 style="color: #0f172a; margin-bottom: 4px;">No hay fichas en ${labelIdioma}</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">Tu profesor asignará nuevos materiales para esta sección.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Renderizar fichas manteniendo exactamente el mismo diseño Google Drive
+      filtradas.forEach(f => {
+        const card = crearTarjetaFicha(f);
+        container.appendChild(card);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 7. GENERACIÓN DE FILTROS EN SUBCARPETAS
+    // ─────────────────────────────────────────────────────────────────────────
+    function generarFiltrosDeSubcarpeta(fichasSubcarpeta, filtroActivo) {
+      const contenedor = document.getElementById('contenedor-filtros');
+      contenedor.innerHTML = '';
+      contenedor.style.display = 'flex';
+
+      const tiposUnicos = [...new Set(
+        fichasSubcarpeta.map(f => getTipoFicha(f)).filter(Boolean)
+      )].sort();
+
+      // Botón "Todas"
+      const btnTodas = document.createElement('button');
+      btnTodas.className = `tab-btn ${filtroActivo === 'all' ? 'active' : ''}`;
+      btnTodas.setAttribute('data-filter', 'all');
+      btnTodas.textContent = `Todas (${fichasSubcarpeta.length})`;
+      btnTodas.addEventListener('click', () => {
+        currentTipoFiltro = 'all';
+        renderVista();
+      });
+      contenedor.appendChild(btnTodas);
+
+      // Botones por tipo
+      tiposUnicos.forEach(tipo => {
+        const count = fichasSubcarpeta.filter(f => getTipoFicha(f).toLowerCase() === tipo.toLowerCase()).length;
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${filtroActivo.toLowerCase() === tipo.toLowerCase() ? 'active' : ''}`;
+        btn.setAttribute('data-filter', tipo);
+        btn.textContent = `${tipo} (${count})`;
+        btn.addEventListener('click', () => {
+          currentTipoFiltro = tipo;
+          renderVista();
+        });
+        contenedor.appendChild(btn);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 8. BÚSQUEDA GLOBAL
+    // ─────────────────────────────────────────────────────────────────────────
+    function renderBusqueda(texto) {
+      const container = document.getElementById('fichasContainer');
+      const breadcrumbs = document.getElementById('folderBreadcrumbs');
+      const btnVolver = document.getElementById('btnVolverCarpeta');
+      const contenedorFiltros = document.getElementById('contenedor-filtros');
+      const resultsLabel = document.getElementById('searchResultsLabel');
+
+      contenedorFiltros.style.display = 'none';
+      btnVolver.style.display = 'inline-flex';
+      btnVolver.innerHTML = '❌ Limpiar Búsqueda';
+      container.className = 'fichas-grid';
+      container.innerHTML = '';
+
+      breadcrumbs.innerHTML = `<span class="breadcrumb-item active">🔍 Búsqueda global</span>`;
+
+      const t = texto.toLowerCase();
+      const filtradas = fichasAsignadas.filter(f => {
+        const titulo = (f.titulo || '').toLowerCase();
+        const tipo = (f.tipo || '').toLowerCase();
+        const carpeta = (f.carpeta || '').toLowerCase();
+        const desc = (f.descripcion || '').toLowerCase();
+        return titulo.includes(t) || tipo.includes(t) || carpeta.includes(t) || desc.includes(t);
+      });
+
+      resultsLabel.textContent = `🔍 ${filtradas.length} resultado${filtradas.length !== 1 ? 's' : ''} para “${texto}”`;
+      resultsLabel.classList.add('visible');
+
+      if (!filtradas.length) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 36px 20px;
+                      background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+            <h3 style="color: #0f172a; margin-bottom: 4px;">No se encontraron fichas</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">Prueba con otra palabra clave o limpia la búsqueda para navegar por carpetas.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtradas.forEach(f => {
+        const card = crearTarjetaFicha(f, true);
+        container.appendChild(card);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 9. CREADOR DE TARJETAS DE FICHAS (DISEÑO GOOGLE DRIVE)
+    // ─────────────────────────────────────────────────────────────────────────
+    function crearTarjetaFicha(f, mostrarCarpetaBadge = false) {
+      const tipo = getTipoFicha(f);
+      const icon = getTipoIcon(tipo);
+      const titulo = (f.titulo || 'Ficha sin título').trim();
+      const grado = (f.grado || 'General').trim();
+      const desc = (f.descripcion || '').trim();
+      const carpeta = obtenerNombreCarpeta(f);
+      const idioma = getIdiomaFicha(f) === 'es' ? '🇪🇸' : '🇺🇸';
+
+      // URL segura
+      const urlArchivo = f.id
+        ? `ver_archivo.php?id=${f.id}`
+        : ((f.ruta_archivo || f.enlace || '#').trim());
+
+      const card = document.createElement('a');
+      card.href = urlArchivo;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+      card.className = 'tarjeta-drive';
+      card.title = `${titulo}${tipo ? ' · ' + tipo : ''}${grado ? ' (' + grado + ')' : ''}${desc ? ' | ' + desc : ''}`;
+
+      const carpetaPill = mostrarCarpetaBadge
+        ? `<span style="font-size: 0.72rem; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">📁 ${carpeta} ${idioma}</span>`
+        : '';
+
+      card.innerHTML = `
+        <div class="tarjeta-drive-header">
+          <span class="tarjeta-drive-type-icon">${icon}</span>
+          <h3 class="tarjeta-drive-title">${titulo}</h3>
+        </div>
+        <div class="tarjeta-drive-preview">
+          <img
+            src="${urlArchivo}"
+            alt="Vista previa de ${titulo}"
+            class="tarjeta-drive-thumbnail"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="tarjeta-drive-preview-icon" style="display:none;">${icon}</div>
+          <div class="tarjeta-drive-preview-overlay">
+            <span>Abrir Ficha ↗</span>
+          </div>
+        </div>
+        <div class="tarjeta-drive-footer">
+          <div style="display: flex; align-items: center; gap: 4px; overflow: hidden;">
+            <span class="tarjeta-drive-badge">${tipo || 'Ficha'}</span>
+            ${carpetaPill}
+          </div>
+          <span class="tarjeta-drive-grade">${grado}</span>
+          <button
+            class="btn-descargar-ficha"
+            title="Descargar ficha"
+            onclick="event.preventDefault(); event.stopPropagation(); descargarFicha('${urlArchivo}', '${titulo.replace(/'/g, "\\'")}')"
+          >⬇ Descargar</button>
+        </div>
+      `;
+
+      return card;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 10. ÍCONOS POR TIPO DE FICHA
+    // ─────────────────────────────────────────────────────────────────────────
+    function getTipoIcon(tipo) {
+      const t = (tipo || '').toLowerCase().trim();
+      if (t.includes('cierre') || t.includes('closing')) return '🏁';
+      if (t.includes('clase 2') || t.includes('class 2')) return '📗';
+      if (t.includes('clase') || t.includes('class')) return '📘';
+      if (t.includes('evaluac') || t.includes('evaluation') || t.includes('quiz') || t.includes('test') || t.includes('examen')) return '📝';
+      if (t.includes('tarea') || t.includes('homework')) return '✏️';
+      if (t.includes('práctica') || t.includes('practica') || t.includes('practice')) return '🔧';
+      if (t.includes('proyecto') || t.includes('project')) return '🚀';
+      if (t.includes('laboratorio') || t.includes('lab')) return '🔬';
+      if (t.includes('lectura') || t.includes('reading')) return '📖';
+      return '📄';
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 11. DESCARGA DE FICHA (fetch + Blob para forzar descarga real)
     // ─────────────────────────────────────────────────────────────────────────
     async function descargarFicha(url, nombre) {
-      // Encontrar el botón que disparó la acción
       const btn = document.querySelector(`[onclick*="${CSS.escape(url)}"]`);
 
       try {
@@ -1062,7 +1667,6 @@
 
         const blob = await response.blob();
 
-        // Determinar extensión según el Content-Type real
         const contentType = response.headers.get('Content-Type') || '';
         let ext = '';
         if (contentType.includes('pdf')) ext = '.pdf';
@@ -1071,10 +1675,8 @@
         else if (contentType.includes('gif')) ext = '.gif';
         else if (contentType.includes('webp')) ext = '.webp';
 
-        // Nombre de archivo limpio
         const nombreArchivo = (nombre || 'ficha').replace(/[\\/:*?"<>|]/g, '_') + ext;
 
-        // Crear enlace temporal y disparar descarga
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
