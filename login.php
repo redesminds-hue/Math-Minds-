@@ -110,6 +110,16 @@ try {
     $nombre     = $usuario['nombre'] ?? $usuario['Nombre'] ?? $usuario['name'] ?? $email;
     $rol        = strtolower(trim($usuario['rol'] ?? $usuario['Rol'] ?? $usuario['role'] ?? 'estudiante'));
     $id         = $usuario['id'] ?? $usuario['ID'] ?? null;
+    $activo     = isset($usuario['activo']) ? intval($usuario['activo']) : 1;
+
+    // Verificar si la cuenta está congelada
+    if ($activo === 0) {
+        echo json_encode([
+            "success" => false,
+            "mensaje" => "Tu cuenta ha sido suspendida temporalmente. Contacta al administrador para más información."
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 
     $dbPasswordTrimmed = trim((string)$dbPassword);
 

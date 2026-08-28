@@ -25,13 +25,19 @@ try {
             $conexion = $db;
     }
 
+    // Asegurar que la columna activo existe (se crea si no existe)
+    try {
+        $conexion->exec("ALTER TABLE usuarios ADD COLUMN activo TINYINT(1) NOT NULL DEFAULT 1");
+    } catch (Throwable $ex) { /* Columna ya existe */ }
+
     // Consultamos los usuarios trayendo su grado real y agrupando sus fichas de la tabla relacional
     $sql = "SELECT u.id, u.nombre, u.email, u.rol, 
                    COALESCE(u.grado, '') AS grado, 
+                   COALESCE(u.activo, 1) AS activo,
                    COALESCE(GROUP_CONCAT(p.ficha_id SEPARATOR ','), '') AS fichas_acceso 
             FROM usuarios u
             LEFT JOIN permisos_fichas p ON u.id = p.usuario_id
-            GROUP BY u.id, u.nombre, u.email, u.rol, u.grado
+            GROUP BY u.id, u.nombre, u.email, u.rol, u.grado, u.activo
             ORDER BY u.id ASC";
 
     $stmt = $conexion->query($sql);

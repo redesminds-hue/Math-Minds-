@@ -596,12 +596,166 @@
       transform: translateY(-1px);
     }
 
+    /* Grade Quick Selection Toolbar */
+    .grade-select-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1.5px dashed #cbd5e1;
+      max-height: 110px;
+      overflow-y: auto;
+    }
+
+    .btn-grade-select {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-grade-select:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-grade-select .grade-badge-count {
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-grade-select:hover .grade-badge-count {
+      background: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+    }
+
+    .selection-feedback {
+      font-size: 0.78rem;
+      color: #059669;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: none;
+      transition: all 0.3s ease;
+    }
+
     .modal-actions-footer {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
       margin-top: 24px;
     }
+
+    /* Fila de usuario congelado */
+    tr.user-frozen td { opacity: 0.55; }
+    tr.user-frozen { background: #f1f5f9 !important; }
+
+    .badge-frozen {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #64748b;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+      margin-left: 6px;
+    }
+
+    .btn-gestionar {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-gestionar:hover {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+      transform: translateY(-1px);
+    }
+
+    /* Modal Gestionar: divisor interno */
+    .gestionar-section {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .gestionar-section h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--admin-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .gestionar-section p {
+      font-size: 0.83rem;
+      color: #64748b;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .btn-freeze {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-freeze.freeze  { background:#fef3c7; color:#92400e; }
+    .btn-freeze.freeze:hover { background:#f59e0b; color:#fff; }
+    .btn-freeze.unfreeze { background:#d1fae5; color:#065f46; }
+    .btn-freeze.unfreeze:hover { background:#10b981; color:#fff; }
+    .btn-delete-user {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-delete-user:hover { background: #ef4444; color: #fff; }
   </style>
 </head>
 
@@ -718,6 +872,7 @@
           <div class="admin-actions-bar">
             <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar usuario..."
               onkeyup="filterUsersTable()" />
+            <button class="btn-primary-admin" onclick="openCrearUsuarioModal()">+ Nuevo Usuario</button>
             <button class="btn-refresh" onclick="cargarUsuariosReales()">Actualizar</button>
           </div>
         </div>
@@ -837,17 +992,28 @@
         </div>
 
         <div class="modal-form-group">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <label style="margin-bottom: 0;">Seleccionar Fichas con Acceso:</label>
-            <div style="display: flex; gap: 6px;">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
               <button type="button" class="btn-select-all" onclick="seleccionarTodasFichas(true)" title="Marcar todas las fichas disponibles">
-                ✅ Asignar todas las fichas
+                ✅ Asignar todas
               </button>
               <button type="button" class="btn-deselect-all" onclick="seleccionarTodasFichas(false)" title="Desmarcar todas">
                 ❌ Desmarcar
               </button>
             </div>
           </div>
+
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 0.76rem; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">
+              Seleccionar todas por grado:
+            </span>
+            <div id="gradeSelectionToolbar" class="grade-select-toolbar">
+              <!-- Botones de grados generados dinámicamente -->
+            </div>
+            <div id="selectionFeedbackMsg" class="selection-feedback"></div>
+          </div>
+
           <div class="checkbox-list-container" id="modalFichasChecklist">
             <!-- Checkboxes generados dinámicamente -->
           </div>
@@ -861,10 +1027,89 @@
     </div>
   </div>
 
+  <!-- Modal para Gestionar Usuario (Congelar / Eliminar) -->
+  <div class="admin-modal-overlay" id="gestionarUsuarioModal">
+    <div class="admin-modal-content" style="max-width: 420px;">
+      <h3 style="margin-bottom: 4px;">⚙️ Gestionar Usuario</h3>
+      <p id="gestionarModalSubtitle" style="font-size:0.87rem; color:#64748b; margin-bottom:20px;"></p>
+
+      <!-- Sección: Congelar / Descongelar -->
+      <div class="gestionar-section">
+        <h4>🔒 Estado de la Cuenta</h4>
+        <p id="gestionarEstadoDesc">Al congelar la cuenta, el usuario no podrá iniciar sesión. Su información y fichas se mantienen en la base de datos intactas.</p>
+        <button class="btn-freeze freeze" id="btnFreezeToggle" onclick="accionGestionarUsuario('congelar')">
+          ❄️ Congelar Cuenta
+        </button>
+      </div>
+
+      <!-- Sección: Eliminar -->
+      <div class="gestionar-section">
+        <h4>🗑️ Eliminar Usuario</h4>
+        <p>Esta acción es <strong>permanente</strong>. El usuario y todos sus permisos de fichas serán eliminados definitivamente.</p>
+        <button class="btn-delete-user" onclick="accionGestionarUsuario('eliminar')">
+          🗑️ Eliminar Usuario Permanentemente
+        </button>
+      </div>
+
+      <div style="text-align:right; margin-top:8px;">
+        <button class="btn-table-action" onclick="closeGestionarModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Nuevo Usuario -->
+  <div class="admin-modal-overlay" id="crearUsuarioModal">
+    <div class="admin-modal-content" style="max-width: 480px;">
+      <h3 style="margin-bottom: 6px;">➕ Crear Nuevo Usuario</h3>
+      <p style="font-size: 0.87rem; color: #64748b; margin-bottom: 20px;">Los datos se guardarán directamente en la base de datos MySQL.</p>
+
+      <form id="crearUsuarioForm" onsubmit="guardarNuevoUsuario(event)">
+        <div class="modal-form-group">
+          <label for="newUserNombre">Nombre Completo</label>
+          <input type="text" id="newUserNombre" class="modal-form-input" placeholder="Ej: Colegio La Salle" required />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="newUserEmail">Correo Electrónico</label>
+          <input type="email" id="newUserEmail" class="modal-form-input" placeholder="Ej: salle@mathminds.com" required />
+        </div>
+
+        <div class="modal-form-group">
+          <label for="newUserPassword">Contraseña</label>
+          <div style="position: relative;">
+            <input type="password" id="newUserPassword" class="modal-form-input" placeholder="Ej: Mathminds-salle2026" required style="padding-right: 44px;" />
+            <button type="button" onclick="toggleNewUserPwd()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.1rem;" title="Mostrar/ocultar contraseña">👁</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="modal-form-group" style="margin-bottom: 0;">
+            <label for="newUserRol">Rol</label>
+            <select id="newUserRol" class="modal-form-input">
+              <option value="estudiante">Estudiante</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group" style="margin-bottom: 0;">
+            <label for="newUserGrado">Grado / Curso</label>
+            <input type="text" id="newUserGrado" class="modal-form-input" placeholder="Ej: 1A, 2do..." />
+          </div>
+        </div>
+
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-table-action" onclick="closeCrearUsuarioModal()">Cancelar</button>
+          <button type="submit" class="btn-primary-admin" id="btnCrearUsuario">Crear Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal para Crear Nueva Ficha -->
   <div class="admin-modal-overlay" id="fichaModal">
     <div class="admin-modal-content">
       <h3 style="margin-bottom: 18px;">Publicar Nueva Ficha en MySQL</h3>
+
       <form id="addFichaForm">
         <div class="modal-form-group">
           <label for="fichaTitleInput">Título de la Ficha</label>
@@ -985,6 +1230,7 @@
         const tr = document.createElement('tr');
         const rolClass = String(user.rol).toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
         const countFichas = user.fichas_acceso ? user.fichas_acceso.split(',').filter(Boolean).length : 0;
+        const frozen = String(user.activo) === '0';
 
         // Validación condicional del grado: solo muestra badge si existe y no está vacío
         const gradoLimpio = (user.grado || '').trim();
@@ -992,15 +1238,21 @@
           ? `<span class="badge-grade">${gradoLimpio}</span>`
           : '';
 
+        const frozenBadge = frozen ? '<span class="badge-frozen">❄ Congelada</span>' : '';
+
+        if (frozen) tr.classList.add('user-frozen');
+
+        const nombreSafe = user.nombre.replace(/'/g, "\\'");
         tr.innerHTML = `
           <td><strong>#${user.id}</strong></td>
-          <td><strong>${user.nombre}</strong></td>
+          <td><strong>${user.nombre}</strong>${frozenBadge}</td>
           <td>${user.email}</td>
           <td><span class="role-badge ${rolClass}">${user.rol}</span></td>
           <td>${gradoHtml}</td>
           <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">${countFichas}</span></td>
-          <td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">Asignar Fichas</button>
+            <button class="btn-gestionar" onclick="openGestionarModal(${user.id}, '${nombreSafe}', ${frozen ? 1 : 0})">⚙️ Gestionar</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1053,6 +1305,129 @@
       });
     }
 
+    // Definición de grados estándar y sus patrones de coincidencia
+    const STANDARD_GRADES = [
+      { key: '1', label: '1° Primero', emoji: '📘', regex: /\b(1|1ro|1ero|1°|primero|primer|grado\s*1)\b/i, gradeInputVal: '1ro' },
+      { key: '2', label: '2° Segundo', emoji: '📗', regex: /\b(2|2do|2°|segundo|grado\s*2)\b/i, gradeInputVal: '2do' },
+      { key: '3', label: '3° Tercero', emoji: '📙', regex: /\b(3|3ro|3ero|3°|tercero|tercer|grado\s*3)\b/i, gradeInputVal: '3ro' },
+      { key: '4', label: '4° Cuarto', emoji: '📕', regex: /\b(4|4to|4°|cuarto|grado\s*4)\b/i, gradeInputVal: '4to' },
+      { key: '5', label: '5° Quinto', emoji: '📒', regex: /\b(5|5to|5°|quinto|grado\s*5)\b/i, gradeInputVal: '5to' },
+      { key: '6', label: '6° Sexto', emoji: '📓', regex: /\b(6|6to|6°|sexto|grado\s*6)\b/i, gradeInputVal: '6to' },
+      { key: '7', label: '7° Séptimo', emoji: '📘', regex: /\b(7|7mo|7°|septimo|séptimo|grado\s*7)\b/i, gradeInputVal: '7mo' },
+      { key: '8', label: '8° Octavo', emoji: '📗', regex: /\b(8|8vo|8°|octavo|grado\s*8)\b/i, gradeInputVal: '8vo' },
+      { key: '9', label: '9° Noveno', emoji: '📙', regex: /\b(9|9no|9°|noveno|grado\s*9)\b/i, gradeInputVal: '9no' },
+      { key: '10', label: '10° Décimo', emoji: '📕', regex: /\b(10|10mo|10°|decimo|décimo|grado\s*10)\b/i, gradeInputVal: '10mo' },
+      { key: '11', label: '11° Once', emoji: '🎓', regex: /\b(11|11vo|11°|once|undecimo|undécimo|grado\s*11)\b/i, gradeInputVal: '11vo' },
+      { key: 'transicion', label: 'Transición', emoji: '🌱', regex: /transici[oó]n/i, gradeInputVal: 'Transición' },
+      { key: 'preescolar', label: 'Preescolar', emoji: '🎨', regex: /preescolar|prejard[ií]n|jard[ií]n|parvulo/i, gradeInputVal: 'Preescolar' }
+    ];
+
+    function fichaPerteneceAGrado(ficha, gradeKey) {
+      if (!ficha) return false;
+      const gradoRaw = String(ficha.grado || '').trim();
+      if (!gradoRaw) return false;
+
+      const std = STANDARD_GRADES.find(g => g.key === gradeKey);
+      if (std) {
+        return std.regex.test(gradoRaw);
+      }
+
+      // Si es un grado personalizado de la base de datos
+      return gradoRaw.toLowerCase().includes(String(gradeKey).toLowerCase());
+    }
+
+    function renderizarBotonesGradosModal() {
+      const container = document.getElementById('gradeSelectionToolbar');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!globalFichas.length) {
+        container.innerHTML = '<span style="font-size:0.75rem; color:#94a3b8;">Sin fichas disponibles</span>';
+        return;
+      }
+
+      const gradesToRender = [];
+      const matchedFichaIds = new Set();
+
+      // 1. Evaluar grados estándar
+      STANDARD_GRADES.forEach(g => {
+        const matchingFichas = globalFichas.filter(f => fichaPerteneceAGrado(f, g.key));
+        // Mostramos siempre 1°, 2°, 3° y cualquier otro grado que tenga fichas en la BD
+        if (matchingFichas.length > 0 || ['1', '2', '3'].includes(g.key)) {
+          gradesToRender.push({
+            key: g.key,
+            label: g.label,
+            emoji: g.emoji,
+            count: matchingFichas.length,
+            gradeInputVal: g.gradeInputVal
+          });
+          matchingFichas.forEach(f => matchedFichaIds.add(f.id));
+        }
+      });
+
+      // 2. Detectar cualquier otro grado que exista en la BD y no coincida con los estándar
+      const customGradosMap = new Map();
+      globalFichas.forEach(f => {
+        const gName = (f.grado || '').trim();
+        if (!matchedFichaIds.has(f.id) && gName && gName.toLowerCase() !== 'todos' && !customGradosMap.has(gName)) {
+          const matchingCustom = globalFichas.filter(cf => (cf.grado || '').trim() === gName);
+          customGradosMap.set(gName, matchingCustom.length);
+        }
+      });
+
+      customGradosMap.forEach((count, gName) => {
+        gradesToRender.push({
+          key: gName,
+          label: gName,
+          emoji: '🏷️',
+          count: count,
+          gradeInputVal: gName
+        });
+      });
+
+      // 3. Renderizar botones
+      gradesToRender.forEach(g => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-grade-select';
+        btn.title = `Marcar únicamente las fichas de ${g.label} (${g.count} disponibles)`;
+        btn.innerHTML = `
+          <span>${g.emoji} ${g.label}</span>
+          <span class="grade-badge-count">${g.count}</span>
+        `;
+        btn.onclick = () => seleccionarFichasPorGrado(g.key, g.label, g.gradeInputVal);
+        container.appendChild(btn);
+      });
+    }
+
+    function seleccionarFichasPorGrado(gradeKey, gradeLabel, gradeInputVal) {
+      let selectedCount = 0;
+      globalFichas.forEach(f => {
+        const cb = document.getElementById(`check_ficha_${f.id}`);
+        if (cb) {
+          const match = fichaPerteneceAGrado(f, gradeKey);
+          cb.checked = match;
+          if (match) selectedCount++;
+        }
+      });
+
+      // Sincronizar el campo de grado del usuario si está vacío o por defecto
+      const inputGrado = document.getElementById('modalUserGrado');
+      if (inputGrado && (!inputGrado.value.trim() || inputGrado.value === 'Sin grado')) {
+        inputGrado.value = gradeInputVal || gradeLabel || gradeKey;
+      }
+
+      // Feedback visual
+      const feedback = document.getElementById('selectionFeedbackMsg');
+      if (feedback) {
+        feedback.textContent = `✓ Se seleccionaron ${selectedCount} ficha(s) de ${gradeLabel || gradeKey}`;
+        feedback.style.display = 'block';
+        setTimeout(() => {
+          feedback.style.display = 'none';
+        }, 3000);
+      }
+    }
+
     // 3. Asignar Fichas y Grado a un Usuario (Modal)
     function openPermisosModal(userId) {
       const user = globalUsuarios.find(u => Number(u.id) === Number(userId));
@@ -1078,12 +1453,15 @@
           div.innerHTML = `
             <input type="checkbox" id="check_ficha_${f.id}" value="${f.id}" ${isChecked ? 'checked' : ''} />
             <label for="check_ficha_${f.id}" style="cursor:pointer; flex:1;">
-              <strong>#F0${f.id} - ${f.titulo}</strong> <small style="color:#64748b;">(${f.area} | ${f.grado})</small>
+              <strong>#F0${f.id} - ${f.titulo}</strong> <small style="color:#64748b;">(${f.area || 'General'} | Grado: ${f.grado || 'Todos'})</small>
             </label>
           `;
           checklistContainer.appendChild(div);
         });
       }
+
+      // Renderizar los botones de selección rápida por grado
+      renderizarBotonesGradosModal();
 
       document.getElementById('permisosModal').classList.add('active');
     }
@@ -1097,6 +1475,17 @@
       checkboxes.forEach(cb => {
         cb.checked = marcar;
       });
+
+      const feedback = document.getElementById('selectionFeedbackMsg');
+      if (feedback) {
+        feedback.textContent = marcar
+          ? `✓ Se seleccionaron todas las fichas (${checkboxes.length})`
+          : '✓ Todas las fichas han sido desmarcadas';
+        feedback.style.display = 'block';
+        setTimeout(() => {
+          feedback.style.display = 'none';
+        }, 3000);
+      }
     }
 
     async function guardarPermisosUsuario(e) {
@@ -1282,6 +1671,119 @@
         box.textContent = 'Respuesta de obtener_usuarios.php:\n' + textUsers;
       } catch (err) {
         box.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    // =============================================
+    // GESTIÓN DE USUARIOS: Crear / Congelar / Eliminar
+    // =============================================
+
+    // --- Crear nuevo usuario ---
+    function openCrearUsuarioModal() {
+      document.getElementById('crearUsuarioForm').reset();
+      document.getElementById('crearUsuarioModal').classList.add('active');
+    }
+    function closeCrearUsuarioModal() {
+      document.getElementById('crearUsuarioModal').classList.remove('active');
+    }
+    function toggleNewUserPwd() {
+      const inp = document.getElementById('newUserPassword');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+    async function guardarNuevoUsuario(e) {
+      e.preventDefault();
+      const nombre   = document.getElementById('newUserNombre').value.trim();
+      const email    = document.getElementById('newUserEmail').value.trim();
+      const password = document.getElementById('newUserPassword').value.trim();
+      const rol      = document.getElementById('newUserRol').value;
+      const grado    = document.getElementById('newUserGrado').value.trim();
+      const btn = document.getElementById('btnCrearUsuario');
+      btn.disabled = true;
+      btn.textContent = 'Creando en MySQL...';
+      try {
+        const res = await fetch('crear_usuario.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, email, password, rol, grado })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`✅ ${data.mensaje}`);
+          closeCrearUsuarioModal();
+          cargarUsuariosReales();
+        } else {
+          alert(`❌ ${data.mensaje || 'Error al crear el usuario.'}`);
+        }
+      } catch (err) {
+        alert('Error de conexión al crear el usuario.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Crear Usuario';
+      }
+    }
+
+    // --- Modal Gestionar (Congelar / Descongelar / Eliminar) ---
+    let _gestionarUserId   = null;
+    let _gestionarFrozen   = false;
+
+    function openGestionarModal(userId, userName, isFrozen) {
+      _gestionarUserId = userId;
+      _gestionarFrozen = Boolean(isFrozen);
+
+      document.getElementById('gestionarModalSubtitle').textContent =
+        `Usuario: ${userName}`;
+
+      const btn    = document.getElementById('btnFreezeToggle');
+      const desc   = document.getElementById('gestionarEstadoDesc');
+
+      if (_gestionarFrozen) {
+        // Ya está congelada → mostrar opción de descongelar
+        btn.textContent = '✅ Reactivar Cuenta';
+        btn.className   = 'btn-freeze unfreeze';
+        btn.onclick     = () => accionGestionarUsuario('descongelar');
+        desc.textContent = 'Esta cuenta está actualmente CONGELADA. El usuario no puede iniciar sesión. Puedes reactivarla para restaurar su acceso.';
+      } else {
+        // Está activa → mostrar opción de congelar
+        btn.textContent = '❄️ Congelar Cuenta';
+        btn.className   = 'btn-freeze freeze';
+        btn.onclick     = () => accionGestionarUsuario('congelar');
+        desc.textContent = 'Al congelar la cuenta, el usuario no podrá iniciar sesión. Su información y fichas se mantienen intactas en la base de datos.';
+      }
+
+      document.getElementById('gestionarUsuarioModal').classList.add('active');
+    }
+
+    function closeGestionarModal() {
+      document.getElementById('gestionarUsuarioModal').classList.remove('active');
+      _gestionarUserId = null;
+    }
+
+    async function accionGestionarUsuario(accion) {
+      if (!_gestionarUserId) return;
+
+      const confirmMsgs = {
+        congelar:    '❄️ ¿Congelar esta cuenta? El usuario no podrá iniciar sesión hasta que la reactives.',
+        descongelar: '✅ ¿Reactivar esta cuenta? El usuario podrá volver a iniciar sesión.',
+        eliminar:    '⚠️ ¿ELIMINAR este usuario permanentemente?\n\nSe borrarán todos sus permisos de fichas. Esta acción NO se puede deshacer.'
+      };
+      if (!confirm(confirmMsgs[accion])) return;
+
+      try {
+        const res = await fetch('gestionar_usuario.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: _gestionarUserId, accion })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`✅ ${data.mensaje}`);
+          closeGestionarModal();
+          cargarUsuariosReales();
+        } else {
+          alert(`❌ ${data.mensaje || 'Error al ejecutar la acción.'}`);
+        }
+      } catch (err) {
+        alert('Error de conexión.');
       }
     }
   </script>
