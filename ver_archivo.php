@@ -1,16 +1,15 @@
 <?php
-// ver_archivo.php - Sirve archivos de forma segura desde fuera de public_html
-require_once 'conexion.php'; // Opcional, por seguridad
+// ver_archivo.php - Sirve archivos locales o redirige a Google Drive y enlaces web
+require_once 'conexion.php';
 
-// Recibimos el ID de la ficha o el nombre del archivo por GET
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$modo = isset($_GET['download']) ? true : false;
 
 if ($id <= 0) {
     die("Archivo no válido.");
 }
 
 try {
-    // Buscamos la ruta real en la base de datos
     $stmt = $conexion->prepare("SELECT ruta_archivo, titulo FROM fichas WHERE id = :id");
     $stmt->execute([':id' => $id]);
     $ficha = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -19,18 +18,35 @@ try {
         die("El archivo no existe en la base de datos.");
     }
 
-    $rutaReal = $ficha['ruta_archivo']; // Ej: /home2/mathmind/fichas_pdf/archivo.png
+    $rutaReal = trim($ficha['ruta_archivo']);
 
-    // Verificamos que el archivo físicamente exista en el servidor
-    if (file_exists($rutaReal)) {
-        // Detectamos el tipo de archivo (imagen, pdf, etc.)
+    // 1. Si es un enlace de Google Drive o URL web externa (http:// o https://)
+    if (preg_match('/^https?:\/\//i', $rutaReal)) {
+        // Extraer ID de Google Drive si es un enlace de Drive
+        if (preg_match('/\/file\/d\/([a-zA-Z0-9_-]+)/', $rutaReal, $matches) || preg_match('/[?&]id=([a-zA-Z0-9_-]+)/', $rutaReal, $matches) || preg_match('/\/d\/([a-zA-Z0-9_-]+)/', $rutaReal, $matches)) {
+            $driveId = $matches[1];
+            if ($modo) {
+                header("Location: https://drive.google.com/uc?export=download&id=" . $driveId);
+            } else {
+                header("Location: https://drive.google.com/file/d/" . $driveId . "/view");
+            }
+            exit;
+        }
+
+        // Redirección directa para otras URLs externas
+        header("Location: " . $rutaReal);
+        exit;
+    }
+
+    // 2. Si es un archivo físico local en el servidor
+    if (!empty($rutaReal) && file_exists($rutaReal)) {
         $tipoMime = mime_content_type($rutaReal);
+        $disposition = $modo ? 'attachment' : 'inline';
 
         header('Content-Type: ' . $tipoMime);
-        header('Content-Disposition: inline; filename="' . basename($rutaReal) . '"');
+        header('Content-Disposition: ' . $disposition . '; filename="' . basename($rutaReal) . '"');
         header('Content-Length: ' . filesize($rutaReal));
 
-        // Entregamos el archivo al navegador
         readfile($rutaReal);
         exit;
     } else {

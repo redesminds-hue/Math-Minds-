@@ -1030,6 +1030,9 @@
           fichasAsignadas = data.fichas;
           totalCount.textContent = data.fichas.length;
 
+          // Indexar y unificar carpetas canónicas (resuelve diferencias de 1 carácter, '5. SUMA' vs '5. SUMA A', etc.)
+          indexarCarpetasFichas(fichasAsignadas);
+
           // Mostrar grado real del estudiante (obtenido directamente de MySQL)
           const gradoFinal = (data.grado || user.grado || '').trim();
           if (gradoFinal && gradoFinal !== 'Asignado' && gradoFinal !== 'Sin grado') {
@@ -1056,48 +1059,169 @@
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 2. EXTRACCIÓN Y LIMPIEZA DE NOMBRES DE CARPETAS Y TIPOS
+    // 2. EXTRACCIÓN, LIMPIEZA Y AGRUPACIÓN CANÓNICA DE CARPETAS
     // ─────────────────────────────────────────────────────────────────────────
-    // Limpia palabras de tipo (clase, clase 2, cierre, evaluacion, class, class 2, closing, evaluation)
-    // para obtener un nombre de carpeta limpio y único por tema.
+    let fichasFolderCache = new WeakMap();
+
+    // Extrae el número de lección o tema (ej: "34. Contar...", "34, Contar...", "Tema 34 - ...", "(34) ...")
+    function extraerNumeroTema(texto) {
+      if (!texto) return null;
+      const s = String(texto).trim();
+
+      // 1. Prefijo explícito: "Tema 34", "Lección 34", "Unidad 34", "Guía 34", etc.
+      const matchPrefijo = s.match(/^(?:tema|lecci[oó]n|cap[ií]tulo|unidad|bloque|semana|gu[ií]a|guia|actividad)\s*(\d+)\b/i);
+      if (matchPrefijo) return parseInt(matchPrefijo[1], 10);
+
+      // 2. Número al inicio con separador: "34.", "34,", "34-", "34 -", "34:", "34) ", "(34) ", "34 "
+      const matchInicio = s.match(/^\(?(\d+)\)?[\s.,:\-–—_]+/);
+      if (matchInicio) return parseInt(matchInicio[1], 10);
+
+      // 3. Número al inicio sin separador directo
+      const matchDigitoInicio = s.match(/^(\d+)\b/);
+      if (matchDigitoInicio) return parseInt(matchDigitoInicio[1], 10);
+
+      return null;
+    }
+
+    // Normaliza una cadena para comparación interna (sin acentos, minúsculas, solo alfanumérico)
+    function normalizarClave(texto) {
+      if (!texto) return '';
+      return String(texto)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // quitar acentos
+        .replace(/[^a-z0-9]/g, "")       // solo caracteres alfanuméricos
+        .trim();
+    }
+
+    // Limpia palabras de tipo, sufijos de letras/partes, extensiones y signos
+    // para obtener el nombre base del tema (ej. "5. SUMA A" -> "5. SUMA", "5. SUMA - CLASE" -> "5. SUMA")
     function limpiarNombreCarpeta(texto) {
       if (!texto) return 'General';
       let s = String(texto).trim();
 
-      // 1. Eliminar palabras de tipo (español e inglés)
-      s = s.replace(/\b(clase\s*2|class\s*2|clase|class|cierre|closing|evaluaci[oó]n|evaluation|tarea|homework|quiz|test|examen)\b/gi, '');
+      // 1. Quitar extensiones de archivo si existieran (.pdf, .png, .jpg, etc.)
+      s = s.replace(/\.(pdf|png|jpe?g|webp|docx?|xlsx?|pptx?)$/i, '');
 
-      // 2. Limpiar paréntesis o corchetes vacíos resultantes () o []
-      s = s.replace(/\(\s*\)/g, '').replace(/\[\s*\]/g, '');
+      // 2. Eliminar palabras pedagógicas de tipo (español e inglés)
+      s = s.replace(/\b(clase\s*2|class\s*2|clase|class|cierre|closing|evaluaci[oó]n|evaluation|tarea|homework|quiz|test|examen|actividad|activity|pr[aá]ctica|practice|ficha|worksheets?|gu[ií]a|taller|workshop|m[oó]dulo|modulo)\b/gi, '');
 
-      // 3. Limpiar separadores sobrantes al inicio o al final (- , : , | , / , _ , .)
+      // 3. Eliminar sufijos de parte, sección, nivel, versión (ej. PARTE 1, SECCION A, NIVEL B, V2, etc.)
+      s = s.replace(/\b(parte|part|secci[oó]n|section|sec|nivel|level|lecci[oó]n|lesson|versi[oó]n|version|ver|v|bloque|block)\s*([a-z0-9]+)?\b/gi, '');
+
+      // 4. Limpiar paréntesis o corchetes con letras/dígitos aislados o vacíos: (A), [1], (B), (), []
+      s = s.replace(/\(\s*[a-zA-Z0-9]?\s*\)/g, '').replace(/\[\s*[a-zA-Z0-9]?\s*\]/g, '');
+
+      // 5. Eliminar sufijos de letras o números aislados al final (ej. "5. SUMA A" -> "5. SUMA", "5. SUMA - B" -> "5. SUMA")
+      s = s.replace(/(?:[\s\-–—/:_]+)([a-zA-Z]|[0-9]|I|II|III|IV|V|VI)\s*[\)\]\.]*$/i, '');
+
+      // 6. Estandarizar numeración inicial (ej: "Tema 5.", "5.-", "5 - ", "5,", "5." -> "5. ")
+      s = s.replace(/^(?:tema|lecci[oó]n|cap[ií]tulo|unidad|bloque)\s*(\d+)[\s.:,\-–—]*/i, '$1. ');
+      s = s.replace(/^(\d+)[\s.:,\-–—]+/, '$1. ');
+
+      // 7. Limpiar separadores sobrantes al inicio o al final (- , : , | , / , _ , .)
       s = s.replace(/^[\s\-–—:|/_,.()\[\]]+|[\s\-–—:|/_,.()\[\]]+$/g, '');
 
-      // 4. Reducir espacios múltiples
+      // 8. Reducir espacios múltiples
       s = s.replace(/\s+/g, ' ').trim();
 
       return s || 'General';
     }
 
-    // Obtiene el nombre de la carpeta de una ficha (desde columna carpeta o desde el título limpio)
+    // Indexa y agrupa de manera inteligente todas las fichas asignadas para unificar variaciones
+    function indexarCarpetasFichas(fichas) {
+      if (!Array.isArray(fichas) || !fichas.length) return;
+
+      // Mapa de grupos: groupKey -> { groupKey, numeroTema, nombreDisplay, nombresLimpios: [], fichas: [] }
+      const grupos = new Map();
+
+      fichas.forEach(f => {
+        const textoOrigen = (f.carpeta && f.carpeta.trim()) ? f.carpeta : (f.titulo || 'General');
+        const numTema = extraerNumeroTema(textoOrigen);
+        const nombreLimpio = limpiarNombreCarpeta(textoOrigen);
+
+        let groupKey = '';
+        if (numTema !== null) {
+          // TODAS las fichas con el mismo número de tema (ej: 29, 30, 34, 35) SE UNEN EN EL MISMO GRUPO
+          groupKey = 'tema_' + numTema;
+        } else {
+          // Sin número: se agrupa por nombre normalizado
+          groupKey = 'texto_' + (normalizarClave(nombreLimpio) || 'general');
+        }
+
+        if (!grupos.has(groupKey)) {
+          grupos.set(groupKey, {
+            groupKey,
+            numeroTema: numTema,
+            nombreDisplay: nombreLimpio,
+            nombresLimpios: [nombreLimpio],
+            fichas: [f]
+          });
+        } else {
+          const g = grupos.get(groupKey);
+          g.fichas.push(f);
+          g.nombresLimpios.push(nombreLimpio);
+        }
+      });
+
+      // Para cada grupo, elegir el título visible óptimo
+      grupos.forEach(g => {
+        if (g.numeroTema !== null) {
+          // Estandarizar todos los títulos del grupo con formato "XX. [Nombre]"
+          const candidatos = g.nombresLimpios.map(n => {
+            let s = n;
+            s = s.replace(/^\(?\d+\)?[\s.,:\-–—_]*/, g.numeroTema + '. ');
+            return s;
+          });
+
+          // Contar frecuencias
+          const freqMap = {};
+          candidatos.forEach(c => {
+            freqMap[c] = (freqMap[c] || 0) + 1;
+          });
+
+          let mejorNombre = candidatos[0];
+          let maxScore = -1;
+
+          candidatos.forEach(c => {
+            const freq = freqMap[c] || 1;
+            const esIngles = /\b(count|by|find|missing|numbers|addition|subtraction|worksheet|forward|backward)\b/i.test(c);
+            let score = freq * 10 + Math.min(c.length, 50);
+            if (esIngles) score -= 30; // Preferir título en español para la carpeta
+
+            if (score > maxScore) {
+              maxScore = score;
+              mejorNombre = c;
+            }
+          });
+
+          g.nombreDisplay = mejorNombre;
+        }
+
+        // Asignar nombre canónico a todas las fichas de este grupo
+        g.fichas.forEach(f => {
+          f._carpetaCanonica = g.nombreDisplay;
+          fichasFolderCache.set(f, g.nombreDisplay);
+        });
+      });
+    }
+
+    // Obtiene el nombre canónico y unificado de la carpeta de una ficha
     function obtenerNombreCarpeta(f) {
       if (!f) return 'General';
-
-      // 1. Si tiene columna carpeta y tiene texto válido
-      if (f.carpeta && f.carpeta.trim()) {
-        const limpia = limpiarNombreCarpeta(f.carpeta);
-        if (limpia && limpia.toLowerCase() !== 'general') {
-          return limpia;
-        }
+      if (f._carpetaCanonica) return f._carpetaCanonica;
+      if (typeof f === 'object' && fichasFolderCache.has(f)) {
+        return fichasFolderCache.get(f);
       }
 
-      // 2. Extraer del título de la ficha eliminando el tipo
-      if (f.titulo && f.titulo.trim()) {
-        const limpia = limpiarNombreCarpeta(f.titulo);
-        if (limpia) return limpia;
+      // Fallback individual
+      const textoOrigen = (f.carpeta && f.carpeta.trim()) ? f.carpeta : (f.titulo || 'General');
+      const num = extraerNumeroTema(textoOrigen);
+      const limpia = limpiarNombreCarpeta(textoOrigen);
+      if (num !== null) {
+        return limpia.replace(/^\(?\d+\)?[\s.,:\-–—_]*/, num + '. ');
       }
-
-      return 'General';
+      return limpia || 'General';
     }
 
     // Detecta el tipo específico y el idioma de una ficha a partir de su tipo y/o título
@@ -1545,8 +1669,9 @@
         const titulo = (f.titulo || '').toLowerCase();
         const tipo = (f.tipo || '').toLowerCase();
         const carpeta = (f.carpeta || '').toLowerCase();
+        const carpetaCanonica = (obtenerNombreCarpeta(f) || '').toLowerCase();
         const desc = (f.descripcion || '').toLowerCase();
-        return titulo.includes(t) || tipo.includes(t) || carpeta.includes(t) || desc.includes(t);
+        return titulo.includes(t) || tipo.includes(t) || carpeta.includes(t) || carpetaCanonica.includes(t) || desc.includes(t);
       });
 
       resultsLabel.textContent = `🔍 ${filtradas.length} resultado${filtradas.length !== 1 ? 's' : ''} para “${texto}”`;
@@ -1573,6 +1698,65 @@
     // ─────────────────────────────────────────────────────────────────────────
     // 9. CREADOR DE TARJETAS DE FICHAS (DISEÑO GOOGLE DRIVE)
     // ─────────────────────────────────────────────────────────────────────────
+    // 9. DETECCIÓN Y RESOLUCIÓN DE ENLACES DE GOOGLE DRIVE Y VISTAS PREVIAS
+    // ─────────────────────────────────────────────────────────────────────────
+    function extraerGoogleDriveId(url) {
+      if (!url) return null;
+      const s = String(url).trim();
+      const matchFileD = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (matchFileD) return matchFileD[1];
+      const matchId = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (matchId) return matchId[1];
+      const matchD = s.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (matchD) return matchD[1];
+      return null;
+    }
+
+    function resolverUrlsFicha(f) {
+      const rutaRaw = (f.ruta_archivo || f.enlace || '').trim();
+      const driveId = extraerGoogleDriveId(rutaRaw);
+
+      if (driveId) {
+        return {
+          esDrive: true,
+          driveId: driveId,
+          // Vista previa directa desde el CDN de Google Drive (funciona para PDFs e imágenes)
+          urlPreview: `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`,
+          fallbackPreview: `https://lh3.googleusercontent.com/d/${driveId}`,
+          // Enlace para abrir la ficha en Google Drive
+          urlAbrir: `https://drive.google.com/file/d/${driveId}/view`,
+          // Enlace para descargar directamente
+          urlDescarga: `https://drive.google.com/uc?export=download&id=${driveId}`
+        };
+      }
+
+      // Si es una URL http/https externa normal
+      if (/^https?:\/\//i.test(rutaRaw)) {
+        return {
+          esDrive: false,
+          driveId: null,
+          urlPreview: rutaRaw,
+          fallbackPreview: '',
+          urlAbrir: rutaRaw,
+          urlDescarga: rutaRaw
+        };
+      }
+
+      // Si es archivo local servido por backend
+      const urlLocal = f.id ? `ver_archivo.php?id=${f.id}` : (rutaRaw || '#');
+      return {
+        esDrive: false,
+        driveId: null,
+        urlPreview: urlLocal,
+        fallbackPreview: '',
+        urlAbrir: urlLocal,
+        urlDescarga: urlLocal
+      };
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 10. CREADOR DE TARJETAS DE FICHAS (DISEÑO GOOGLE DRIVE)
+    // ─────────────────────────────────────────────────────────────────────────
     function crearTarjetaFicha(f, mostrarCarpetaBadge = false) {
       const tipo = getTipoFicha(f);
       const icon = getTipoIcon(tipo);
@@ -1582,13 +1766,10 @@
       const carpeta = obtenerNombreCarpeta(f);
       const idioma = getIdiomaFicha(f) === 'es' ? '🇪🇸' : '🇺🇸';
 
-      // URL segura
-      const urlArchivo = f.id
-        ? `ver_archivo.php?id=${f.id}`
-        : ((f.ruta_archivo || f.enlace || '#').trim());
+      const urls = resolverUrlsFicha(f);
 
       const card = document.createElement('a');
-      card.href = urlArchivo;
+      card.href = urls.urlAbrir;
       card.target = '_blank';
       card.rel = 'noopener noreferrer';
       card.className = 'tarjeta-drive';
@@ -1598,6 +1779,8 @@
         ? `<span style="font-size: 0.72rem; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">📁 ${carpeta} ${idioma}</span>`
         : '';
 
+      const fallbackAttr = urls.fallbackPreview ? urls.fallbackPreview : '';
+
       card.innerHTML = `
         <div class="tarjeta-drive-header">
           <span class="tarjeta-drive-type-icon">${icon}</span>
@@ -1605,11 +1788,11 @@
         </div>
         <div class="tarjeta-drive-preview">
           <img
-            src="${urlArchivo}"
+            src="${urls.urlPreview}"
             alt="Vista previa de ${titulo}"
             class="tarjeta-drive-thumbnail"
             loading="lazy"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            onerror="if('${fallbackAttr}' && this.dataset.fallbackApplied !== '1'){ this.dataset.fallbackApplied = '1'; this.src='${fallbackAttr}'; } else { this.style.display='none'; this.nextElementSibling.style.display='flex'; }"
           />
           <div class="tarjeta-drive-preview-icon" style="display:none;">${icon}</div>
           <div class="tarjeta-drive-preview-overlay">
@@ -1625,7 +1808,7 @@
           <button
             class="btn-descargar-ficha"
             title="Descargar ficha"
-            onclick="event.preventDefault(); event.stopPropagation(); descargarFicha('${urlArchivo}', '${titulo.replace(/'/g, "\\'")}')"
+            onclick="event.preventDefault(); event.stopPropagation(); descargarFicha('${urls.urlDescarga}', '${titulo.replace(/'/g, "\\'")}', ${urls.esDrive})"
           >⬇ Descargar</button>
         </div>
       `;
@@ -1634,7 +1817,7 @@
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 10. ÍCONOS POR TIPO DE FICHA
+    // 11. ÍCONOS POR TIPO DE FICHA
     // ─────────────────────────────────────────────────────────────────────────
     function getTipoIcon(tipo) {
       const t = (tipo || '').toLowerCase().trim();
@@ -1651,15 +1834,27 @@
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 11. DESCARGA DE FICHA (fetch + Blob para forzar descarga real)
+    // 12. DESCARGA DE FICHA (Soporta Google Drive y URLs locales)
     // ─────────────────────────────────────────────────────────────────────────
-    async function descargarFicha(url, nombre) {
+    async function descargarFicha(url, nombre, esDrive = false) {
       const btn = document.querySelector(`[onclick*="${CSS.escape(url)}"]`);
 
       try {
         if (btn) {
           btn.classList.add('descargando');
           btn.textContent = '⏳ Descargando...';
+        }
+
+        if (esDrive) {
+          // Para enlaces de Google Drive, abrir descarga directa
+          const link = document.createElement('a');
+          link.href = url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
         }
 
         const response = await fetch(url);
@@ -1688,7 +1883,8 @@
 
       } catch (err) {
         console.error('Error al descargar la ficha:', err);
-        alert('No se pudo descargar la ficha. Intenta abrirla y guardarla manualmente.');
+        // Fallback: abrir enlace directamente
+        window.open(url, '_blank');
       } finally {
         if (btn) {
           btn.classList.remove('descargando');
