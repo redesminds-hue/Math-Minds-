@@ -667,8 +667,13 @@
     }
 
     /* Fila de usuario congelado */
-    tr.user-frozen td { opacity: 0.55; }
-    tr.user-frozen { background: #f1f5f9 !important; }
+    tr.user-frozen td {
+      opacity: 0.55;
+    }
+
+    tr.user-frozen {
+      background: #f1f5f9 !important;
+    }
 
     .badge-frozen {
       display: inline-flex;
@@ -699,6 +704,7 @@
       transition: all 0.2s;
       font-family: inherit;
     }
+
     .btn-gestionar:hover {
       background: #0f172a;
       color: #ffffff;
@@ -713,6 +719,7 @@
       padding: 16px;
       margin-bottom: 14px;
     }
+
     .gestionar-section h4 {
       font-size: 0.85rem;
       font-weight: 700;
@@ -721,12 +728,14 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
+
     .gestionar-section p {
       font-size: 0.83rem;
       color: #64748b;
       margin-bottom: 12px;
       line-height: 1.5;
     }
+
     .btn-freeze {
       width: 100%;
       padding: 10px;
@@ -738,10 +747,27 @@
       transition: all 0.2s;
       font-family: inherit;
     }
-    .btn-freeze.freeze  { background:#fef3c7; color:#92400e; }
-    .btn-freeze.freeze:hover { background:#f59e0b; color:#fff; }
-    .btn-freeze.unfreeze { background:#d1fae5; color:#065f46; }
-    .btn-freeze.unfreeze:hover { background:#10b981; color:#fff; }
+
+    .btn-freeze.freeze {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .btn-freeze.freeze:hover {
+      background: #f59e0b;
+      color: #fff;
+    }
+
+    .btn-freeze.unfreeze {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .btn-freeze.unfreeze:hover {
+      background: #10b981;
+      color: #fff;
+    }
+
     .btn-delete-user {
       width: 100%;
       padding: 10px;
@@ -755,7 +781,11 @@
       transition: all 0.2s;
       font-family: inherit;
     }
-    .btn-delete-user:hover { background: #ef4444; color: #fff; }
+
+    .btn-delete-user:hover {
+      background: #ef4444;
+      color: #fff;
+    }
   </style>
 </head>
 
@@ -873,6 +903,8 @@
             <input type="text" id="searchUserInput" class="search-input-box" placeholder="Buscar usuario..."
               onkeyup="filterUsersTable()" />
             <button class="btn-primary-admin" onclick="openCrearUsuarioModal()">+ Nuevo Usuario</button>
+            <button class="btn-primary-admin" style="background: #334155;" onclick="openGestionarModal()">⚙️
+              Gestionar</button>
             <button class="btn-refresh" onclick="cargarUsuariosReales()">Actualizar</button>
           </div>
         </div>
@@ -992,13 +1024,16 @@
         </div>
 
         <div class="modal-form-group">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+          <div
+            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <label style="margin-bottom: 0;">Seleccionar Fichas con Acceso:</label>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button type="button" class="btn-select-all" onclick="seleccionarTodasFichas(true)" title="Marcar todas las fichas disponibles">
+              <button type="button" class="btn-select-all" onclick="seleccionarTodasFichas(true)"
+                title="Marcar todas las fichas disponibles">
                 ✅ Asignar todas
               </button>
-              <button type="button" class="btn-deselect-all" onclick="seleccionarTodasFichas(false)" title="Desmarcar todas">
+              <button type="button" class="btn-deselect-all" onclick="seleccionarTodasFichas(false)"
+                title="Desmarcar todas">
                 ❌ Desmarcar
               </button>
             </div>
@@ -1029,30 +1064,50 @@
 
   <!-- Modal para Gestionar Usuario (Congelar / Eliminar) -->
   <div class="admin-modal-overlay" id="gestionarUsuarioModal">
-    <div class="admin-modal-content" style="max-width: 420px;">
-      <h3 style="margin-bottom: 4px;">⚙️ Gestionar Usuario</h3>
-      <p id="gestionarModalSubtitle" style="font-size:0.87rem; color:#64748b; margin-bottom:20px;"></p>
+    <div class="admin-modal-content" style="max-width: 480px;">
+      <h3 style="margin-bottom: 4px;">⚙️ Gestionar Cuentas de Usuario</h3>
+      <p style="font-size:0.87rem; color:#64748b; margin-bottom:16px;">Selecciona un usuario registrado para congelar su
+        acceso o eliminarlo.</p>
+
+      <div class="modal-form-group" style="margin-bottom: 14px;">
+        <label for="gestionarSelectUser">Seleccionar Usuario a Gestionar:</label>
+        <select id="gestionarSelectUser" class="modal-form-input" onchange="onSelectUserInGestionarModal()">
+          <!-- Poblado dinámicamente -->
+        </select>
+      </div>
+
+      <div id="gestionarUserDetailsBox"
+        style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+          <strong id="gestionarUserNameDisplay" style="font-size: 1rem; color: #0f172a;">-</strong>
+          <span id="gestionarUserStatusBadge" class="badge-frozen" style="margin-left: 0;">-</span>
+        </div>
+        <div id="gestionarUserEmailDisplay" style="font-size: 0.84rem; color: #64748b;">-</div>
+      </div>
 
       <!-- Sección: Congelar / Descongelar -->
       <div class="gestionar-section">
-        <h4>🔒 Estado de la Cuenta</h4>
-        <p id="gestionarEstadoDesc">Al congelar la cuenta, el usuario no podrá iniciar sesión. Su información y fichas se mantienen en la base de datos intactas.</p>
-        <button class="btn-freeze freeze" id="btnFreezeToggle" onclick="accionGestionarUsuario('congelar')">
+        <h4> Congelar / Reactivar Acceso</h4>
+        <p id="gestionarEstadoDesc">Al congelar la cuenta, el usuario no podrá iniciar sesión pero seguirá registrado en
+          la base de datos con todas sus fichas.</p>
+        <button class="btn-freeze freeze" id="btnFreezeToggle" type="button"
+          onclick="ejecutarAccionGestionar('congelar')">
           ❄️ Congelar Cuenta
         </button>
       </div>
 
       <!-- Sección: Eliminar -->
-      <div class="gestionar-section">
-        <h4>🗑️ Eliminar Usuario</h4>
-        <p>Esta acción es <strong>permanente</strong>. El usuario y todos sus permisos de fichas serán eliminados definitivamente.</p>
-        <button class="btn-delete-user" onclick="accionGestionarUsuario('eliminar')">
-          🗑️ Eliminar Usuario Permanentemente
+      <div class="gestionar-section" style="margin-bottom: 0;">
+        <h4> Eliminar Definitivamente</h4>
+        <p>Esta acción es <strong>permanente</strong>. El usuario y todas sus fichas asignadas se borrarán de MySQL.</p>
+        <button class="btn-delete-user" type="button" onclick="ejecutarAccionGestionar('eliminar')">
+          Eliminar Usuario Permanentemente
         </button>
       </div>
 
-      <div style="text-align:right; margin-top:8px;">
-        <button class="btn-table-action" onclick="closeGestionarModal()">Cerrar</button>
+      <div style="text-align:right; margin-top:16px;">
+        <button type="button" class="btn-table-action" onclick="closeGestionarModal()">Cerrar</button>
       </div>
     </div>
   </div>
@@ -1061,7 +1116,8 @@
   <div class="admin-modal-overlay" id="crearUsuarioModal">
     <div class="admin-modal-content" style="max-width: 480px;">
       <h3 style="margin-bottom: 6px;">➕ Crear Nuevo Usuario</h3>
-      <p style="font-size: 0.87rem; color: #64748b; margin-bottom: 20px;">Los datos se guardarán directamente en la base de datos MySQL.</p>
+      <p style="font-size: 0.87rem; color: #64748b; margin-bottom: 20px;">Los datos se guardarán directamente en la base
+        de datos MySQL.</p>
 
       <form id="crearUsuarioForm" onsubmit="guardarNuevoUsuario(event)">
         <div class="modal-form-group">
@@ -1071,14 +1127,18 @@
 
         <div class="modal-form-group">
           <label for="newUserEmail">Correo Electrónico</label>
-          <input type="email" id="newUserEmail" class="modal-form-input" placeholder="Ej: salle@mathminds.com" required />
+          <input type="email" id="newUserEmail" class="modal-form-input" placeholder="Ej: salle@mathminds.com"
+            required />
         </div>
 
         <div class="modal-form-group">
           <label for="newUserPassword">Contraseña</label>
           <div style="position: relative;">
-            <input type="password" id="newUserPassword" class="modal-form-input" placeholder="Ej: Mathminds-salle2026" required style="padding-right: 44px;" />
-            <button type="button" onclick="toggleNewUserPwd()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.1rem;" title="Mostrar/ocultar contraseña">👁</button>
+            <input type="password" id="newUserPassword" class="modal-form-input" placeholder="Ej: Mathminds-salle2026"
+              required style="padding-right: 44px;" />
+            <button type="button" onclick="toggleNewUserPwd()"
+              style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.1rem;"
+              title="Mostrar/ocultar contraseña">👁</button>
           </div>
         </div>
 
@@ -1242,7 +1302,6 @@
 
         if (frozen) tr.classList.add('user-frozen');
 
-        const nombreSafe = user.nombre.replace(/'/g, "\\'");
         tr.innerHTML = `
           <td><strong>#${user.id}</strong></td>
           <td><strong>${user.nombre}</strong>${frozenBadge}</td>
@@ -1250,9 +1309,8 @@
           <td><span class="role-badge ${rolClass}">${user.rol}</span></td>
           <td>${gradoHtml}</td>
           <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">${countFichas}</span></td>
-          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+          <td>
             <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">Asignar Fichas</button>
-            <button class="btn-gestionar" onclick="openGestionarModal(${user.id}, '${nombreSafe}', ${frozen ? 1 : 0})">⚙️ Gestionar</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1692,11 +1750,11 @@
     }
     async function guardarNuevoUsuario(e) {
       e.preventDefault();
-      const nombre   = document.getElementById('newUserNombre').value.trim();
-      const email    = document.getElementById('newUserEmail').value.trim();
+      const nombre = document.getElementById('newUserNombre').value.trim();
+      const email = document.getElementById('newUserEmail').value.trim();
       const password = document.getElementById('newUserPassword').value.trim();
-      const rol      = document.getElementById('newUserRol').value;
-      const grado    = document.getElementById('newUserGrado').value.trim();
+      const rol = document.getElementById('newUserRol').value;
+      const grado = document.getElementById('newUserGrado').value.trim();
       const btn = document.getElementById('btnCrearUsuario');
       btn.disabled = true;
       btn.textContent = 'Creando en MySQL...';
@@ -1723,34 +1781,75 @@
     }
 
     // --- Modal Gestionar (Congelar / Descongelar / Eliminar) ---
-    let _gestionarUserId   = null;
-    let _gestionarFrozen   = false;
+    let _gestionarUserId = null;
 
-    function openGestionarModal(userId, userName, isFrozen) {
-      _gestionarUserId = userId;
-      _gestionarFrozen = Boolean(isFrozen);
+    function openGestionarModal(preselectUserId = null) {
+      const select = document.getElementById('gestionarSelectUser');
+      if (!select) return;
+      select.innerHTML = '';
 
-      document.getElementById('gestionarModalSubtitle').textContent =
-        `Usuario: ${userName}`;
-
-      const btn    = document.getElementById('btnFreezeToggle');
-      const desc   = document.getElementById('gestionarEstadoDesc');
-
-      if (_gestionarFrozen) {
-        // Ya está congelada → mostrar opción de descongelar
-        btn.textContent = '✅ Reactivar Cuenta';
-        btn.className   = 'btn-freeze unfreeze';
-        btn.onclick     = () => accionGestionarUsuario('descongelar');
-        desc.textContent = 'Esta cuenta está actualmente CONGELADA. El usuario no puede iniciar sesión. Puedes reactivarla para restaurar su acceso.';
-      } else {
-        // Está activa → mostrar opción de congelar
-        btn.textContent = '❄️ Congelar Cuenta';
-        btn.className   = 'btn-freeze freeze';
-        btn.onclick     = () => accionGestionarUsuario('congelar');
-        desc.textContent = 'Al congelar la cuenta, el usuario no podrá iniciar sesión. Su información y fichas se mantienen intactas en la base de datos.';
+      if (!globalUsuarios.length) {
+        select.innerHTML = '<option value="">No hay usuarios registrados</option>';
+        document.getElementById('gestionarUserDetailsBox').style.display = 'none';
+        document.getElementById('gestionarUsuarioModal').classList.add('active');
+        return;
       }
 
+      document.getElementById('gestionarUserDetailsBox').style.display = 'block';
+
+      globalUsuarios.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        const isFrozen = String(u.activo) === '0';
+        opt.textContent = `#${u.id} - ${u.nombre} (${u.email}) ${isFrozen ? ' [CONGELADA]' : ' [ACTIVA]'}`;
+        select.appendChild(opt);
+      });
+
+      if (preselectUserId) {
+        select.value = preselectUserId;
+      }
+
+      onSelectUserInGestionarModal();
       document.getElementById('gestionarUsuarioModal').classList.add('active');
+    }
+
+    function onSelectUserInGestionarModal() {
+      const select = document.getElementById('gestionarSelectUser');
+      const userId = Number(select.value);
+      const user = globalUsuarios.find(u => Number(u.id) === userId);
+      if (!user) return;
+
+      _gestionarUserId = user.id;
+      const isFrozen = String(user.activo) === '0';
+
+      document.getElementById('gestionarUserNameDisplay').textContent = `${user.nombre} (#${user.id})`;
+      document.getElementById('gestionarUserEmailDisplay').textContent = `${user.email} | Rol: ${user.rol} | Grado: ${user.grado || 'Sin grado'}`;
+
+      const statusBadge = document.getElementById('gestionarUserStatusBadge');
+      const btn = document.getElementById('btnFreezeToggle');
+      const desc = document.getElementById('gestionarEstadoDesc');
+
+      if (isFrozen) {
+        statusBadge.textContent = ' Cuenta Congelada';
+        statusBadge.style.background = '#fef3c7';
+        statusBadge.style.color = '#92400e';
+        statusBadge.style.borderColor = '#fde68a';
+
+        btn.textContent = ' Reactivar Cuenta';
+        btn.className = 'btn-freeze unfreeze';
+        btn.onclick = () => ejecutarAccionGestionar('descongelar');
+        desc.textContent = 'Esta cuenta está actualmente CONGELADA. El usuario no puede iniciar sesión. Haz clic para reactivarla.';
+      } else {
+        statusBadge.textContent = 'Cuenta Activa';
+        statusBadge.style.background = '#d1fae5';
+        statusBadge.style.color = '#065f46';
+        statusBadge.style.borderColor = '#a7f3d0';
+
+        btn.textContent = ' Congelar Cuenta';
+        btn.className = 'btn-freeze freeze';
+        btn.onclick = () => ejecutarAccionGestionar('congelar');
+        desc.textContent = 'Al congelar la cuenta, el usuario no podrá iniciar sesión pero sus datos seguirán guardados en la base de datos.';
+      }
     }
 
     function closeGestionarModal() {
@@ -1758,32 +1857,39 @@
       _gestionarUserId = null;
     }
 
-    async function accionGestionarUsuario(accion) {
+    async function ejecutarAccionGestionar(accion) {
       if (!_gestionarUserId) return;
+      const user = globalUsuarios.find(u => Number(u.id) === Number(_gestionarUserId));
+      const userName = user ? user.nombre : `Usuario #${_gestionarUserId}`;
 
       const confirmMsgs = {
-        congelar:    '❄️ ¿Congelar esta cuenta? El usuario no podrá iniciar sesión hasta que la reactives.',
-        descongelar: '✅ ¿Reactivar esta cuenta? El usuario podrá volver a iniciar sesión.',
-        eliminar:    '⚠️ ¿ELIMINAR este usuario permanentemente?\n\nSe borrarán todos sus permisos de fichas. Esta acción NO se puede deshacer.'
+        congelar: `❄️ ¿Deseas congelar la cuenta de "${userName}"?\n\nEl usuario no podrá iniciar sesión pero permanecerá en la base de datos.`,
+        descongelar: ` ¿Deseas reactivar la cuenta de "${userName}"?\n\nEl usuario podrá volver a ingresar al sistema.`,
+        eliminar: ` ¿ESTÁS SEGURO de eliminar definitivamente a "${userName}" de la base de datos?\n\nEsta acción es permanente e irreversible.`
       };
+
       if (!confirm(confirmMsgs[accion])) return;
 
       try {
         const res = await fetch('gestionar_usuario.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: _gestionarUserId, accion })
+          body: JSON.stringify({ id: _gestionarUserId, accion: accion })
         });
         const data = await res.json();
         if (data.success) {
           alert(`✅ ${data.mensaje}`);
-          closeGestionarModal();
-          cargarUsuariosReales();
+          await cargarUsuariosReales();
+          if (accion === 'eliminar') {
+            closeGestionarModal();
+          } else {
+            openGestionarModal(_gestionarUserId);
+          }
         } else {
           alert(`❌ ${data.mensaje || 'Error al ejecutar la acción.'}`);
         }
       } catch (err) {
-        alert('Error de conexión.');
+        alert('Error de conexión al procesar la solicitud.');
       }
     }
   </script>
