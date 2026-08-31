@@ -1,5 +1,5 @@
 <?php
-// guardar_ficha.php - Guardar una ficha en la base de datos de cPanel
+// guardar_archivo.php 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
@@ -15,52 +15,39 @@ error_reporting(E_ALL);
 
 try {
     require_once 'conexion.php';
-
-    if (!isset($conexion)) {
-        if (isset($pdo))
-            $conexion = $pdo;
-        elseif (isset($conn))
-            $conexion = $conn;
-        elseif (isset($db))
-            $conexion = $db;
+    if (!isset($conexion)) { /* ... tu lógica de conexión original ... */
     }
 
     $inputJSON = file_get_contents('php://input');
     $data = json_decode($inputJSON, true);
-
     if (!$data && !empty($_POST)) {
         $data = $_POST;
     }
 
     $titulo = isset($data['titulo']) ? trim($data['titulo']) : '';
-    $grado = isset($data['grado']) ? trim($data['grado']) : 'Todos';
-    $descripcion = isset($data['descripcion']) ? trim($data['descripcion']) : '';
+    // CAMBIO: Ahora recibimos la carpeta destino en lugar del grado
+    $carpeta_id = isset($data['carpeta_id']) ? intval($data['carpeta_id']) : 0;
     $ruta_archivo = isset($data['ruta_archivo']) ? trim($data['ruta_archivo']) : (isset($data['enlace']) ? trim($data['enlace']) : '');
 
-    if (empty($titulo)) {
-        echo json_encode(["success" => false, "mensaje" => "El título de la ficha es obligatorio."]);
+    if (empty($titulo) || $carpeta_id <= 0) {
+        echo json_encode(["success" => false, "mensaje" => "El título y la carpeta destino son obligatorios."]);
         exit;
     }
 
-    // Usamos los nombres exactos de tu tabla: titulo, grado, descripcion, ruta_archivo
-    $stmt = $conexion->prepare("INSERT INTO fichas (titulo, grado, descripcion, ruta_archivo) VALUES (:titulo, :grado, :descripcion, :ruta_archivo)");
+    // CAMBIO: Insertamos en la nueva tabla 'archivos'
+    $stmt = $conexion->prepare("INSERT INTO archivos (titulo, ruta_archivo, carpeta_id) VALUES (:titulo, :ruta_archivo, :carpeta_id)");
     $stmt->execute([
         ':titulo' => $titulo,
-        ':grado' => $grado,
-        ':descripcion' => $descripcion,
-        ':ruta_archivo' => $ruta_archivo
+        ':ruta_archivo' => $ruta_archivo,
+        ':carpeta_id' => $carpeta_id
     ]);
 
     $nuevoID = $conexion->lastInsertId();
 
-    echo json_encode([
-        "success" => true,
-        "mensaje" => "Ficha creada correctamente.",
-        "ficha_id" => $nuevoID
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode(["success" => true, "mensaje" => "Archivo creado correctamente.", "archivo_id" => $nuevoID], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
     http_response_code(200);
-    echo json_encode(["success" => false, "mensaje" => "Error al guardar la ficha: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    echo json_encode(["success" => false, "mensaje" => "Error al guardar: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }
 ?>

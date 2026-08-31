@@ -1,0 +1,216 @@
+/* ==========================================================================
+   GESTOR DE RECURSOS - ESTILOS TIPO GOOGLE DRIVE
+   ========================================================================== */
+:root {
+  --drive-bg: #f8fafc;
+  --drive-card-bg: #ffffff;
+  --drive-card-hover: #f1f5f9;
+  --drive-border: #e2e8f0;
+  --drive-text: #1e293b;
+  --drive-text-muted: #64748b;
+  --drive-primary: #1a73e8;
+  --drive-primary-light: #e8f0fe;
+  --drive-folder-bg: #fef3c7;
+  --drive-folder-icon: #d97706;
+  --drive-radius: 12px;
+  --drive-radius-sm: 8px;
+  --drive-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --drive-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --drive-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Contenedor Principal */
+.drive-manager-container {
+  width: 100%;
+  background: var(--drive-card-bg);
+  border: 1px solid var(--drive-border);
+  border-radius: var(--drive-radius);
+  box-shadow: var(--drive-shadow);
+  padding: 24px;
+  min-height: 480px;
+}
+
+/* Cabecera y Migas de Pan (Breadcrumbs) */
+.drive-breadcrumbs-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--drive-border);
+}
+
+.drive-breadcrumb-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--drive-text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: var(--drive-radius-sm);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  transition: var(--drive-transition);
+  user-select: none;
+}
+
+.drive-breadcrumb-node:hover {
+  background-color: var(--drive-card-hover);
+  color: var(--drive-primary);
+}
+
+.drive-breadcrumb-node.active {
+  color: var(--drive-text);
+  font-weight: 700;
+  cursor: default;
+  background-color: transparent;
+}
+
+.drive-breadcrumb-sep {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  user-select: none;
+}
+
+/* Secciones de Contenido */
+.drive-section-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--drive-text-muted);
+  font-weight: 700;
+  margin: 18px 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.drive-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+/* Tarjetas (Carpetas y Archivos) */
+.drive-item-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background-color: var(--drive-card-bg);
+  border: 1px solid var(--drive-border);
+  border-radius: var(--drive-radius);
+  cursor: pointer;
+  transition: var(--drive-transition);
+  user-select: none;
+  text-decoration: none;
+  color: inherit;
+}
+
+.drive-item-card:hover {
+  background-color: var(--drive-card-hover);
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: var(--drive-shadow-hover);
+}
+
+.drive-item-card.folder-type:hover {
+  border-color: var(--drive-primary);
+}
+
+.drive-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--drive-radius-sm);
+  flex-shrink: 0;
+}
+
+.drive-item-icon.folder {
+  background-color: var(--drive-folder-bg);
+  color: var(--drive-folder-icon);
+}
+
+.drive-item-icon.file {
+  background-color: var(--drive-primary-light);
+  color: var(--drive-primary);
+}
+
+.drive-item-icon.image {
+  background-color: #fce7f3;
+  color: #db2777;
+}
+
+.drive-item-icon.pdf {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.drive-item-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.drive-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.drive-item-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--drive-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.drive-item-sub {
+  font-size: 0.75rem;
+  color: var(--drive-text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Estados Vacío / Cargando */
+.drive-status-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  color: var(--drive-text-muted);
+  text-align: center;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.drive-status-state svg {
+  width: 44px;
+  height: 44px;
+  color: #94a3b8;
+}
+
+.drive-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--drive-border);
+  border-top-color: var(--drive-primary);
+  border-radius: 50%;
+  animation: driveSpin 0.8s linear infinite;
+}
+
+@keyframes driveSpin {
+  to { transform: rotate(360deg); }
+}

@@ -17,9 +17,12 @@ try {
     require_once 'conexion.php';
 
     if (!isset($conexion)) {
-        if (isset($pdo)) $conexion = $pdo;
-        elseif (isset($conn)) $conexion = $conn;
-        elseif (isset($db)) $conexion = $db;
+        if (isset($pdo))
+            $conexion = $pdo;
+        elseif (isset($conn))
+            $conexion = $conn;
+        elseif (isset($db))
+            $conexion = $db;
     }
 
     $inputJSON = file_get_contents('php://input');
@@ -36,7 +39,7 @@ try {
         exit;
     }
 
-    $stmt = $conexion->prepare("DELETE FROM fichas WHERE id = :id");
+    $stmt = $conexion->prepare("DELETE FROM archivos WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
     echo json_encode(["success" => true, "mensaje" => "Ficha eliminada correctamente."], JSON_UNESCAPED_UNICODE);

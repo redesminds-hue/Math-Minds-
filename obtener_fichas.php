@@ -1,54 +1,56 @@
 <?php
-// obtener_fichas.php - Versión estricta de seguridad para estudiantes
+// obtener_fichas.php
 header('Content-Type: application/json; charset=utf-8');
 include 'conexion.php';
 
 $rol = isset($_GET['rol']) ? $_GET['rol'] : 'estudiante';
-$grado = isset($_GET['grado']) ? $_GET['grado'] : '';
 $usuario_id = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : 0;
+$carpeta_actual = isset($_GET['carpeta_id']) ? intval($_GET['carpeta_id']) : null;
 
 try {
-    if ($rol === 'admin') {
-        // El administrador ve todas las fichas
-        $sql = "SELECT * FROM fichas ORDER BY id DESC";
-        $stmt = $conexion->prepare($sql);
-        $stmt->execute();
-        $fichas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-        $gradoEstudiante = $grado;
-        if ($usuario_id > 0) {
-            // Consultar el grado real del estudiante en la base de datos
-            $stmtUser = $conexion->prepare("SELECT grado FROM usuarios WHERE id = :uid LIMIT 1");
-            $stmtUser->execute([':uid' => $usuario_id]);
-            $userRow = $stmtUser->fetch(PDO::FETCH_ASSOC);
-            if ($userRow && !empty($userRow['grado'])) {
-                $gradoEstudiante = trim($userRow['grado']);
-            }
+    $carpetas = [];
+    $archivos = [];
 
-            $sql = "SELECT f.* FROM fichas f
-                    INNER JOIN permisos_fichas p ON f.id = p.ficha_id
-                    WHERE p.usuario_id = :usuario_id
-                    ORDER BY f.id DESC";
-            $stmt = $conexion->prepare($sql);
-            $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
-            $stmt->execute();
-            $fichas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // --- 1. OBTENER CARPETAS ---
+    if ($carpeta_actual) {
+        // Si ya está dentro de una carpeta permitida, mostramos sus subcarpetas
+        $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id = :parent_id");
+        $stmt_carpetas->execute([':parent_id' => $carpeta_actual]);
+        $carpetas = $stmt_carpetas->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        // Si está en la RAÍZ, filtramos qué carpetas principales puede ver
+        if ($rol === 'admin') {
+            // El admin ve todas las carpetas principales
+            $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id IS NULL");
+            $stmt_carpetas->execute();
         } else {
-            // Si no viene el ID de usuario, por seguridad devolvemos cero fichas
-            $fichas = [];
+            // El estudiante solo ve las carpetas asignadas en 'permisos_carpetas'
+            $stmt_carpetas = $conexion->prepare("
+                SELECT c.* FROM carpetas c 
+                INNER JOIN permisos_carpetas p ON c.id = p.carpeta_id 
+                WHERE c.parent_id IS NULL AND p.usuario_id = :usuario_id
+            ");
+            $stmt_carpetas->execute([':usuario_id' => $usuario_id]);
         }
+        $carpetas = $stmt_carpetas->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // --- 2. OBTENER ARCHIVOS ---
+    // Solo buscamos archivos si el usuario ya entró a una carpeta
+    if ($carpeta_actual) {
+        // No necesitamos JOIN de permisos aquí, porque la seguridad ya se aplicó en la carpeta padre
+        $stmt_archivos = $conexion->prepare("SELECT * FROM archivos WHERE carpeta_id = :carpeta_id ORDER BY id DESC");
+        $stmt_archivos->execute([':carpeta_id' => $carpeta_actual]);
+        $archivos = $stmt_archivos->fetchAll(PDO::FETCH_ASSOC);
     }
 
     echo json_encode([
         "success" => true,
-        "grado"   => $gradoEstudiante ?? $grado,
-        "fichas"  => $fichas
+        "carpetas" => $carpetas,
+        "archivos" => $archivos
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $e) {
-    echo json_encode([
-        "success" => false,
-        "mensaje" => "Error al obtener las fichas: " . $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode(["success" => false, "mensaje" => "Error: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }
 ?>

@@ -49,41 +49,64 @@ try {
         exit;
     }
 
-    // 1. PASO CLAVE: Borramos todos los permisos anteriores de este usuario para empezar limpios
-    $stmtDelete = $conexion->prepare("DELETE FROM permisos_fichas WHERE usuario_id = :usuario_id");
+    // 1. Borramos los permisos de carpetas anteriores de este usuario
+    $stmtDelete = $conexion->prepare("DELETE FROM permisos_carpetas WHERE usuario_id = :usuario_id");
     $stmtDelete->execute([':usuario_id' => $usuario_id]);
 
-    // 2. Capturamos las fichas seleccionadas (puede venir como un array o como un valor único)
-    $fichasSeleccionadas = [];
-    if (isset($data['fichas_acceso'])) {
-        if (is_array($data['fichas_acceso'])) {
-            $fichasSeleccionadas = $data['fichas_acceso'];
+    // 2. Capturamos las carpetas seleccionadas (puede venir como 'carpetas_acceso' o 'fichas_acceso')
+    $carpetasSeleccionadas = [];
+    $rawCarpetas = isset($data['carpetas_acceso']) ? $data['carpetas_acceso'] : (isset($data['fichas_acceso']) ? $data['fichas_acceso'] : null);
+
+    if ($rawCarpetas !== null) {
+        if (is_array($rawCarpetas)) {
+            $carpetasSeleccionadas = $rawCarpetas;
         } else {
-            // Si viene como string separado por comas o un solo número
-            $fichasSeleccionadas = explode(',', $data['fichas_acceso']);
+            $carpetasSeleccionadas = explode(',', strval($rawCarpetas));
         }
-    } elseif (isset($data['ficha_id'])) {
-        $fichasSeleccionadas = [$data['ficha_id']];
+    } elseif (isset($data['carpeta_id'])) {
+        $carpetasSeleccionadas = [$data['carpeta_id']];
     }
 
-    // 3. Insertamos las nuevas fichas que el admin marcó (si dejó alguna seleccionada)
-    if (!empty($fichasSeleccionadas)) {
-        $stmtInsert = $conexion->prepare("INSERT INTO permisos_fichas (usuario_id, ficha_id) VALUES (:usuario_id, :ficha_id)");
+    // 3. Insertamos las carpetas principales permitidas
+    if (!empty($carpetasSeleccionadas)) {
+        $stmtInsert = $conexion->prepare("INSERT INTO permisos_carpetas (usuario_id, carpeta_id) VALUES (:usuario_id, :carpeta_id)");
 
-        foreach ($fichasSeleccionadas as $ficha_id) {
-            $ficha_id = intval(trim($ficha_id));
-            if ($ficha_id > 0) {
+        foreach ($carpetasSeleccionadas as $cid) {
+            $cid = intval(trim($cid));
+            if ($cid > 0) {
                 $stmtInsert->execute([
                     ':usuario_id' => $usuario_id,
-                    ':ficha_id' => $ficha_id
+                    ':carpeta_id' => $cid
                 ]);
             }
         }
     }
 
+    // 4. Actualizamos el grado y rol del usuario si fueron proporcionados
+    $grado = isset($data['grado']) ? trim($data['grado']) : null;
+    $rol = isset($data['rol']) ? trim($data['rol']) : null;
+
+    if ($grado !== null || $rol !== null) {
+        $fields = [];
+        $params = [':uid' => $usuario_id];
+        if ($grado !== null) {
+            $fields[] = "grado = :grado";
+            $params[':grado'] = $grado;
+        }
+        if ($rol !== null) {
+            $fields[] = "rol = :rol";
+            $params[':rol'] = $rol;
+        }
+        if (!empty($fields)) {
+            $sqlUser = "UPDATE usuarios SET " . implode(", ", $fields) . " WHERE id = :uid";
+            $stmtUser = $conexion->prepare($sqlUser);
+            $stmtUser->execute($params);
+        }
+    }
+
     echo json_encode([
         "success" => true,
-        "mensaje" => "Permisos actualizados correctamente en la base de datos."
+        "mensaje" => "Permisos de carpetas actualizados correctamente."
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {

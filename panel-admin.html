@@ -918,7 +918,7 @@
                 <th>Correo Electrónico</th>
                 <th>Rol</th>
                 <th>Grado / Curso</th>
-                <th>Fichas Asignadas</th>
+                <th>Carpetas Asignadas</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -982,10 +982,10 @@
           <p><strong>Base de Datos MySQL:</strong> <code>mathmind_fichasdb</code></p>
           <p><strong>Endpoints Activos:</strong></p>
           <ul style="padding-left: 20px; color: var(--admin-text-muted); line-height: 1.8;">
-            <li><code>obtener_usuarios.php</code>: Consulta usuarios de la tabla <code>usuarios</code>.</li>
-            <li><code>guardar_usuario_permisos.php</code>: Guarda fichas específicas y grado de cada estudiante.</li>
-            <li><code>obtener_fichas.php</code>: Devuelve fichas según permisos y rol.</li>
-            <li><code>guardar_ficha.php</code> / <code>eliminar_ficha.php</code>: Gestión de fichas en MySQL.</li>
+            <li><code>obtener_usuarios.php</code>: Consulta usuarios y carpetas asignadas.</li>
+            <li><code>guardar_usuario_permisos.php</code>: Sincroniza permisos en <code>permisos_carpetas</code>.</li>
+            <li><code>obtener_fichas.php</code>: Devuelve estructura de carpetas y archivos autorizados.</li>
+            <li><code>guardar_ficha.php</code> / <code>eliminar_ficha.php</code>: Gestión de archivos en MySQL.</li>
           </ul>
 
           <div style="margin-top: 10px;">
@@ -999,12 +999,11 @@
 
   </main>
 
-  <!-- Modal para Asignar Fichas a un Usuario -->
+  <!-- Modal para Asignar Carpetas a un Usuario -->
   <div class="admin-modal-overlay" id="permisosModal">
     <div class="admin-modal-content">
-      <h3 style="margin-bottom: 8px;">Asignar Fichas y Grado a Estudiante</h3>
-      <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;" id="modalUserSubtitle">Selecciona a qué fichas
-        tendrá acceso este usuario en su panel.</p>
+      <h3 style="margin-bottom: 8px;">Asignar Carpetas Principales y Grado a Estudiante</h3>
+      <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;" id="modalUserSubtitle">Selecciona a qué carpetas principales tendrá acceso este usuario en su panel.</p>
 
       <form id="permisosForm" onsubmit="guardarPermisosUsuario(event)">
         <input type="hidden" id="modalUserId" />
@@ -1026,31 +1025,23 @@
         <div class="modal-form-group">
           <div
             style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-            <label style="margin-bottom: 0;">Seleccionar Fichas con Acceso:</label>
+            <label style="margin-bottom: 0;">Carpetas Principales con Acceso:</label>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button type="button" class="btn-select-all" onclick="seleccionarTodasFichas(true)"
-                title="Marcar todas las fichas disponibles">
+              <button type="button" class="btn-select-all" onclick="seleccionarTodasCarpetas(true)"
+                title="Marcar todas las carpetas disponibles">
                 ✅ Asignar todas
               </button>
-              <button type="button" class="btn-deselect-all" onclick="seleccionarTodasFichas(false)"
+              <button type="button" class="btn-deselect-all" onclick="seleccionarTodasCarpetas(false)"
                 title="Desmarcar todas">
                 ❌ Desmarcar
               </button>
             </div>
           </div>
 
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 0.76rem; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">
-              Seleccionar todas por grado:
-            </span>
-            <div id="gradeSelectionToolbar" class="grade-select-toolbar">
-              <!-- Botones de grados generados dinámicamente -->
-            </div>
-            <div id="selectionFeedbackMsg" class="selection-feedback"></div>
-          </div>
+          <div id="selectionFeedbackMsg" class="selection-feedback" style="margin-bottom: 8px;"></div>
 
           <div class="checkbox-list-container" id="modalFichasChecklist">
-            <!-- Checkboxes generados dinámicamente -->
+            <!-- Checkboxes de carpetas generados dinámicamente -->
           </div>
         </div>
 
@@ -1218,6 +1209,7 @@
   <script>
     let globalUsuarios = [];
     let globalFichas = [];
+    let globalCarpetas = [];
 
     document.addEventListener('DOMContentLoaded', () => {
       const AUTH_KEY = 'mathMindsLoggedUser';
@@ -1248,9 +1240,23 @@
       });
 
       // Cargar datos iniciales
+      cargarCarpetasPrincipalesAdmin();
       cargarFichasAdmin();
       cargarUsuariosReales();
     });
+
+    // 0. Cargar Carpetas Principales (Raíz)
+    async function cargarCarpetasPrincipalesAdmin() {
+      try {
+        const res = await fetch('obtener_fichas.php?rol=admin&carpeta_id=0');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.carpetas)) {
+          globalCarpetas = data.carpetas;
+        }
+      } catch (err) {
+        console.error('Error al obtener carpetas principales:', err);
+      }
+    }
 
     // 1. Cargar Usuarios Reales desde MySQL
     async function cargarUsuariosReales() {
@@ -1289,7 +1295,8 @@
       usuarios.forEach(user => {
         const tr = document.createElement('tr');
         const rolClass = String(user.rol).toLowerCase() === 'admin' ? 'role-admin' : 'role-estudiante';
-        const countFichas = user.fichas_acceso ? user.fichas_acceso.split(',').filter(Boolean).length : 0;
+        const carpetasRaw = user.carpetas_acceso || user.fichas_acceso || '';
+        const countCarpetas = carpetasRaw ? carpetasRaw.split(',').filter(Boolean).length : 0;
         const frozen = String(user.activo) === '0';
 
         // Validación condicional del grado: solo muestra badge si existe y no está vacío
@@ -1308,9 +1315,9 @@
           <td>${user.email}</td>
           <td><span class="role-badge ${rolClass}">${user.rol}</span></td>
           <td>${gradoHtml}</td>
-          <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">${countFichas}</span></td>
+          <td><span style="font-size:0.85rem; font-weight:600; color:#0284c7;">📁 ${countCarpetas} carpeta${countCarpetas !== 1 ? 's' : ''}</span></td>
           <td>
-            <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">Asignar Fichas</button>
+            <button class="btn-table-action assign" onclick="openPermisosModal(${user.id})">Asignar Carpetas</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1324,12 +1331,13 @@
         const res = await fetch('obtener_fichas.php?rol=admin');
         const data = await res.json();
 
-        if (data.success && Array.isArray(data.fichas)) {
-          globalFichas = data.fichas;
-          document.getElementById('statFichasCount').textContent = data.fichas.length;
-          renderFichasTable(data.fichas);
+        const listaItems = data.archivos || data.fichas || [];
+        if (data.success && Array.isArray(listaItems)) {
+          globalFichas = listaItems;
+          document.getElementById('statFichasCount').textContent = listaItems.length;
+          renderFichasTable(listaItems);
         } else {
-          tbody.innerHTML = `<tr><td colspan="6" style="color:#ef4444; text-align:center;">${data.mensaje || 'Error al cargar fichas.'}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" style="color:#ef4444; text-align:center;">${data.mensaje || 'Error al cargar recursos.'}</td></tr>`;
         }
       } catch (err) {
         console.error(err);
@@ -1363,163 +1371,46 @@
       });
     }
 
-    // Definición de grados estándar y sus patrones de coincidencia
-    const STANDARD_GRADES = [
-      { key: '1', label: '1° Primero', emoji: '📘', regex: /\b(1|1ro|1ero|1°|primero|primer|grado\s*1)\b/i, gradeInputVal: '1ro' },
-      { key: '2', label: '2° Segundo', emoji: '📗', regex: /\b(2|2do|2°|segundo|grado\s*2)\b/i, gradeInputVal: '2do' },
-      { key: '3', label: '3° Tercero', emoji: '📙', regex: /\b(3|3ro|3ero|3°|tercero|tercer|grado\s*3)\b/i, gradeInputVal: '3ro' },
-      { key: '4', label: '4° Cuarto', emoji: '📕', regex: /\b(4|4to|4°|cuarto|grado\s*4)\b/i, gradeInputVal: '4to' },
-      { key: '5', label: '5° Quinto', emoji: '📒', regex: /\b(5|5to|5°|quinto|grado\s*5)\b/i, gradeInputVal: '5to' },
-      { key: '6', label: '6° Sexto', emoji: '📓', regex: /\b(6|6to|6°|sexto|grado\s*6)\b/i, gradeInputVal: '6to' },
-      { key: '7', label: '7° Séptimo', emoji: '📘', regex: /\b(7|7mo|7°|septimo|séptimo|grado\s*7)\b/i, gradeInputVal: '7mo' },
-      { key: '8', label: '8° Octavo', emoji: '📗', regex: /\b(8|8vo|8°|octavo|grado\s*8)\b/i, gradeInputVal: '8vo' },
-      { key: '9', label: '9° Noveno', emoji: '📙', regex: /\b(9|9no|9°|noveno|grado\s*9)\b/i, gradeInputVal: '9no' },
-      { key: '10', label: '10° Décimo', emoji: '📕', regex: /\b(10|10mo|10°|decimo|décimo|grado\s*10)\b/i, gradeInputVal: '10mo' },
-      { key: '11', label: '11° Once', emoji: '🎓', regex: /\b(11|11vo|11°|once|undecimo|undécimo|grado\s*11)\b/i, gradeInputVal: '11vo' },
-      { key: 'transicion', label: 'Transición', emoji: '🌱', regex: /transici[oó]n/i, gradeInputVal: 'Transición' },
-      { key: 'preescolar', label: 'Preescolar', emoji: '🎨', regex: /preescolar|prejard[ií]n|jard[ií]n|parvulo/i, gradeInputVal: 'Preescolar' }
-    ];
-
-    function fichaPerteneceAGrado(ficha, gradeKey) {
-      if (!ficha) return false;
-      const gradoRaw = String(ficha.grado || '').trim();
-      if (!gradoRaw) return false;
-
-      const std = STANDARD_GRADES.find(g => g.key === gradeKey);
-      if (std) {
-        return std.regex.test(gradoRaw);
-      }
-
-      // Si es un grado personalizado de la base de datos
-      return gradoRaw.toLowerCase().includes(String(gradeKey).toLowerCase());
-    }
-
-    function renderizarBotonesGradosModal() {
-      const container = document.getElementById('gradeSelectionToolbar');
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (!globalFichas.length) {
-        container.innerHTML = '<span style="font-size:0.75rem; color:#94a3b8;">Sin fichas disponibles</span>';
-        return;
-      }
-
-      const gradesToRender = [];
-      const matchedFichaIds = new Set();
-
-      // 1. Evaluar grados estándar
-      STANDARD_GRADES.forEach(g => {
-        const matchingFichas = globalFichas.filter(f => fichaPerteneceAGrado(f, g.key));
-        // Mostramos siempre 1°, 2°, 3° y cualquier otro grado que tenga fichas en la BD
-        if (matchingFichas.length > 0 || ['1', '2', '3'].includes(g.key)) {
-          gradesToRender.push({
-            key: g.key,
-            label: g.label,
-            emoji: g.emoji,
-            count: matchingFichas.length,
-            gradeInputVal: g.gradeInputVal
-          });
-          matchingFichas.forEach(f => matchedFichaIds.add(f.id));
-        }
-      });
-
-      // 2. Detectar cualquier otro grado que exista en la BD y no coincida con los estándar
-      const customGradosMap = new Map();
-      globalFichas.forEach(f => {
-        const gName = (f.grado || '').trim();
-        if (!matchedFichaIds.has(f.id) && gName && gName.toLowerCase() !== 'todos' && !customGradosMap.has(gName)) {
-          const matchingCustom = globalFichas.filter(cf => (cf.grado || '').trim() === gName);
-          customGradosMap.set(gName, matchingCustom.length);
-        }
-      });
-
-      customGradosMap.forEach((count, gName) => {
-        gradesToRender.push({
-          key: gName,
-          label: gName,
-          emoji: '🏷️',
-          count: count,
-          gradeInputVal: gName
-        });
-      });
-
-      // 3. Renderizar botones
-      gradesToRender.forEach(g => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'btn-grade-select';
-        btn.title = `Marcar únicamente las fichas de ${g.label} (${g.count} disponibles)`;
-        btn.innerHTML = `
-          <span>${g.emoji} ${g.label}</span>
-          <span class="grade-badge-count">${g.count}</span>
-        `;
-        btn.onclick = () => seleccionarFichasPorGrado(g.key, g.label, g.gradeInputVal);
-        container.appendChild(btn);
-      });
-    }
-
-    function seleccionarFichasPorGrado(gradeKey, gradeLabel, gradeInputVal) {
-      let selectedCount = 0;
-      globalFichas.forEach(f => {
-        const cb = document.getElementById(`check_ficha_${f.id}`);
-        if (cb) {
-          const match = fichaPerteneceAGrado(f, gradeKey);
-          cb.checked = match;
-          if (match) selectedCount++;
-        }
-      });
-
-      // Sincronizar el campo de grado del usuario si está vacío o por defecto
-      const inputGrado = document.getElementById('modalUserGrado');
-      if (inputGrado && (!inputGrado.value.trim() || inputGrado.value === 'Sin grado')) {
-        inputGrado.value = gradeInputVal || gradeLabel || gradeKey;
-      }
-
-      // Feedback visual
-      const feedback = document.getElementById('selectionFeedbackMsg');
-      if (feedback) {
-        feedback.textContent = `✓ Se seleccionaron ${selectedCount} ficha(s) de ${gradeLabel || gradeKey}`;
-        feedback.style.display = 'block';
-        setTimeout(() => {
-          feedback.style.display = 'none';
-        }, 3000);
-      }
-    }
-
-    // 3. Asignar Fichas y Grado a un Usuario (Modal)
-    function openPermisosModal(userId) {
+    // 3. Asignar Carpetas Principales y Grado a un Usuario (Modal)
+    async function openPermisosModal(userId) {
       const user = globalUsuarios.find(u => Number(u.id) === Number(userId));
       if (!user) return;
+
+      // Asegurar que tengamos las carpetas raíz cargadas
+      if (!globalCarpetas.length) {
+        await cargarCarpetasPrincipalesAdmin();
+      }
 
       document.getElementById('modalUserId').value = user.id;
       document.getElementById('modalUserSubtitle').textContent = `Configurando acceso para: ${user.nombre} (${user.email})`;
       document.getElementById('modalUserGrado').value = user.grado === 'Sin grado' ? '' : (user.grado || '');
       document.getElementById('modalUserRol').value = String(user.rol).toLowerCase();
 
-      const userFichasAcceso = user.fichas_acceso ? user.fichas_acceso.split(',').map(s => s.trim()) : [];
+      const userCarpetasAcceso = (user.carpetas_acceso || user.fichas_acceso || '')
+        ? String(user.carpetas_acceso || user.fichas_acceso).split(',').map(s => s.trim())
+        : [];
 
       const checklistContainer = document.getElementById('modalFichasChecklist');
       checklistContainer.innerHTML = '';
 
-      if (!globalFichas.length) {
-        checklistContainer.innerHTML = '<p style="font-size:0.85rem; color:#64748b;">No hay fichas creadas aún.</p>';
+      if (!globalCarpetas.length) {
+        checklistContainer.innerHTML = '<p style="font-size:0.85rem; color:#64748b; padding:12px;">No hay carpetas principales creadas en la base de datos.</p>';
       } else {
-        globalFichas.forEach(f => {
-          const isChecked = userFichasAcceso.includes(String(f.id));
+        globalCarpetas.forEach(c => {
+          const isChecked = userCarpetasAcceso.includes(String(c.id));
           const div = document.createElement('div');
           div.className = 'checkbox-item';
           div.innerHTML = `
-            <input type="checkbox" id="check_ficha_${f.id}" value="${f.id}" ${isChecked ? 'checked' : ''} />
-            <label for="check_ficha_${f.id}" style="cursor:pointer; flex:1;">
-              <strong>#F0${f.id} - ${f.titulo}</strong> <small style="color:#64748b;">(${f.area || 'General'} | Grado: ${f.grado || 'Todos'})</small>
+            <input type="checkbox" id="check_carpeta_${c.id}" value="${c.id}" ${isChecked ? 'checked' : ''} />
+            <label for="check_carpeta_${c.id}" style="cursor:pointer; flex:1; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.1rem;">📁</span>
+              <strong>${c.nombre}</strong>
+              <small style="color:#64748b;">(ID: #${c.id})</small>
             </label>
           `;
           checklistContainer.appendChild(div);
         });
       }
-
-      // Renderizar los botones de selección rápida por grado
-      renderizarBotonesGradosModal();
 
       document.getElementById('permisosModal').classList.add('active');
     }
@@ -1528,7 +1419,7 @@
       document.getElementById('permisosModal').classList.remove('active');
     }
 
-    function seleccionarTodasFichas(marcar = true) {
+    function seleccionarTodasCarpetas(marcar = true) {
       const checkboxes = document.querySelectorAll('#modalFichasChecklist input[type="checkbox"]');
       checkboxes.forEach(cb => {
         cb.checked = marcar;
@@ -1537,8 +1428,8 @@
       const feedback = document.getElementById('selectionFeedbackMsg');
       if (feedback) {
         feedback.textContent = marcar
-          ? `✓ Se seleccionaron todas las fichas (${checkboxes.length})`
-          : '✓ Todas las fichas han sido desmarcadas';
+          ? `✓ Se seleccionaron todas las carpetas (${checkboxes.length})`
+          : '✓ Todas las carpetas han sido desmarcadas';
         feedback.style.display = 'block';
         setTimeout(() => {
           feedback.style.display = 'none';
@@ -1552,9 +1443,9 @@
       const grado = document.getElementById('modalUserGrado').value.trim();
       const rol = document.getElementById('modalUserRol').value;
 
-      // Obtener IDs de fichas seleccionadas
+      // Obtener IDs de carpetas seleccionadas
       const checkboxes = document.querySelectorAll('#modalFichasChecklist input[type="checkbox"]:checked');
-      const fichasIds = Array.from(checkboxes).map(cb => cb.value).join(',');
+      const carpetasIds = Array.from(checkboxes).map(cb => cb.value).join(',');
 
       const btn = document.getElementById('btnSavePermisos');
       btn.disabled = true;
@@ -1567,7 +1458,7 @@
           body: JSON.stringify({
             usuario_id: userId,
             grado: grado,
-            fichas_acceso: fichasIds,
+            carpetas_acceso: carpetasIds,
             rol: rol
           })
         });

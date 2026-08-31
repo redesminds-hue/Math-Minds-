@@ -10,7 +10,7 @@ if ($id <= 0) {
 }
 
 try {
-    $stmt = $conexion->prepare("SELECT ruta_archivo, titulo FROM fichas WHERE id = :id");
+    $stmt = $conexion->prepare("SELECT ruta_archivo, titulo FROM archivos WHERE id = :id");
     $stmt->execute([':id' => $id]);
     $ficha = $stmt->fetch(PDO::FETCH_ASSOC);
 
