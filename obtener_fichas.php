@@ -12,35 +12,30 @@ try {
     $carpetas = [];
     $archivos = [];
 
-    // --- 1. OBTENER CARPETAS ---
+    // --- 1. OBTENER CARPETAS (Ordenadas numéricamente: 1, 2, 3... 10) ---
     if ($carpeta_actual) {
-        // Si ya está dentro de una carpeta permitida, mostramos sus subcarpetas
-        $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id = :parent_id");
+        $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id = :parent_id ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC");
         $stmt_carpetas->execute([':parent_id' => $carpeta_actual]);
         $carpetas = $stmt_carpetas->fetchAll(PDO::FETCH_ASSOC);
     } else {
-        // Si está en la RAÍZ, filtramos qué carpetas principales puede ver
         if ($rol === 'admin') {
-            // El admin ve todas las carpetas principales
-            $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id IS NULL");
+            $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id IS NULL ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC");
             $stmt_carpetas->execute();
         } else {
-            // El estudiante solo ve las carpetas asignadas en 'permisos_carpetas'
             $stmt_carpetas = $conexion->prepare("
                 SELECT c.* FROM carpetas c 
                 INNER JOIN permisos_carpetas p ON c.id = p.carpeta_id 
                 WHERE c.parent_id IS NULL AND p.usuario_id = :usuario_id
+                ORDER BY CAST(c.nombre AS UNSIGNED) ASC, c.nombre ASC
             ");
             $stmt_carpetas->execute([':usuario_id' => $usuario_id]);
         }
         $carpetas = $stmt_carpetas->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- 2. OBTENER ARCHIVOS ---
-    // Solo buscamos archivos si el usuario ya entró a una carpeta
+    // --- 2. OBTENER ARCHIVOS (Ordenados numéricamente: 1, 2, 3...) ---
     if ($carpeta_actual) {
-        // No necesitamos JOIN de permisos aquí, porque la seguridad ya se aplicó en la carpeta padre
-        $stmt_archivos = $conexion->prepare("SELECT * FROM archivos WHERE carpeta_id = :carpeta_id ORDER BY id DESC");
+        $stmt_archivos = $conexion->prepare("SELECT * FROM archivos WHERE carpeta_id = :carpeta_id ORDER BY CAST(titulo AS UNSIGNED) ASC, titulo ASC, id ASC");
         $stmt_archivos->execute([':carpeta_id' => $carpeta_actual]);
         $archivos = $stmt_archivos->fetchAll(PDO::FETCH_ASSOC);
     }

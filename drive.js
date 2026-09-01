@@ -144,12 +144,39 @@ class GoogleDriveManager {
     this.renderizarContenido(carpetasFiltradas, archivosFiltrados, true);
   }
 
+  // Ordenamiento natural numérico (1, 2, 3... 10)
+  ordenarElementos(items, campoNombre = 'nombre') {
+    return [...items].sort((a, b) => {
+      const textoA = String(a[campoNombre] || '').trim();
+      const textoB = String(b[campoNombre] || '').trim();
+
+      const numA = (textoA.match(/\d+/) || [])[0];
+      const numB = (textoB.match(/\d+/) || [])[0];
+
+      if (numA !== undefined && numB !== undefined) {
+        const intA = parseInt(numA, 10);
+        const intB = parseInt(numB, 10);
+        if (intA !== intB) return intA - intB;
+      } else if (numA !== undefined && numB === undefined) {
+        return -1;
+      } else if (numA === undefined && numB !== undefined) {
+        return 1;
+      }
+
+      return textoA.localeCompare(textoB, undefined, { numeric: true, sensitivity: 'base' });
+    });
+  }
+
   // 3. Renderizar Contenido en Cuadrícula (CSS Grid)
   renderizarContenido(carpetas, archivos, esBusqueda = false) {
     if (!this.contentEl) return;
     this.contentEl.innerHTML = '';
 
-    const total = carpetas.length + archivos.length;
+    // Ordenar numéricamente siempre antes de renderizar
+    const carpetasOrdenadas = this.ordenarElementos(carpetas, 'nombre');
+    const archivosOrdenados = this.ordenarElementos(archivos, 'titulo');
+
+    const total = carpetasOrdenadas.length + archivosOrdenados.length;
 
     if (total === 0) {
       this.contentEl.innerHTML = `
@@ -169,21 +196,21 @@ class GoogleDriveManager {
       : 'General';
 
     // --- SECCIÓN 1: CARPETAS ---
-    if (carpetas.length > 0) {
+    if (carpetasOrdenadas.length > 0) {
       const seccionCarpetas = document.createElement('div');
       seccionCarpetas.className = 'drive-section-group';
 
-      if (archivos.length > 0 || this.ruta.length > 1) {
+      if (archivosOrdenados.length > 0 || this.ruta.length > 1) {
         const titleCarpetas = document.createElement('div');
         titleCarpetas.className = 'drive-section-title';
-        titleCarpetas.innerHTML = `📁 Carpetas (${carpetas.length})`;
+        titleCarpetas.innerHTML = `📁 Carpetas (${carpetasOrdenadas.length})`;
         seccionCarpetas.appendChild(titleCarpetas);
       }
 
       const gridCarpetas = document.createElement('div');
       gridCarpetas.className = 'drive-grid-layout';
 
-      carpetas.forEach(c => {
+      carpetasOrdenadas.forEach(c => {
         const nombreLimpio = this.formatearTexto(c.nombre);
         const card = document.createElement('div');
         card.className = 'tarjeta-recurso-carpeta';
@@ -212,21 +239,21 @@ class GoogleDriveManager {
     }
 
     // --- SECCIÓN 2: ARCHIVOS ---
-    if (archivos.length > 0) {
+    if (archivosOrdenados.length > 0) {
       const seccionArchivos = document.createElement('div');
       seccionArchivos.className = 'drive-section-group';
 
-      if (carpetas.length > 0 || this.ruta.length > 1) {
+      if (carpetasOrdenadas.length > 0 || this.ruta.length > 1) {
         const titleArchivos = document.createElement('div');
         titleArchivos.className = 'drive-section-title';
-        titleArchivos.innerHTML = `📄 Archivos (${archivos.length})`;
+        titleArchivos.innerHTML = `📄 Archivos (${archivosOrdenados.length})`;
         seccionArchivos.appendChild(titleArchivos);
       }
 
       const gridArchivos = document.createElement('div');
       gridArchivos.className = 'drive-grid-layout';
 
-      archivos.forEach(a => {
+      archivosOrdenados.forEach(a => {
         const card = this.crearTarjetaArchivo(a, carpetaPadreNombre);
         gridArchivos.appendChild(card);
       });
