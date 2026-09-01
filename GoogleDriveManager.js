@@ -1,6 +1,6 @@
 /**
  * GESTOR DE RECURSOS GOOGLE DRIVE (Vanilla JS)
- * drive.js
+ * GoogleDriveManager.js
  * MATH MINDS
  */
 class GoogleDriveManager {

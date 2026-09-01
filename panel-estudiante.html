@@ -920,27 +920,16 @@
               aria-label="Buscar fichas" />
           </div>
 
-          <!-- Etiqueta de resultados de búsqueda -->
-          <p class="search-results-label" id="searchResultsLabel"></p>
-
-          <!-- Barra de Navegación de Carpetas (Breadcrumbs + Botón Volver) -->
+          <!-- Barra de Navegación de Carpetas (Breadcrumbs) -->
           <div class="folder-nav-header" id="folderNavHeader">
-            <div class="folder-breadcrumbs" id="folderBreadcrumbs">
-              <span class="breadcrumb-item active">📁 Carpetas</span>
+            <div class="drive-breadcrumbs-bar" id="drive-breadcrumbs">
+              <span class="drive-breadcrumb-node active">📁 Mi Unidad</span>
             </div>
-            <button type="button" id="btnVolverCarpeta" class="btn-back-folder" style="display: none;" onclick="volverAtras()">
-              ⬅ Volver
-            </button>
           </div>
 
-          <!-- Filter Tabs (generados dinámicamente según el contenido actual) -->
-          <div class="filter-tabs" id="contenedor-filtros" style="display: none;">
-            <button class="tab-btn active" data-filter="all">Todas</button>
-          </div>
-
-          <!-- Grid Dinámico (Carpetas o Fichas) -->
-          <div id="fichasContainer" class="folder-grid">
-            <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #64748b;">
+          <!-- Contenedor Principal para Tarjetas de Carpetas y Archivos -->
+          <div id="drive-content" class="drive-content-container">
+            <div style="text-align: center; padding: 30px; color: #64748b;">
               ⏳ Consultando fichas asignadas a tu cuenta...
             </div>
           </div>
@@ -950,8 +939,8 @@
     </div>
   </main>
 
-  <!-- Script de Conexión en Vivo con obtener_fichas.php y Gestor Google Drive -->
-  <script src="drive.js"></script>
+  <!-- Script del Gestor Google Drive -->
+  <script src="GoogleDriveManager.js"></script>
   <script>
     let driveManager = null;
 
@@ -987,16 +976,13 @@
 
         // Inicializar el gestor de recursos Google Drive
         driveManager = new GoogleDriveManager({
-          breadcrumbsId: 'folderBreadcrumbs',
-          contentId: 'fichasContainer',
+          breadcrumbsId: 'drive-breadcrumbs',
+          contentId: 'drive-content',
+          searchInputId: 'buscadorFichas',
           endpoint: 'obtener_fichas.php',
           rol: user.rol || 'estudiante',
-          usuarioId: user.id || 0,
-          rootName: 'Mi Unidad',
-          onOpenFile: (archivo) => {
-            const url = archivo.id ? `ver_archivo.php?id=${archivo.id}` : (archivo.ruta_archivo || '#');
-            window.open(url, '_blank');
-          }
+          usuarioId: user.id || 1,
+          rootName: 'Mi Unidad'
         });
 
         driveManager.init();
@@ -1005,11 +991,14 @@
         if (unauthAlert) unauthAlert.classList.add('show');
         if (navUserName) navUserName.textContent = 'Invitado';
         if (navUserEmail) navUserEmail.textContent = 'No autenticado';
-        document.getElementById('fichasContainer').innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
-            ⚠️ Inicia sesión para ver tus recursos y carpetas asignadas.
-          </div>
-        `;
+        const contentEl = document.getElementById('drive-content');
+        if (contentEl) {
+          contentEl.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #ef4444;">
+              ⚠️ Inicia sesión para ver tus recursos y carpetas asignadas.
+            </div>
+          `;
+        }
       }
 
       if (logoutBtn) {

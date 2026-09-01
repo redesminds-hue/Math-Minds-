@@ -8,6 +8,7 @@ $usuario_id = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : 0;
 $carpeta_actual = isset($_GET['carpeta_id']) ? intval($_GET['carpeta_id']) : null;
 
 try {
+    $conexion->exec("SET NAMES utf8mb4");
     $carpetas = [];
     $archivos = [];
 

@@ -1,210 +1,459 @@
 /* ==========================================================================
-   GESTOR DE RECURSOS - ESTILOS TIPO GOOGLE DRIVE
+   GESTOR DE RECURSOS - DISEÑO DE TARJETAS CLÁSICO (GRID & MATERIAL DRIVE)
    ========================================================================== */
 :root {
   --drive-bg: #f8fafc;
   --drive-card-bg: #ffffff;
-  --drive-card-hover: #f1f5f9;
-  --drive-border: #e2e8f0;
-  --drive-text: #1e293b;
+  --drive-card-hover: #ffffff;
+  --drive-border: #e5e7eb;
+  --drive-border-hover: #38bdf8;
+  --drive-text-main: #0f172a;
   --drive-text-muted: #64748b;
-  --drive-primary: #1a73e8;
-  --drive-primary-light: #e8f0fe;
+  --drive-primary: #0284c7;
+  --drive-primary-hover: #0369a1;
+  --drive-primary-light: #e0f2fe;
+  --drive-primary-text: #0369a1;
   --drive-folder-bg: #fef3c7;
   --drive-folder-icon: #d97706;
-  --drive-radius: 12px;
+  --drive-radius: 14px;
   --drive-radius-sm: 8px;
-  --drive-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --drive-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.08);
-  --drive-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --drive-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  --drive-shadow-hover: 0 12px 28px rgba(15, 23, 42, 0.1);
+  --drive-transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Contenedor Principal */
-.drive-manager-container {
-  width: 100%;
-  background: var(--drive-card-bg);
-  border: 1px solid var(--drive-border);
-  border-radius: var(--drive-radius);
-  box-shadow: var(--drive-shadow);
-  padding: 24px;
-  min-height: 480px;
-}
-
-/* Cabecera y Migas de Pan (Breadcrumbs) */
-.drive-breadcrumbs-bar {
+/* ==========================================================================
+   BREADCRUMBS & NAVEGACIÓN SUPERIOR
+   ========================================================================== */
+.drive-breadcrumbs-bar,
+.folder-breadcrumbs {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding-bottom: 16px;
+  padding: 8px 0;
   margin-bottom: 20px;
-  border-bottom: 1px solid var(--drive-border);
+  font-family: inherit;
 }
 
-.drive-breadcrumb-node {
+.drive-breadcrumb-node,
+.breadcrumb-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   color: var(--drive-text-muted);
   font-size: 0.95rem;
   font-weight: 500;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: var(--drive-radius-sm);
   cursor: pointer;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   font-family: inherit;
   transition: var(--drive-transition);
   user-select: none;
 }
 
-.drive-breadcrumb-node:hover {
-  background-color: var(--drive-card-hover);
-  color: var(--drive-primary);
+.drive-breadcrumb-node:hover,
+.breadcrumb-item:hover {
+  background-color: var(--drive-primary-light);
+  color: var(--drive-primary-text);
+  border-color: #bae6fd;
 }
 
-.drive-breadcrumb-node.active {
-  color: var(--drive-text);
+.drive-breadcrumb-node.active,
+.breadcrumb-item.active {
+  color: var(--drive-text-main);
   font-weight: 700;
   cursor: default;
-  background-color: transparent;
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
 }
 
-.drive-breadcrumb-sep {
+.drive-breadcrumb-sep,
+.breadcrumb-sep {
   color: #94a3b8;
   font-size: 0.85rem;
   user-select: none;
+  display: inline-flex;
+  align-items: center;
 }
 
-/* Secciones de Contenido */
+/* ==========================================================================
+   CONTENEDOR Y GRID PRINCIPAL (3 COLUMNAS RESPONSIVE)
+   ========================================================================== */
+.drive-content-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.drive-section-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.drive-grid-layout {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+/* Responsive: 2 columnas en pantallas medianas / tablets */
+@media (max-width: 1100px) {
+  .drive-grid-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Responsive: 1 columna en móviles */
+@media (max-width: 680px) {
+  .drive-grid-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Títulos de sección */
 .drive-section-title {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--drive-text-muted);
   font-weight: 700;
-  margin: 18px 0 12px 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  margin: 4px 0;
 }
 
-.drive-grid-layout {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-/* Tarjetas (Carpetas y Archivos) */
-.drive-item-card {
+/* ==========================================================================
+   TARJETA DE CARPETA (DISEÑO HORIZONTAL ELEGANTE)
+   ========================================================================== */
+.tarjeta-recurso-carpeta {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 16px 20px;
   background-color: var(--drive-card-bg);
   border: 1px solid var(--drive-border);
   border-radius: var(--drive-radius);
+  box-shadow: var(--drive-shadow);
   cursor: pointer;
   transition: var(--drive-transition);
   user-select: none;
   text-decoration: none;
   color: inherit;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-.drive-item-card:hover {
+.tarjeta-recurso-carpeta:hover {
   background-color: var(--drive-card-hover);
-  border-color: #cbd5e1;
+  border-color: var(--drive-border-hover);
   transform: translateY(-2px);
   box-shadow: var(--drive-shadow-hover);
 }
 
-.drive-item-card.folder-type:hover {
-  border-color: var(--drive-primary);
-}
-
-.drive-item-icon {
+.tarjeta-carpeta-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--drive-radius-sm);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: var(--drive-folder-bg);
+  color: var(--drive-folder-icon);
   flex-shrink: 0;
 }
 
-.drive-item-icon.folder {
-  background-color: var(--drive-folder-bg);
-  color: var(--drive-folder-icon);
+.tarjeta-carpeta-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
-.drive-item-icon.file {
-  background-color: var(--drive-primary-light);
-  color: var(--drive-primary);
-}
-
-.drive-item-icon.image {
-  background-color: #fce7f3;
-  color: #db2777;
-}
-
-.drive-item-icon.pdf {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
-.drive-item-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.drive-item-info {
+.tarjeta-carpeta-info {
   flex: 1;
   min-width: 0;
 }
 
-.drive-item-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--drive-text);
+.tarjeta-carpeta-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--drive-text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
 }
 
-.drive-item-sub {
-  font-size: 0.75rem;
+.tarjeta-carpeta-sub {
+  font-size: 0.8rem;
   color: var(--drive-text-muted);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-top: 3px;
   display: block;
 }
 
-/* Estados Vacío / Cargando */
+.tarjeta-carpeta-arrow {
+  color: #94a3b8;
+  font-size: 1.15rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.tarjeta-recurso-carpeta:hover .tarjeta-carpeta-arrow {
+  color: var(--drive-primary);
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
+   TARJETA DE ARCHIVO (DISEÑO COMPLETO TIPO FICHA CON PREVIEW)
+   ========================================================================== */
+.tarjeta-recurso-archivo {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--drive-card-bg);
+  border: 1px solid var(--drive-border);
+  border-radius: var(--drive-radius);
+  box-shadow: var(--drive-shadow);
+  overflow: hidden;
+  transition: var(--drive-transition);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.tarjeta-recurso-archivo:hover {
+  transform: translateY(-4px);
+  border-color: var(--drive-border-hover);
+  box-shadow: var(--drive-shadow-hover);
+}
+
+/* 1. Encabezado de la Tarjeta */
+.tarjeta-archivo-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background-color: #ffffff;
+  min-width: 0;
+}
+
+.tarjeta-archivo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--drive-primary-light);
+  color: var(--drive-primary-text);
+  flex-shrink: 0;
+}
+
+.tarjeta-archivo-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tarjeta-archivo-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--drive-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+/* 2. Contenedor de Miniatura (Thumbnail) */
+.tarjeta-archivo-preview {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: #f8fafc;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tarjeta-archivo-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.3s ease;
+  background-color: #ffffff;
+}
+
+.tarjeta-recurso-archivo:hover .tarjeta-archivo-thumb-img {
+  transform: scale(1.03);
+}
+
+.tarjeta-archivo-fallback-icon {
+  font-size: 3.5rem;
+  color: #94a3b8;
+}
+
+.tarjeta-archivo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.tarjeta-archivo-overlay span {
+  background: #ffffff;
+  color: var(--drive-text-main);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(4px);
+  transition: transform 0.2s ease;
+}
+
+.tarjeta-recurso-archivo:hover .tarjeta-archivo-overlay {
+  opacity: 1;
+}
+
+.tarjeta-recurso-archivo:hover .tarjeta-archivo-overlay span {
+  transform: translateY(0);
+}
+
+/* 3. Cuerpo y Etiquetas (Badges) */
+.tarjeta-archivo-body {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  min-width: 0;
+}
+
+.tarjeta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background-color: var(--drive-primary-light);
+  color: var(--drive-primary-text);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tarjeta-badge-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* 4. Pie de Tarjeta (Footer) */
+.tarjeta-archivo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid #f1f5f9;
+  background-color: #fafafa;
+  margin-top: auto;
+  min-width: 0;
+}
+
+.tarjeta-footer-grade {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--drive-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+}
+
+.btn-descargar-tarjeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--drive-primary);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn-descargar-tarjeta:hover {
+  background-color: var(--drive-primary-light);
+  color: var(--drive-primary-hover);
+}
+
+/* ==========================================================================
+   ESTADOS: VACÍO Y CARGANDO
+   ========================================================================== */
 .drive-status-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 50px 20px;
+  padding: 60px 20px;
   color: var(--drive-text-muted);
   text-align: center;
   gap: 12px;
-  grid-column: 1 / -1;
+  width: 100%;
+  background: #ffffff;
+  border-radius: var(--drive-radius);
+  border: 1px dashed var(--drive-border);
+  box-sizing: border-box;
 }
 
 .drive-status-state svg {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   color: #94a3b8;
 }
 
 .drive-spinner {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: 3px solid var(--drive-border);
   border-top-color: var(--drive-primary);
   border-radius: 50%;
@@ -212,5 +461,7 @@
 }
 
 @keyframes driveSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
