@@ -12,20 +12,39 @@ try {
     $carpetas = [];
     $archivos = [];
 
-    // --- 1. OBTENER CARPETAS (Ordenadas numéricamente: 1, 2, 3... 10) ---
+    // --- 1. OBTENER CARPETAS ---
     if ($carpeta_actual) {
-        $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id = :parent_id ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC");
+        // Obtenemos subcarpetas agrupadas para evitar duplicados si se importaron repetidas
+        $stmt_carpetas = $conexion->prepare("
+            SELECT MIN(id) AS id, nombre, parent_id 
+            FROM carpetas 
+            WHERE parent_id = :parent_id 
+            GROUP BY TRIM(LOWER(nombre)), parent_id 
+            ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC
+        ");
         $stmt_carpetas->execute([':parent_id' => $carpeta_actual]);
         $carpetas = $stmt_carpetas->fetchAll(PDO::FETCH_ASSOC);
     } else {
+        // En la raíz
         if ($rol === 'admin') {
-            $stmt_carpetas = $conexion->prepare("SELECT * FROM carpetas WHERE parent_id IS NULL ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC");
+            $stmt_carpetas = $conexion->prepare("
+                SELECT MIN(id) AS id, nombre, parent_id 
+                FROM carpetas 
+                WHERE parent_id IS NULL 
+                GROUP BY TRIM(LOWER(nombre)), parent_id 
+                ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC
+            ");
             $stmt_carpetas->execute();
         } else {
             $stmt_carpetas = $conexion->prepare("
-                SELECT c.* FROM carpetas c 
-                INNER JOIN permisos_carpetas p ON c.id = p.carpeta_id 
+                SELECT MIN(c.id) AS id, c.nombre, c.parent_id 
+                FROM carpetas c 
+                INNER JOIN permisos_carpetas p ON (
+                    c.id = p.carpeta_id 
+                    OR TRIM(LOWER(c.nombre)) IN (SELECT TRIM(LOWER(c2.nombre)) FROM carpetas c2 WHERE c2.id = p.carpeta_id)
+                )
                 WHERE c.parent_id IS NULL AND p.usuario_id = :usuario_id
+                GROUP BY TRIM(LOWER(c.nombre)), c.parent_id
                 ORDER BY CAST(c.nombre AS UNSIGNED) ASC, c.nombre ASC
             ");
             $stmt_carpetas->execute([':usuario_id' => $usuario_id]);
@@ -33,11 +52,42 @@ try {
         $carpetas = $stmt_carpetas->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- 2. OBTENER ARCHIVOS (Ordenados numéricamente: 1, 2, 3...) ---
+    // --- 2. OBTENER ARCHIVOS ---
     if ($carpeta_actual) {
-        $stmt_archivos = $conexion->prepare("SELECT * FROM archivos WHERE carpeta_id = :carpeta_id ORDER BY CAST(titulo AS UNSIGNED) ASC, titulo ASC, id ASC");
-        $stmt_archivos->execute([':carpeta_id' => $carpeta_actual]);
-        $archivos = $stmt_archivos->fetchAll(PDO::FETCH_ASSOC);
+        // Obtenemos los archivos asociados a esta carpeta y a cualquier carpeta homónima duplicada
+        $stmt_archivos = $conexion->prepare("
+            SELECT DISTINCT a.* 
+            FROM archivos a 
+            WHERE a.carpeta_id = :carpeta_id 
+               OR a.carpeta_id IN (
+                    SELECT c_dup.id FROM carpetas c_dup 
+                    WHERE TRIM(LOWER(c_dup.nombre)) = (SELECT TRIM(LOWER(c_orig.nombre)) FROM carpetas c_orig WHERE c_orig.id = :carpeta_id2)
+                    AND (
+                        c_dup.parent_id = (SELECT c_orig2.parent_id FROM carpetas c_orig2 WHERE c_orig2.id = :carpeta_id3)
+                        OR (c_dup.parent_id IS NULL AND (SELECT c_orig3.parent_id FROM carpetas c_orig3 WHERE c_orig3.id = :carpeta_id4) IS NULL)
+                    )
+               )
+            ORDER BY CAST(a.titulo AS UNSIGNED) ASC, a.titulo ASC, a.id ASC
+        ");
+        $stmt_archivos->execute([
+            ':carpeta_id' => $carpeta_actual,
+            ':carpeta_id2' => $carpeta_actual,
+            ':carpeta_id3' => $carpeta_actual,
+            ':carpeta_id4' => $carpeta_actual
+        ]);
+        $rawArchivos = $stmt_archivos->fetchAll(PDO::FETCH_ASSOC);
+
+        // Desduplicar archivos en memoria por título o enlace de archivo
+        $archivosUnicos = [];
+        $vistosArchivos = [];
+        foreach ($rawArchivos as $arch) {
+            $clave = trim(mb_strtolower($arch['titulo'] ?? '')) . '|' . trim($arch['ruta_archivo'] ?? '');
+            if (!isset($vistosArchivos[$clave])) {
+                $vistosArchivos[$clave] = true;
+                $archivosUnicos[] = $arch;
+            }
+        }
+        $archivos = $archivosUnicos;
     }
 
     echo json_encode([

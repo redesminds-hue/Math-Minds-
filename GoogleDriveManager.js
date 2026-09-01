@@ -144,6 +144,21 @@ class GoogleDriveManager {
     this.renderizarContenido(carpetasFiltradas, archivosFiltrados, true);
   }
 
+  // Desduplicar elementos por nombre / título formateado
+  desduplicarElementos(items, campoNombre = 'nombre') {
+    const vistos = new Set();
+    const unicos = [];
+    for (const item of items) {
+      const nombreNorm = this.formatearTexto(item[campoNombre] || '').toLowerCase().trim();
+      const clave = nombreNorm || String(item.id);
+      if (!vistos.has(clave)) {
+        vistos.add(clave);
+        unicos.push(item);
+      }
+    }
+    return unicos;
+  }
+
   // Ordenamiento natural numérico (1, 2, 3... 10)
   ordenarElementos(items, campoNombre = 'nombre') {
     return [...items].sort((a, b) => {
@@ -172,9 +187,13 @@ class GoogleDriveManager {
     if (!this.contentEl) return;
     this.contentEl.innerHTML = '';
 
-    // Ordenar numéricamente siempre antes de renderizar
-    const carpetasOrdenadas = this.ordenarElementos(carpetas, 'nombre');
-    const archivosOrdenados = this.ordenarElementos(archivos, 'titulo');
+    // 1. Eliminar duplicados si existen homónimos
+    const carpetasUnicas = this.desduplicarElementos(carpetas, 'nombre');
+    const archivosUnicos = this.desduplicarElementos(archivos, 'titulo');
+
+    // 2. Ordenar numéricamente (1, 2, 3... 10)
+    const carpetasOrdenadas = this.ordenarElementos(carpetasUnicas, 'nombre');
+    const archivosOrdenados = this.ordenarElementos(archivosUnicos, 'titulo');
 
     const total = carpetasOrdenadas.length + archivosOrdenados.length;
 
