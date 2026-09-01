@@ -6,11 +6,29 @@ include 'conexion.php';
 $rol = isset($_GET['rol']) ? $_GET['rol'] : 'estudiante';
 $usuario_id = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : 0;
 $carpeta_actual = isset($_GET['carpeta_id']) ? intval($_GET['carpeta_id']) : null;
+$pedir_todas = isset($_GET['todas_carpetas']) ? true : false;
 
 try {
     $conexion->exec("SET NAMES utf8mb4");
     $carpetas = [];
     $archivos = [];
+
+    // Si se solicitan todas las carpetas (para selectores de carpetas)
+    if ($pedir_todas) {
+        $stmt_todas = $conexion->prepare("
+            SELECT id, nombre, parent_id 
+            FROM carpetas 
+            ORDER BY CAST(nombre AS UNSIGNED) ASC, nombre ASC
+        ");
+        $stmt_todas->execute();
+        $todas = $stmt_todas->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            "success" => true,
+            "carpetas" => $todas
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 
     // --- 1. OBTENER CARPETAS ---
     if ($carpeta_actual) {
@@ -88,12 +106,36 @@ try {
             }
         }
         $archivos = $archivosUnicos;
+    } else {
+        // Si estamos en la raíz y es admin, obtener archivos que no tienen carpeta o están en raíz
+        if ($rol === 'admin') {
+            $stmt_archivos = $conexion->prepare("
+                SELECT DISTINCT a.* 
+                FROM archivos a 
+                WHERE a.carpeta_id IS NULL OR a.carpeta_id = 0
+                ORDER BY CAST(a.titulo AS UNSIGNED) ASC, a.titulo ASC, a.id ASC
+            ");
+            $stmt_archivos->execute();
+            $archivos = $stmt_archivos->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
+
+    // Conteos globales para métricas del admin
+    $total_fichas = 0;
+    $total_carpetas = 0;
+    try {
+        $stmt_cf = $conexion->query("SELECT COUNT(*) FROM archivos");
+        if ($stmt_cf) $total_fichas = intval($stmt_cf->fetchColumn());
+        $stmt_cc = $conexion->query("SELECT COUNT(*) FROM carpetas");
+        if ($stmt_cc) $total_carpetas = intval($stmt_cc->fetchColumn());
+    } catch (Exception $e_count) {}
 
     echo json_encode([
         "success" => true,
         "carpetas" => $carpetas,
-        "archivos" => $archivos
+        "archivos" => $archivos,
+        "total_fichas" => $total_fichas,
+        "total_carpetas" => $total_carpetas
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $e) {
